@@ -181,7 +181,7 @@ extension ResultFromJsonExtension on Result {
   ///   errorFn: (e) => ApiError('Invalid data structure')
   /// );
   /// ```
-  static Result<T, E> fromJson<T, E>({
+  Result<T, E> fromJson<T, E>({
     required dynamic json,
     required T Function(Map<dynamic, dynamic> json) fromJsonFn,
     required E Function(dynamic error) errorFn,
@@ -225,7 +225,7 @@ extension ResultFromJsonExtension on Result {
   ///   errorFn: (e) => ApiError('Failed to parse users: ${e.toString()}')
   /// );
   /// ```
-  static Result<T, E> fromJsonList<T, E>({
+  Result<T, E> fromJsonList<T, E>({
     required dynamic json,
     required T Function(List<dynamic> jsonList) fromJsonFn,
     required E Function(dynamic error) errorFn,
@@ -260,7 +260,7 @@ extension ResultFromJsonExtension on Result {
   ///   errorFn: (e) => ApiError('Invalid user data: ${e.toString()}')
   /// );
   /// ```
-  static Result<List<I>, E> fromJsonItems<I, E>({
+  Result<List<I>, E> fromJsonItems<I, E>({
     required dynamic json,
     required I Function(Map<dynamic, dynamic> json) itemFromJsonFn,
     required E Function(dynamic error) errorFn,
@@ -314,7 +314,7 @@ extension ResultFromJsonExtension on Result {
   ///   err: handleError
   /// );
   /// ```
-  static Result<dynamic, E> decodeJson<E>({
+  Result<dynamic, E> decodeJson<E>({
     required dynamic json,
     required E Function(dynamic error) errorFn,
   }) {

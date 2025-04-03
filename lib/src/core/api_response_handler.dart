@@ -1,149 +1,130 @@
-import 'api_err_handler.dart';
-import 'api_handler.dart';
+import 'package:result_handler/src/core/api_err_handler.dart';
 
-/// ApiResponse class that integrates with the Result pattern
+/// Represents a response from an API operation
 ///
-/// This class provides a lightweight container for API operation results,
-/// holding either successful response data or error information. It serves
-/// as a bridge between low-level HTTP operations and the higher-level
-/// ApiResult functional error handling.
+/// Provides a comprehensive and flexible way to handle API responses
+/// with robust error management and type-safe data processing.
 ///
-/// Example:
+/// Key Features:
+/// - Supports various data types (maps, lists, primitives)
+/// - Type-safe data processing
+/// - Comprehensive error handling
+/// - Flexible response transformation methods
+///
+/// This class is designed to simplify API response parsing and
+/// provide a consistent approach to handling different response scenarios.
+///
+/// Example Usage:
 /// ```dart
-/// // Create ApiResponse from a raw HTTP response
-/// Future<ApiResponse> fetchUserData(String userId) async {
-///   try {
-///     final response = await http.get(
-///       Uri.parse('https://api.example.com/users/$userId'),
-///       headers: {'Authorization': 'Bearer $token'},
-///     );
+/// ApiResponse response = await apiClient.get('/users');
 ///
-///     if (response.statusCode >= 200 && response.statusCode < 300) {
-///       // Success case
-///       return ApiResponse.success(
-///         jsonDecode(response.body),
-///         statusCode: response.statusCode,
-///       );
-///     } else {
-///       // Error case with HTTP status code
-///       return ApiResponse.failure(
-///         HttpError(
-///           exception: Exception('HTTP error ${response.statusCode}'),
-///           stackTrace: StackTrace.current,
-///           data: _parseErrorMessage(response.body),
-///         ),
-///         statusCode: response.statusCode,
-///       );
-///     }
-///   } catch (e, stackTrace) {
-///     // Network or parsing error
-///     return ApiResponse.failure(
-///       HttpError(
-///         exception: e,
-///         stackTrace: stackTrace,
-///         data: HttpMessage(
-///           success: false,
-///           title: 'Connection Error',
-///           details: 'Failed to connect to the server'
-///         ),
-///       ),
-///     );
-///   }
-/// }
+/// final users = response.whenList(
+///   ok: (list) => list.map(User.fromJson).toList(),
+///   err: (error) => [],
+/// );
 /// ```
 class ApiResponse {
-  /// The response data for successful API calls
+  /// The raw response data from the API
   ///
-  /// This can be any type depending on the API response format,
-  /// typically a Map<String, dynamic> parsed from JSON or a List.
+  /// Can be of various types: Map, List, String, number,
+  /// or any other JSON-compatible type.
   final dynamic data;
 
-  /// HTTP status code of the response
+  /// The HTTP status code of the response
   ///
-  /// Common values:
-  /// - 200: OK
-  /// - 201: Created
-  /// - 204: No Content
-  /// - 400: Bad Request
-  /// - 401: Unauthorized
-  /// - 404: Not Found
-  /// - 500: Internal Server Error
+  /// Provides context about the request's outcome:
+  /// - 200-299: Successful responses
+  /// - 400-499: Client errors
+  /// - 500-599: Server errors
   final int? statusCode;
 
-  /// Error details if the API call failed
+  /// Detailed error information if the API call failed
   ///
-  /// This will be null for successful responses and populated
-  /// with error information for failures.
+  /// Contains exception details, stack trace, and user-friendly error messages
   final HttpError? error;
 
-  /// Creates a new ApiResponse
+  /// Constructs an [ApiResponse] with optional data, status code, and error
   ///
-  /// This general constructor allows setting all properties directly.
-  /// Usually, the factory constructors [ApiResponse.success] and
-  /// [ApiResponse.failure] are more convenient.
+  /// Allows flexible creation of API responses for different scenarios
+  ///
+  /// Parameters:
+  /// - [statusCode]: HTTP status code of the response
+  /// - [data]: Raw response data
+  /// - [error]: Detailed error information
   ApiResponse({this.statusCode, this.data, this.error});
 
-  /// Creates an ApiResponse indicating success
+  /// Creates a successful API response
   ///
-  /// Use this constructor when an API call succeeds to wrap the
-  /// response data and status code.
+  /// Used when an API call completes successfully with data
+  ///
+  /// Parameters:
+  /// - [data]: Successful response data
+  /// - [statusCode]: Optional HTTP status code
   ///
   /// Example:
   /// ```dart
-  /// final jsonData = jsonDecode(response.body);
-  /// return ApiResponse.success(
-  ///   jsonData,
-  ///   statusCode: response.statusCode,
+  /// final response = ApiResponse.success(
+  ///   {'name': 'John', 'age': 30},
+  ///   statusCode: 200
   /// );
   /// ```
   factory ApiResponse.success(dynamic data, {int? statusCode}) {
     return ApiResponse(data: data, statusCode: statusCode);
   }
 
-  /// Creates an ApiResponse indicating failure
+  /// Creates an API response representing a failure
   ///
-  /// Use this constructor when an API call fails to wrap the
-  /// error information and status code.
+  /// Used when an API call encounters an error
+  ///
+  /// Parameters:
+  /// - [error]: Detailed error information
+  /// - [statusCode]: Optional HTTP status code
   ///
   /// Example:
   /// ```dart
-  /// return ApiResponse.failure(
+  /// final response = ApiResponse.failure(
   ///   HttpError(
-  ///     exception: Exception('Network timeout'),
-  ///     stackTrace: StackTrace.current,
+  ///     exception: Exception('Network error'),
   ///     data: HttpMessage(
   ///       success: false,
   ///       title: 'Connection Error',
-  ///       details: 'Request timed out'
-  ///     ),
+  ///       details: 'Could not connect to server'
+  ///     )
   ///   ),
-  ///   statusCode: null, // No status code for network error
+  ///   statusCode: 500
   /// );
   /// ```
   factory ApiResponse.failure(HttpError error, {int? statusCode}) {
     return ApiResponse(error: error, statusCode: statusCode, data: null);
   }
 
-  /// Handles this response by applying the appropriate function
+  /// Processes the response with separate handlers for success and error cases
   ///
-  /// Similar to the Result.when pattern, this allows processing both
-  /// success and error cases with a single function call.
+  /// Provides a functional approach to handling API responses with flexible error management
+  ///
+  /// This method is useful when:
+  /// - You need to process API responses with different outcomes
+  /// - Want to handle success and error scenarios in a single call
+  /// - Require type-safe error and success processing
+  ///
+  /// Parameters:
+  /// - [ok]: Function to process successful data
+  /// - [err]: Function to handle errors
+  ///
+  /// Returns the result of processing the response based on its state
   ///
   /// Example:
   /// ```dart
-  /// final userInfo = apiResponse.when(
-  ///   ok: (data) {
-  ///     // Process the successful data
-  ///     final Map<String, dynamic> userData = data;
-  ///     return User.fromJson(userData);
-  ///   },
-  ///   err: (error) {
-  ///     // Handle the error
-  ///     print('Error fetching user: ${error.data?.details}');
-  ///     return User.empty(); // Return a default user
-  ///   },
+  /// final userName = response.when(
+  ///   ok: (data) => data['name'],
+  ///   err: (error) => 'Unknown User'
   /// );
   /// ```
+  ///
+  /// Possible scenarios:
+  /// - Successful response: Calls the [ok] function with response data
+  /// - Error response: Calls the [err] function with error details
+  /// - Null data: Treats as an error condition
   T when<T>({
     required T Function(dynamic data) ok,
     required T Function(HttpError error) err,
@@ -151,33 +132,45 @@ class ApiResponse {
     if (error != null) {
       return err(error!);
     }
+
+    if (data == null) {
+      return err(HttpError(
+        exception: Exception('No data in response'),
+        stackTrace: StackTrace.current,
+      ));
+    }
+
     return ok(data);
   }
 
-  /// Processes a response that contains a list
+  /// Processes a list response with flexible map conversion
   ///
-  /// This is a specialized version of [when] designed for handling
-  /// API responses that should contain a list of items.
-  /// It performs type checking and safely converts the data to the
-  /// expected format.
+  /// Converts the list to a list of Map<String, dynamic>
+  ///
+  /// This method is particularly useful when:
+  /// - Dealing with API responses containing lists of objects
+  /// - Need to standardize map structures
+  /// - Handle different map input types
+  ///
+  /// Parameters:
+  /// - [ok]: Function to process the converted list
+  /// - [err]: Function to handle errors
+  ///
+  /// Returns the result of processing the list
   ///
   /// Example:
   /// ```dart
-  /// final usersList = apiResponse.whenList(
-  ///   ok: (userDataList) {
-  ///     // Process the list of user data
-  ///     return userDataList
-  ///         .map((userData) => User.fromJson(userData))
-  ///         .toList();
-  ///   },
-  ///   err: (error) {
-  ///     // Handle the error
-  ///     print('Error fetching users: ${error.data?.details}');
-  ///     return <User>[]; // Return an empty list
-  ///   },
+  /// final users = response.whenList(
+  ///   ok: (list) => list.map(User.fromJson).toList(),
+  ///   err: (error) => [],
   /// );
   /// ```
-  T whenList<T, I>({
+  ///
+  /// Possible scenarios:
+  /// - Successful response: Converts list to Map<String, dynamic>
+  /// - Error response: Calls error handler
+  /// - Non-list data: Treats as an error condition
+  T whenList<T>({
     required T Function(List<Map<String, dynamic>> data) ok,
     required T Function(HttpError error) err,
   }) {
@@ -185,40 +178,182 @@ class ApiResponse {
       return err(error!);
     }
 
-    if (data is List) {
-      try {
-        final List<Map<String, dynamic>> typedList =
-            data.map((item) {
-              if (item is Map<String, dynamic>) {
-                return item;
-              } else {
-                throw FormatException(
-                  'List item is not a Map<String, dynamic>',
-                );
-              }
-            }).toList();
-        return ok(typedList);
-      } catch (e, stack) {
-        return err(
-          HttpError(
-            exception: e,
-            stackTrace: stack,
-            data: HttpMessage.fromException(e),
-          ),
-        );
+    if (data == null) {
+      return err(HttpError(
+        exception: Exception('No data in response'),
+        stackTrace: StackTrace.current,
+      ));
+    }
+
+    if (data is! List) {
+      return err(HttpError(
+        exception: Exception('Expected a list, got ${data.runtimeType}'),
+        stackTrace: StackTrace.current,
+      ));
+    }
+
+    // Convert to List<Map<String, dynamic>>
+    final List<Map<String, dynamic>> typedList = [];
+
+    for (var item in data) {
+      if (item is Map<String, dynamic>) {
+        typedList.add(item);
+      } else if (item is Map) {
+        typedList.add(Map<String, dynamic>.from(item));
       }
     }
 
-    return err(
-      HttpError(
-        exception: Exception('Data is not a list'),
+    return ok(typedList);
+  }
+
+  /// Processes a list response with type-specific conversion
+  ///
+  /// Allows converting a list to a specific type or handling mixed lists
+  ///
+  /// This method is useful when:
+  /// - Need to convert list items to a specific type
+  /// - Want to handle lists with mixed or dynamic content
+  /// - Require flexible list transformation
+  ///
+  /// Parameters:
+  /// - [ok]: Function to process the converted list
+  /// - [err]: Function to handle errors
+  /// - [filterNulls]: Option to remove null values from the list
+  ///
+  /// Returns the result of processing the typed list
+  ///
+  /// Example:
+  /// ```dart
+  /// final numbers = response.whenListType(
+  ///   ok: (list) => list,
+  ///   err: (error) => [],
+  ///   filterNulls: true,
+  /// );
+  /// ```
+  ///
+  /// Possible scenarios:
+  /// - Successful response: Converts list to specified type
+  /// - Error response: Calls error handler
+  /// - Non-list data: Treats as an error condition
+  T whenListType<T, I>({
+    required T Function(List<I> data) ok,
+    required T Function(HttpError error) err,
+    bool filterNulls = false,
+  }) {
+    if (error != null) {
+      return err(error!);
+    }
+
+    if (data == null) {
+      return err(HttpError(
+        exception: Exception('No data in response'),
         stackTrace: StackTrace.current,
-        data: HttpMessage(
-          success: false,
-          title: 'Format Error',
-          details: 'Expected a list but received a different type',
-        ),
-      ),
-    );
+      ));
+    }
+
+    if (data is! List) {
+      return err(HttpError(
+        exception: Exception('Expected a list, got ${data.runtimeType}'),
+        stackTrace: StackTrace.current,
+      ));
+    }
+
+    // Convert to List<I>
+    final List<I> typedList = [];
+
+    for (var item in data) {
+      try {
+        // Attempt direct cast if possible
+        final convertedItem = item is I ? item : null;
+
+        if (convertedItem != null || !filterNulls) {
+          typedList.add(convertedItem as I);
+        }
+      } catch (e) {
+        return err(HttpError(
+          exception: Exception('Error converting item: $e'),
+          stackTrace: StackTrace.current,
+        ));
+      }
+    }
+
+    return ok(typedList);
+  }
+
+  /// Processes a list of JSON maps with dynamic string keys
+  ///
+  /// Provides a comprehensive method to handle API responses that return
+  /// lists of complex, dynamic JSON objects with string keys
+  ///
+  /// This method is particularly useful when dealing with:
+  /// - Configuration lists
+  /// - Dynamic report data
+  /// - Flexible API responses with varying object structures
+  ///
+  /// Parameters:
+  /// - [ok]: Function to process the list of JSON maps
+  /// - [err]: Function to handle errors
+  ///
+  /// Returns the result of processing the list of maps
+  ///
+  /// Example:
+  /// ```dart
+  /// // Fetching a list of dynamic user configurations
+  /// ApiResponse response = await apiClient.get(path: 'user/configurations');
+  ///
+  /// final configurations = response.whenJsonListMap(
+  ///   ok: (configList) => configList.map((config) {
+  ///     return UserConfiguration(
+  ///       id: config['id'],
+  ///       settings: config['settings'] ?? {},
+  ///     );
+  ///   }).toList(),
+  ///   err: (error) => [], // Return empty list on error
+  /// );
+  /// ```
+  ///
+  /// Possible scenarios:
+  /// - Successful response: List of maps with string keys and dynamic values
+  /// - Error response: Returns result of error handler
+  /// - Invalid data: Throws format exception if data is not a list of maps
+  T whenJsonListMap<T>({
+    required T Function(List<Map<String, dynamic>> data) ok,
+    required T Function(HttpError error) err,
+  }) {
+    if (error != null) {
+      return err(error!);
+    }
+
+    if (data == null) {
+      return err(HttpError(
+        exception: Exception('No data in response'),
+        stackTrace: StackTrace.current,
+      ));
+    }
+
+    if (data is! List) {
+      return err(HttpError(
+        exception: Exception('Expected a list, got ${data.runtimeType}'),
+        stackTrace: StackTrace.current,
+      ));
+    }
+
+    // Convert to List<Map<String, dynamic>>
+    final List<Map<String, dynamic>> typedList = [];
+
+    for (var item in data) {
+      if (item is Map<String, dynamic>) {
+        typedList.add(item);
+      } else if (item is Map) {
+        typedList.add(Map<String, dynamic>.from(item));
+      } else {
+        return err(HttpError(
+          exception: Exception('List contains non-map items'),
+          stackTrace: StackTrace.current,
+        ));
+      }
+    }
+
+    return ok(typedList);
   }
 }
