@@ -15,16 +15,19 @@ void main() {
         statusCode: 404,
         exception: Exception('Not found'),
         message: HttpMessage(
-            success: false,
-            title: 'Not Found',
-            details: 'The requested resource could not be found'
+          success: false,
+          title: 'Not Found',
+          details: 'The requested resource could not be found',
         ),
       );
 
       expect(apiErr.statusCode, equals(404));
       expect(apiErr.exception.toString(), equals('Exception: Not found'));
       expect(apiErr.message?.title, equals('Not Found'));
-      expect(apiErr.message?.details, equals('The requested resource could not be found'));
+      expect(
+        apiErr.message?.details,
+        equals('The requested resource could not be found'),
+      );
       expect(apiErr.error, equals('The requested resource could not be found'));
     });
 
@@ -42,9 +45,9 @@ void main() {
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
         data: HttpMessage(
-            success: false,
-            title: 'Connection Error',
-            details: 'Could not connect to the server'
+          success: false,
+          title: 'Connection Error',
+          details: 'Could not connect to the server',
         ),
       );
 
@@ -52,7 +55,10 @@ void main() {
 
       expect(apiErr.exception.toString(), equals('Exception: Network timeout'));
       expect(apiErr.message?.title, equals('Connection Error'));
-      expect(apiErr.message?.details, equals('Could not connect to the server'));
+      expect(
+        apiErr.message?.details,
+        equals('Could not connect to the server'),
+      );
       expect(apiErr.error, equals('Could not connect to the server'));
       expect(apiErr.stackTrace, equals(httpError.stackTrace));
     });
@@ -61,13 +67,16 @@ void main() {
       final apiErr = ApiErr(
         statusCode: 400,
         message: HttpMessage(
-            success: false,
-            title: 'Validation Error',
-            details: 'Invalid email format'
+          success: false,
+          title: 'Validation Error',
+          details: 'Invalid email format',
         ),
       );
 
-      expect(apiErr.toString(), equals('Status: 400 | Validation Error: Invalid email format'));
+      expect(
+        apiErr.toString(),
+        equals('Status: 400 | Validation Error: Invalid email format'),
+      );
     });
 
     test('ApiErr toString with null values', () {
@@ -77,17 +86,13 @@ void main() {
     });
 
     test('ApiErr toString with only exception', () {
-      final apiErr = ApiErr(
-        exception: Exception('Test exception'),
-      );
+      final apiErr = ApiErr(exception: Exception('Test exception'));
 
       expect(apiErr.toString(), equals('Error: Exception: Test exception'));
     });
 
     test('ApiErr toString with status code only', () {
-      final apiErr = ApiErr(
-        statusCode: 500,
-      );
+      final apiErr = ApiErr(statusCode: 500);
 
       expect(apiErr.toString(), equals('Status: 500 | Unknown API error'));
     });
@@ -97,14 +102,17 @@ void main() {
       final apiErr = ApiErr(
         statusCode: 500,
         message: HttpMessage(
-            success: false,
-            title: 'Server Error',
-            details: 'Internal server error'
+          success: false,
+          title: 'Server Error',
+          details: 'Internal server error',
         ),
         stackTrace: stackTrace,
       );
 
-      expect(apiErr.toString(), contains('Status: 500 | Server Error: Internal server error'));
+      expect(
+        apiErr.toString(),
+        contains('Status: 500 | Server Error: Internal server error'),
+      );
       expect(apiErr.toString(), contains('mock stack trace'));
     });
   });
@@ -114,9 +122,9 @@ void main() {
       final exception = Exception('Network error');
       final stackTrace = MockStackTrace();
       final data = HttpMessage(
-          success: false,
-          title: 'Connection Error',
-          details: 'Failed to connect to server'
+        success: false,
+        title: 'Connection Error',
+        details: 'Failed to connect to server',
       );
 
       final httpError = HttpError(
@@ -134,10 +142,7 @@ void main() {
       final stackTrace = MockStackTrace();
 
       // Debería compilar y ejecutarse sin errores
-      final httpError = HttpError(
-        exception: null,
-        stackTrace: stackTrace,
-      );
+      final httpError = HttpError(exception: null, stackTrace: stackTrace);
 
       expect(httpError.exception, isNull);
       expect(httpError.stackTrace, equals(stackTrace));
@@ -148,10 +153,7 @@ void main() {
       final exception = Exception('Network error');
       final stackTrace = MockStackTrace();
 
-      final httpError = HttpError(
-        exception: exception,
-        stackTrace: stackTrace,
-      );
+      final httpError = HttpError(exception: exception, stackTrace: stackTrace);
 
       expect(httpError.exception, equals(exception));
       expect(httpError.stackTrace, equals(stackTrace));
@@ -162,9 +164,9 @@ void main() {
   group('HttpMessage Tests', () {
     test('HttpMessage basic creation', () {
       final message = HttpMessage(
-          success: true,
-          title: 'Success',
-          details: 'Operation completed successfully'
+        success: true,
+        title: 'Success',
+        details: 'Operation completed successfully',
       );
 
       expect(message.success, isTrue);
@@ -173,10 +175,7 @@ void main() {
     });
 
     test('HttpMessage with default success value', () {
-      final message = HttpMessage(
-          title: 'Title',
-          details: 'Details'
-      );
+      final message = HttpMessage(title: 'Title', details: 'Details');
 
       expect(message.success, isTrue);
       expect(message.title, equals('Title'));
@@ -187,7 +186,7 @@ void main() {
       final json = {
         'success': false,
         'title': 'Error Title',
-        'content': 'Error details'
+        'content': 'Error details',
       };
 
       final message = HttpMessage.fromJson(json);
@@ -201,7 +200,7 @@ void main() {
       final json = {
         'success': false,
         'title': 'Error Title',
-        'message': 'Error message'
+        'message': 'Error message',
       };
 
       final message = HttpMessage.fromJson(json);
@@ -223,9 +222,9 @@ void main() {
 
     test('HttpMessage.toJson', () {
       final message = HttpMessage(
-          success: true,
-          title: 'Success',
-          details: 'Operation completed successfully'
+        success: true,
+        title: 'Success',
+        details: 'Operation completed successfully',
       );
 
       final json = message.toJson();
@@ -249,9 +248,9 @@ void main() {
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
         data: HttpMessage(
-            success: false,
-            title: 'Connection Error',
-            details: 'Could not connect to the server'
+          success: false,
+          title: 'Connection Error',
+          details: 'Could not connect to the server',
         ),
       );
 

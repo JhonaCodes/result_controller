@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:result_handler/result_handler.dart';
 
-class MockStackTrace  implements StackTrace {
+class MockStackTrace implements StackTrace {
   @override
   String toString() => 'mock stack trace';
 }
@@ -65,8 +65,8 @@ void main() {
     test('map method should transform error if errorTransform is provided', () {
       final errResult = Err<int, String>('Error message');
       final mappedResult = errResult.map(
-            (value) => value * 2,
-            (error) => 'Transformed: $error',
+        (value) => value * 2,
+        (error) => 'Transformed: $error',
       );
 
       expect(mappedResult.isErr, isTrue);
@@ -76,7 +76,7 @@ void main() {
     test('flatMap method should chain results in success case', () {
       final okResult = Ok<int, String>(42);
       final chainedResult = okResult.flatMap(
-            (value) => Ok<String, String>('Value is $value'),
+        (value) => Ok<String, String>('Value is $value'),
       );
 
       expect(chainedResult.isOk, isTrue);
@@ -86,23 +86,26 @@ void main() {
     test('flatMap method should preserve error', () {
       final errResult = Err<int, String>('Error message');
       final chainedResult = errResult.flatMap(
-            (value) => Ok<String, String>('Value is $value'),
+        (value) => Ok<String, String>('Value is $value'),
       );
 
       expect(chainedResult.isErr, isTrue);
       expect(chainedResult.errorOrNull, equals('Error message'));
     });
 
-    test('flatMap method should transform error if errorTransform is provided', () {
-      final errResult = Err<int, String>('Error message');
-      final chainedResult = errResult.flatMap(
-            (value) => Ok<String, String>('Value is $value'),
-            (error) => Err<String, String>('Transformed: $error'),
-      );
+    test(
+      'flatMap method should transform error if errorTransform is provided',
+      () {
+        final errResult = Err<int, String>('Error message');
+        final chainedResult = errResult.flatMap(
+          (value) => Ok<String, String>('Value is $value'),
+          (error) => Err<String, String>('Transformed: $error'),
+        );
 
-      expect(chainedResult.isErr, isTrue);
-      expect(chainedResult.errorOrNull, equals('Transformed: Error message'));
-    });
+        expect(chainedResult.isErr, isTrue);
+        expect(chainedResult.errorOrNull, equals('Transformed: Error message'));
+      },
+    );
 
     test('trySync method should wrap successful operation', () {
       final result = Result.trySync(() => 42);
@@ -120,8 +123,8 @@ void main() {
 
     test('trySyncMap method should use custom error mapper', () {
       final result = Result.trySyncMap<int, String>(
-            () => throw Exception('Test exception'),
-            (error, stack) => 'Custom error: $error',
+        () => throw Exception('Test exception'),
+        (error, stack) => 'Custom error: $error',
       );
 
       expect(result.isErr, isTrue);
@@ -136,21 +139,26 @@ void main() {
     });
 
     test('tryAsync method should wrap async exception', () async {
-      final result = await Result.tryAsync(() async => throw Exception('Test exception'));
+      final result = await Result.tryAsync(
+        () async => throw Exception('Test exception'),
+      );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.error, contains('Exception: Test exception'));
     });
 
-    test('tryAsyncMap method should use custom error mapper for async operations', () async {
-      final result = await Result.tryAsyncMap<int, String>(
-            () async => throw Exception('Test exception'),
-            (error, stack) => 'Custom async error: $error',
-      );
+    test(
+      'tryAsyncMap method should use custom error mapper for async operations',
+      () async {
+        final result = await Result.tryAsyncMap<int, String>(
+          () async => throw Exception('Test exception'),
+          (error, stack) => 'Custom async error: $error',
+        );
 
-      expect(result.isErr, isTrue);
-      expect(result.errorOrNull, contains('Custom async error:'));
-    });
+        expect(result.isErr, isTrue);
+        expect(result.errorOrNull, contains('Custom async error:'));
+      },
+    );
 
     test('equals and hashCode should work correctly for Ok', () {
       final result1 = Ok<int, String>(42);
@@ -207,7 +215,11 @@ void main() {
     test('GenericResultError with original error', () {
       final originalError = Exception('Original exception');
       final stackTrace = MockStackTrace();
-      final error = GenericResultError('Test error', originalError, stackTrace: stackTrace);
+      final error = GenericResultError(
+        'Test error',
+        originalError,
+        stackTrace: stackTrace,
+      );
 
       expect(error.error, equals('Test error'));
       expect(error.originalError, equals(originalError));

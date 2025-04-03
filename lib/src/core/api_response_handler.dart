@@ -134,10 +134,12 @@ class ApiResponse {
     }
 
     if (data == null) {
-      return err(HttpError(
-        exception: Exception('No data in response'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('No data in response'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     return ok(data);
@@ -179,17 +181,21 @@ class ApiResponse {
     }
 
     if (data == null) {
-      return err(HttpError(
-        exception: Exception('No data in response'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('No data in response'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     if (data is! List) {
-      return err(HttpError(
-        exception: Exception('Expected a list, got ${data.runtimeType}'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('Expected a list, got ${data.runtimeType}'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     // Convert to List<Map<String, dynamic>>
@@ -245,17 +251,21 @@ class ApiResponse {
     }
 
     if (data == null) {
-      return err(HttpError(
-        exception: Exception('No data in response'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('No data in response'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     if (data is! List) {
-      return err(HttpError(
-        exception: Exception('Expected a list, got ${data.runtimeType}'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('Expected a list, got ${data.runtimeType}'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     // Convert to List<I>
@@ -270,10 +280,12 @@ class ApiResponse {
           typedList.add(convertedItem as I);
         }
       } catch (e) {
-        return err(HttpError(
-          exception: Exception('Error converting item: $e'),
-          stackTrace: StackTrace.current,
-        ));
+        return err(
+          HttpError(
+            exception: Exception('Error converting item: $e'),
+            stackTrace: StackTrace.current,
+          ),
+        );
       }
     }
 
@@ -325,17 +337,21 @@ class ApiResponse {
     }
 
     if (data == null) {
-      return err(HttpError(
-        exception: Exception('No data in response'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('No data in response'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     if (data is! List) {
-      return err(HttpError(
-        exception: Exception('Expected a list, got ${data.runtimeType}'),
-        stackTrace: StackTrace.current,
-      ));
+      return err(
+        HttpError(
+          exception: Exception('Expected a list, got ${data.runtimeType}'),
+          stackTrace: StackTrace.current,
+        ),
+      );
     }
 
     // Convert to List<Map<String, dynamic>>
@@ -347,10 +363,12 @@ class ApiResponse {
       } else if (item is Map) {
         typedList.add(Map<String, dynamic>.from(item));
       } else {
-        return err(HttpError(
-          exception: Exception('List contains non-map items'),
-          stackTrace: StackTrace.current,
-        ));
+        return err(
+          HttpError(
+            exception: Exception('List contains non-map items'),
+            stackTrace: StackTrace.current,
+          ),
+        );
       }
     }
 

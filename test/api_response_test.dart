@@ -82,7 +82,6 @@ void main() {
         {'id': 2, 'name': 'Jane'},
       ]);
       final result = response.whenList(
-
         ok: (list) {
           final rr = list.map((item) => item['name']).toList();
           print(rr);
@@ -132,5 +131,4 @@ void main() {
       expect(result, ['Error']);
     });
   });
-
 }

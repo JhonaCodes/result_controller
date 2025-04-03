@@ -9,16 +9,10 @@ class User {
   User({required this.id, required this.name});
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'].toString(),
-      name: json['name'] as String,
-    );
+    return User(id: json['id'].toString(), name: json['name'] as String);
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-  };
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
 
 void main() {
@@ -70,7 +64,9 @@ void main() {
       final errResult = Err<int, String>('Original Error');
 
       final mappedOkResult = okResult.mapError((error) => 'Transformed Error');
-      final mappedErrResult = errResult.mapError((error) => 'Transformed Error');
+      final mappedErrResult = errResult.mapError(
+        (error) => 'Transformed Error',
+      );
 
       expect(mappedOkResult.isOk, isTrue);
       expect(mappedOkResult.data, equals(42));
@@ -156,10 +152,10 @@ void main() {
 
   group('ApiResponseExtensions', () {
     test('toResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.success(
-        {'id': '123', 'name': 'John Doe'},
-        statusCode: 200,
-      );
+      final apiResponse = ApiResponse.success({
+        'id': '123',
+        'name': 'John Doe',
+      }, statusCode: 200);
 
       final result = apiResponse.toResult(User.fromJson);
 
@@ -189,16 +185,13 @@ void main() {
     });
 
     test('toListResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.success(
-        [
-          {'id': '1', 'name': 'John'},
-          {'id': '2', 'name': 'Jane'},
-        ],
-        statusCode: 200,
-      );
+      final apiResponse = ApiResponse.success([
+        {'id': '1', 'name': 'John'},
+        {'id': '2', 'name': 'Jane'},
+      ], statusCode: 200);
 
       final result = apiResponse.toListResult(
-            (items) => items.map(User.fromJson).toList(),
+        (items) => items.map(User.fromJson).toList(),
       );
 
       expect(result.isOk, isTrue);
@@ -222,7 +215,7 @@ void main() {
       );
 
       final result = apiResponse.toListResult(
-            (items) => items.map(User.fromJson).toList(),
+        (items) => items.map(User.fromJson).toList(),
       );
 
       expect(result.isErr, isTrue);

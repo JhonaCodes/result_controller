@@ -17,24 +17,18 @@ class User {
   User({required this.id, required this.name});
 
   factory User.fromJson(Map<dynamic, dynamic> json) {
-    return User(
-      id: json['id'] as String,
-      name: json['name'] as String,
-    );
+    return User(id: json['id'] as String, name: json['name'] as String);
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-  };
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is User &&
-              runtimeType == other.runtimeType &&
-              id == other.id &&
-              name == other.name;
+      other is User &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name;
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode;
@@ -56,9 +50,9 @@ void main() {
       final apiErr = ApiErr(
         statusCode: 404,
         message: HttpMessage(
-            success: false,
-            title: 'Not Found',
-            details: 'Resource not found'
+          success: false,
+          title: 'Not Found',
+          details: 'Resource not found',
         ),
       );
 
@@ -75,9 +69,9 @@ void main() {
         ApiErr(
           statusCode: 500,
           message: HttpMessage(
-              success: false,
-              title: 'Server Error',
-              details: 'Internal server error'
+            success: false,
+            title: 'Server Error',
+            details: 'Internal server error',
           ),
         ),
       );
@@ -117,13 +111,13 @@ void main() {
       final apiErr = ApiErr(statusCode: 500);
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map(
-            (value) => value.toString(),
-            (error) => ApiErr(
+        (value) => value.toString(),
+        (error) => ApiErr(
           statusCode: error.statusCode,
           message: HttpMessage(
-              success: false,
-              title: 'Transformed',
-              details: 'Error was transformed'
+            success: false,
+            title: 'Transformed',
+            details: 'Error was transformed',
           ),
         ),
       );
@@ -136,7 +130,7 @@ void main() {
     test('ApiResult flatMap method', () {
       final okResult = ApiResult<int>.ok(42);
       final chainedResult = okResult.flatMap(
-            (value) => ApiResult<String>.ok('Value: $value'),
+        (value) => ApiResult<String>.ok('Value: $value'),
       );
 
       expect(chainedResult.isOk, isTrue);
@@ -147,7 +141,7 @@ void main() {
       final apiErr = ApiErr(statusCode: 500);
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
-            (value) => ApiResult<String>.ok('Value: $value'),
+        (value) => ApiResult<String>.ok('Value: $value'),
       );
 
       expect(chainedResult.isErr, isTrue);
@@ -158,14 +152,14 @@ void main() {
       final apiErr = ApiErr(statusCode: 500);
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
-            (value) => ApiResult<String>.ok('Value: $value'),
-            (error) => ApiResult<String>.err(
+        (value) => ApiResult<String>.ok('Value: $value'),
+        (error) => ApiResult<String>.err(
           ApiErr(
             statusCode: error.statusCode,
             message: HttpMessage(
-                success: false,
-                title: 'Transformed',
-                details: 'Error was transformed'
+              success: false,
+              title: 'Transformed',
+              details: 'Error was transformed',
             ),
           ),
         ),
@@ -177,10 +171,10 @@ void main() {
     });
 
     test('ApiResult.from with successful response', () {
-      final response = ApiResponse.success(
-        {'id': '123', 'name': 'John Doe'},
-        statusCode: 200,
-      );
+      final response = ApiResponse.success({
+        'id': '123',
+        'name': 'John Doe',
+      }, statusCode: 200);
 
       final result = ApiResult.from<User>(
         response: response,
@@ -198,9 +192,9 @@ void main() {
         exception: Exception('Network error'),
         stackTrace: stackTrace,
         data: HttpMessage(
-            success: false,
-            title: 'Connection Error',
-            details: 'Failed to connect to the server'
+          success: false,
+          title: 'Connection Error',
+          details: 'Failed to connect to the server',
         ),
       );
 
@@ -213,7 +207,10 @@ void main() {
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.message?.title, equals('Connection Error'));
-      expect(result.errorOrNull?.message?.details, equals('Failed to connect to the server'));
+      expect(
+        result.errorOrNull?.message?.details,
+        equals('Failed to connect to the server'),
+      );
     });
 
     test('ApiResult.from with null data', () {
@@ -225,7 +222,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.exception.toString(), contains('No data in response'));
+      expect(
+        result.errorOrNull?.exception.toString(),
+        contains('No data in response'),
+      );
     });
 
     test('ApiResult.from with parsing error', () {
@@ -240,17 +240,17 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
     });
 
     test('ApiResult.fromList with successful response', () {
-      final response = ApiResponse.success(
-        [
-          {'id': '1', 'name': 'User 1'},
-          {'id': '2', 'name': 'User 2'},
-        ],
-        statusCode: 200,
-      );
+      final response = ApiResponse.success([
+        {'id': '1', 'name': 'User 1'},
+        {'id': '2', 'name': 'User 2'},
+      ], statusCode: 200);
 
       final result = ApiResult.fromList<User>(
         response: response,
@@ -269,9 +269,9 @@ void main() {
         exception: Exception('Network error'),
         stackTrace: stackTrace,
         data: HttpMessage(
-            success: false,
-            title: 'Connection Error',
-            details: 'Failed to connect to the server'
+          success: false,
+          title: 'Connection Error',
+          details: 'Failed to connect to the server',
         ),
       );
 
@@ -295,17 +295,17 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.exception.toString(), contains('No data in response'));
+      expect(
+        result.errorOrNull?.exception.toString(),
+        contains('No data in response'),
+      );
     });
 
     test('ApiResult.fromList with parsing error', () {
-      final response = ApiResponse.success(
-        [
-          {'id': 1, 'name': 'User 1'}, // Invalid data types
-          {'id': '2'}, // Missing name
-        ],
-        statusCode: 200,
-      );
+      final response = ApiResponse.success([
+        {'id': 1, 'name': 'User 1'}, // Invalid data types
+        {'id': '2'}, // Missing name
+      ], statusCode: 200);
 
       final result = ApiResult.fromList<User>(
         response: response,
@@ -313,7 +313,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
     });
 
     // Prueba indirecta del manejo JSON a través de API pública
@@ -334,7 +337,8 @@ void main() {
 
     test('ApiResult.fromList with JSON string handling', () {
       // Probar indirectamente la funcionalidad de _ensureJsonList
-      final jsonString = '[{"id":"1","name":"User 1"},{"id":"2","name":"User 2"}]';
+      final jsonString =
+          '[{"id":"1","name":"User 1"},{"id":"2","name":"User 2"}]';
       final response = ApiResponse.success(jsonString, statusCode: 200);
 
       final result = ApiResult.fromList<User>(
@@ -358,7 +362,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
     });
 
     test('ApiResult.fromList with invalid JSON string', () {
@@ -371,7 +378,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
     });
   });
 
