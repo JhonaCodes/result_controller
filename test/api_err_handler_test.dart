@@ -274,10 +274,7 @@ void main() {
     });
 
     test('HttpMessage.fromError with null exception', () {
-      final httpError = HttpErr(
-        exception: null,
-        stackTrace: MockStackTrace(),
-      );
+      final httpError = HttpErr(exception: null, stackTrace: MockStackTrace());
 
       final message = HttpMessage.fromError(httpError);
 
