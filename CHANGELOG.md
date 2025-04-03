@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2]
+## Refactor
+- Cleaning extensions in result.
+### Added
+- More test cases.
+
+
 ## [1.0.1] 
 ## Readme
 - Update readme

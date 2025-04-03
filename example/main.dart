@@ -133,7 +133,7 @@ void demonstrateAsyncErrorHandling() {
 
       // Simulate random failure
       if (DateTime.now().millisecondsSinceEpoch.isEven) {
-        throw Exception('Random network error');
+        return Err('Random network error');
       }
 
       return Ok('Successful data fetch');

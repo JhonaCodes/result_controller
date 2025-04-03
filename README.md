@@ -26,7 +26,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  result_controller: ^1.0.0
+  result_controller: ^1.0.2
 ```
 
 ## Basic Usage
@@ -372,28 +372,6 @@ Future<Result<User, UserError>> fetchUser(String id) async {
   );
 }
 ```
-
-### JSON Processing
-
-Safe JSON parsing with custom error handling:
-
-```dart
-Result<User, ApiErr> parseUserJson(String jsonString) {
-  return Result.fromJson<User, ApiErr>(
-    json: jsonString,
-    fromJsonFn: (json) => User.fromJson(json),
-    errorFn: (e) => ApiErr(
-      exception: e,
-      message: HttpMessage(
-        success: false,
-        title: 'Parse Error',
-        details: 'Invalid user data format',
-      ),
-    ),
-  );
-}
-```
-
 ### Complete API Client Example
 
 Here's a more complete example showing how to use the Result Controller in an API client:
