@@ -2,7 +2,7 @@
 
 A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail. This library implements the Result/Either pattern for elegant error handling.
 
-![result_controller](https://github.com/user-attachments/assets/5988fe09-37ca-4cf2-ae85-ad72e1da9147)
+![result_controller](https://github.com/user-attachments/assets/35b03a5c-e2e9-4a99-8c56-aa6084e82066)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![result_controller](https://img.shields.io/pub/v/result_controller.svg)](https://pub.dev/packages/result_controller)
