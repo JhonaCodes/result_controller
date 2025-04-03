@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:result_handler/src/result_handler.dart';
+import 'package:result_controller/src/result_controller.dart';
 
 import 'api_handler.dart';
 import 'api_response_handler.dart';

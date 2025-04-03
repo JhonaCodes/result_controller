@@ -2,10 +2,10 @@
 
 A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail. This library implements the Result/Either pattern for elegant error handling.
 
-![result_handler](https://github.com/user-attachments/assets/5988fe09-37ca-4cf2-ae85-ad72e1da9147)
+![result_controller](https://github.com/user-attachments/assets/5988fe09-37ca-4cf2-ae85-ad72e1da9147)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![result_handler](https://img.shields.io/pub/v/result_handler.svg)](https://pub.dev/packages/result_handler)
+[![result_controller](https://img.shields.io/pub/v/result_controller.svg)](https://pub.dev/packages/result_controller)
 [![Dart 3](https://img.shields.io/badge/Dart-3%2B-blue.svg)](https://dart.dev/)
 [![Flutter 3.10](https://img.shields.io/badge/Flutter-3%2B-blue.svg)](https://flutter.dev/)
 
@@ -26,7 +26,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  result_handler: ^1.0.0
+  result_controller: ^1.0.0
 ```
 
 ## Basic Usage
@@ -36,7 +36,7 @@ dependencies:
 The foundation of this library is the `Result<T, E>` type which represents either a successful value of type `T` or an error of type `E`.
 
 ```dart
-import 'package:result_handler/result_handler.dart';
+import 'package:result_controller/result_controller.dart';
 
 // Safe division function that can't throw exceptions
 Result<double, String> divideNumbers(int a, int b) {
@@ -112,7 +112,7 @@ stringResult.when(
 The `ApiResponse` class represents a response from an API operation, containing data, status code, and possible error information.
 
 ```dart
-import 'package:result_handler/result_handler.dart';
+import 'package:result_controller/result_controller.dart';
 
 // Create a successful response
 final successResponse = ApiResponse.success(
@@ -488,7 +488,7 @@ The Result Handler library promotes a functional approach to error handling:
 
 ## Contribution
 
-Contributions are welcome! If you have ideas for new features or improvements, please open an [issue](https://github.com/YourUsername/result_handler/issues) or submit a pull request.
+Contributions are welcome! If you have ideas for new features or improvements, please open an [issue](https://github.com/YourUsername/result_controller/issues) or submit a pull request.
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/new-feature`).

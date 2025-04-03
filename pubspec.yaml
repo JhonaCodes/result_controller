@@ -1,4 +1,4 @@
-name: result_handler
+name: result_controller
 description: "Functional error handling with Result pattern. Safely manage operations that can fail, with clean, type-safe error control."
 
 version: 1.0.0

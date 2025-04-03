@@ -1,4 +1,4 @@
-import 'package:result_handler/src/api_err_handler.dart';
+import 'package:result_controller/src/api_err_handler.dart';
 
 /// Represents a response from an API operation
 ///

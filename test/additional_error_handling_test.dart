@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:result_handler/result_handler.dart';
+import 'package:result_controller/result_controller.dart';
 
 import 'api_handler_test.dart';
 
