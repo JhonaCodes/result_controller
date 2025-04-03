@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_controller/result_controller.dart';
 
-import 'additional_error_handling_test.dart';
-
 // Mock class for testing
 class User {
   final String id;
@@ -57,7 +55,8 @@ class Post {
   }
 
   @override
-  int get hashCode => id.hashCode ^ userId.hashCode ^ title.hashCode ^ body.hashCode;
+  int get hashCode =>
+      id.hashCode ^ userId.hashCode ^ title.hashCode ^ body.hashCode;
 }
 
 class Comment {
@@ -97,16 +96,19 @@ class Comment {
   }
 
   @override
-  int get hashCode => id.hashCode ^ postId.hashCode ^ name.hashCode ^ email.hashCode ^ body.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      postId.hashCode ^
+      name.hashCode ^
+      email.hashCode ^
+      body.hashCode;
 }
 
 void main() {
   group('ApiResult complex chains', () {
     test('Chains multiple map operations successfully', () {
       // Start with a successful user result
-      final userResult = ApiResult<User>.ok(
-        User(id: '1', name: 'John Doe'),
-      );
+      final userResult = ApiResult<User>.ok(User(id: '1', name: 'John Doe'));
 
       // Chain multiple map operations
       final result = userResult
@@ -159,8 +161,8 @@ void main() {
 
       // Chain with error transformation
       final result = errorResult.map(
-            (user) => user.name,
-            (error) => ApiErr(
+        (user) => user.name,
+        (error) => ApiErr(
           statusCode: 500,
           message: HttpMessage(
             success: false,
@@ -194,30 +196,33 @@ void main() {
           .map(
             (user) => user.name,
             (error) => ApiErr(
-          statusCode: 400,
-          message: HttpMessage(
-            success: false,
-            title: 'First Transform',
-            details: 'Step 1: ${error.message?.details}',
-          ),
-        ),
-      )
+              statusCode: 400,
+              message: HttpMessage(
+                success: false,
+                title: 'First Transform',
+                details: 'Step 1: ${error.message?.details}',
+              ),
+            ),
+          )
           .map(
             (name) => name.toUpperCase(),
             (error) => ApiErr(
-          statusCode: 500,
-          message: HttpMessage(
-            success: false,
-            title: 'Second Transform',
-            details: 'Step 2: ${error.message?.details}',
-          ),
-        ),
-      );
+              statusCode: 500,
+              message: HttpMessage(
+                success: false,
+                title: 'Second Transform',
+                details: 'Step 2: ${error.message?.details}',
+              ),
+            ),
+          );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.statusCode, equals(500));
       expect(result.errorOrNull?.message?.title, equals('Second Transform'));
-      expect(result.errorOrNull?.message?.details, contains('Step 2: Step 1: User not found'));
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Step 2: Step 1: User not found'),
+      );
     });
   });
 
@@ -237,8 +242,20 @@ void main() {
 
       ApiResult<List<Comment>> getPostComments(Post post) {
         return ApiResult.ok([
-          Comment(id: '1', postId: post.id, name: 'Comment 1', email: 'user1@example.com', body: 'Great post!'),
-          Comment(id: '2', postId: post.id, name: 'Comment 2', email: 'user2@example.com', body: 'Interesting'),
+          Comment(
+            id: '1',
+            postId: post.id,
+            name: 'Comment 1',
+            email: 'user1@example.com',
+            body: 'Great post!',
+          ),
+          Comment(
+            id: '2',
+            postId: post.id,
+            name: 'Comment 2',
+            email: 'user2@example.com',
+            body: 'Interesting',
+          ),
         ]);
       }
 
@@ -247,11 +264,7 @@ void main() {
         return getUserPosts(user).flatMap((posts) {
           final firstPost = posts.first;
           return getPostComments(firstPost).map((comments) {
-            return {
-              'user': user,
-              'post': firstPost,
-              'comments': comments,
-            };
+            return {'user': user, 'post': firstPost, 'comments': comments};
           });
         });
       });
@@ -284,7 +297,13 @@ void main() {
 
       ApiResult<List<Comment>> getPostComments(Post post) {
         return ApiResult.ok([
-          Comment(id: '1', postId: post.id, name: 'Comment 1', email: 'user1@example.com', body: 'Great post!'),
+          Comment(
+            id: '1',
+            postId: post.id,
+            name: 'Comment 1',
+            email: 'user1@example.com',
+            body: 'Great post!',
+          ),
         ]);
       }
 
@@ -293,18 +312,17 @@ void main() {
         return getUserPosts(user).flatMap((posts) {
           final firstPost = posts.first;
           return getPostComments(firstPost).map((comments) {
-            return {
-              'user': user,
-              'post': firstPost,
-              'comments': comments,
-            };
+            return {'user': user, 'post': firstPost, 'comments': comments};
           });
         });
       });
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.statusCode, equals(500));
-      expect(result.errorOrNull?.message?.details, contains('Failed to fetch posts for user 1'));
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Failed to fetch posts for user 1'),
+      );
     });
 
     test('Error recovery in the middle of a chain', () {
@@ -328,30 +346,40 @@ void main() {
 
       ApiResult<List<Post>> getFallbackPosts(User user) {
         return ApiResult.ok([
-          Post(id: '999', userId: user.id, title: 'Fallback Post', body: 'Fallback Content'),
+          Post(
+            id: '999',
+            userId: user.id,
+            title: 'Fallback Post',
+            body: 'Fallback Content',
+          ),
         ]);
       }
 
       // Chain operations with recovery
       final result = getUser('1').flatMap((user) {
-        return getUserPosts(user).recover((error) {
-          if (error.statusCode == 500) {
-            // Recovery logic
-            return getFallbackPosts(user);
-          }
-          return ApiResult.err(error); // Propagate other errors
-        }).flatMap((posts) {
-          return ApiResult.ok({
-            'user': user,
-            'posts': posts,
-            'postsCount': posts.length,
-          });
-        });
+        return getUserPosts(user)
+            .recover((error) {
+              if (error.statusCode == 500) {
+                // Recovery logic
+                return getFallbackPosts(user);
+              }
+              return ApiResult.err(error); // Propagate other errors
+            })
+            .flatMap((posts) {
+              return ApiResult.ok({
+                'user': user,
+                'posts': posts,
+                'postsCount': posts.length,
+              });
+            });
       });
 
       expect(result.isOk, isTrue);
       expect(result.data['user'], isA<User>());
-      expect((result.data['posts'] as List<Post>).first.title, equals('Fallback Post'));
+      expect(
+        (result.data['posts'] as List<Post>).first.title,
+        equals('Fallback Post'),
+      );
       expect(result.data['postsCount'], equals(1));
     });
 
@@ -374,50 +402,54 @@ void main() {
       }
 
       // Chain with complex error handling
-      final result = getUser('404').flatMap(
-            (user) => ApiResult.ok('User: ${user.name}'),
-            (error) {
-          if (error.statusCode == 404) {
-            return ApiResult.err(
-              ApiErr(
-                statusCode: 404,
-                message: HttpMessage(
-                  success: false,
-                  title: 'Custom Not Found',
-                  details: 'Could not find the requested user. Please try another ID.',
-                ),
+      final result = getUser(
+        '404',
+      ).flatMap((user) => ApiResult.ok('User: ${user.name}'), (error) {
+        if (error.statusCode == 404) {
+          return ApiResult.err(
+            ApiErr(
+              statusCode: 404,
+              message: HttpMessage(
+                success: false,
+                title: 'Custom Not Found',
+                details:
+                    'Could not find the requested user. Please try another ID.',
               ),
-            );
-          } else if (error.statusCode == 401) {
-            return ApiResult.err(
-              ApiErr(
-                statusCode: 401,
-                message: HttpMessage(
-                  success: false,
-                  title: 'Authentication Required',
-                  details: 'Please login to access this resource.',
-                ),
+            ),
+          );
+        } else if (error.statusCode == 401) {
+          return ApiResult.err(
+            ApiErr(
+              statusCode: 401,
+              message: HttpMessage(
+                success: false,
+                title: 'Authentication Required',
+                details: 'Please login to access this resource.',
               ),
-            );
-          } else {
-            return ApiResult.err(
-              ApiErr(
-                statusCode: 500,
-                message: HttpMessage(
-                  success: false,
-                  title: 'System Error',
-                  details: 'An unexpected error occurred. Original error: ${error.message?.details}',
-                ),
+            ),
+          );
+        } else {
+          return ApiResult.err(
+            ApiErr(
+              statusCode: 500,
+              message: HttpMessage(
+                success: false,
+                title: 'System Error',
+                details:
+                    'An unexpected error occurred. Original error: ${error.message?.details}',
               ),
-            );
-          }
-        },
-      );
+            ),
+          );
+        }
+      });
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.statusCode, equals(404));
       expect(result.errorOrNull?.message?.title, equals('Custom Not Found'));
-      expect(result.errorOrNull?.message?.details, contains('Could not find the requested user'));
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Could not find the requested user'),
+      );
     });
 
     test('Deep nested flatMap chain with type transformations', () {
@@ -425,27 +457,41 @@ void main() {
       final initialResult = ApiResult<String>.ok('123');
 
       // Chain of operations with type changes
-      final result = initialResult.flatMap((userId) {
-        // Convert string to User
-        final user = User(id: userId, name: 'User $userId');
-        return ApiResult<User>.ok(user);
-      }).flatMap((user) {
-        // Convert User to List<Post>
-        final posts = [
-          Post(id: '1', userId: user.id, title: 'Post 1', body: 'Content 1'),
-          Post(id: '2', userId: user.id, title: 'Post 2', body: 'Content 2'),
-        ];
-        return ApiResult<List<Post>>.ok(posts);
-      }).flatMap((posts) {
-        // Convert List<Post> to Post count
-        return ApiResult<int>.ok(posts.length);
-      }).flatMap((postCount) {
-        // Convert post count to message
-        return ApiResult<Map<String, dynamic>>.ok({
-          'message': 'Found $postCount posts',
-          'count': postCount,
-        });
-      });
+      final result = initialResult
+          .flatMap((userId) {
+            // Convert string to User
+            final user = User(id: userId, name: 'User $userId');
+            return ApiResult<User>.ok(user);
+          })
+          .flatMap((user) {
+            // Convert User to List<Post>
+            final posts = [
+              Post(
+                id: '1',
+                userId: user.id,
+                title: 'Post 1',
+                body: 'Content 1',
+              ),
+              Post(
+                id: '2',
+                userId: user.id,
+                title: 'Post 2',
+                body: 'Content 2',
+              ),
+            ];
+            return ApiResult<List<Post>>.ok(posts);
+          })
+          .flatMap((posts) {
+            // Convert List<Post> to Post count
+            return ApiResult<int>.ok(posts.length);
+          })
+          .flatMap((postCount) {
+            // Convert post count to message
+            return ApiResult<Map<String, dynamic>>.ok({
+              'message': 'Found $postCount posts',
+              'count': postCount,
+            });
+          });
 
       expect(result.isOk, isTrue);
       expect(result.data['message'], equals('Found 2 posts'));
@@ -491,15 +537,32 @@ void main() {
 
       // Create different error scenarios
       final networkError = ApiResult<User>.err(
-        ApiErr(statusCode: 0, exception: Exception('Network connection failed')),
+        ApiErr(
+          statusCode: 0,
+          exception: Exception('Network connection failed'),
+        ),
       );
 
       final authError = ApiResult<User>.err(
-        ApiErr(statusCode: 401, message: HttpMessage(success: false, title: 'Unauthorized', details: 'Token expired')),
+        ApiErr(
+          statusCode: 401,
+          message: HttpMessage(
+            success: false,
+            title: 'Unauthorized',
+            details: 'Token expired',
+          ),
+        ),
       );
 
       final serverError = ApiResult<User>.err(
-        ApiErr(statusCode: 500, message: HttpMessage(success: false, title: 'Internal Error', details: 'Database failure')),
+        ApiErr(
+          statusCode: 500,
+          message: HttpMessage(
+            success: false,
+            title: 'Internal Error',
+            details: 'Database failure',
+          ),
+        ),
       );
 
       // Apply different error handlers based on status code
@@ -515,74 +578,92 @@ void main() {
       }
 
       // Process each error
-      final processedNetworkError = networkError.map((user) => user, processError);
+      final processedNetworkError = networkError.map(
+        (user) => user,
+        processError,
+      );
       final processedAuthError = authError.map((user) => user, processError);
-      final processedServerError = serverError.map((user) => user, processError);
+      final processedServerError = serverError.map(
+        (user) => user,
+        processError,
+      );
 
       // Check results
-      expect(processedNetworkError.errorOrNull?.message?.title, equals('Network Error'));
-      expect(processedAuthError.errorOrNull?.message?.title, equals('Authentication Error'));
-      expect(processedServerError.errorOrNull?.message?.title, equals('Server Error'));
+      expect(
+        processedNetworkError.errorOrNull?.message?.title,
+        equals('Network Error'),
+      );
+      expect(
+        processedAuthError.errorOrNull?.message?.title,
+        equals('Authentication Error'),
+      );
+      expect(
+        processedServerError.errorOrNull?.message?.title,
+        equals('Server Error'),
+      );
     });
 
     test('Error transformation in nested operations', () {
       // Create a chain of operations with nested errors
       final result = ApiResult<String>.ok('start')
           .flatMap((value) {
-        // First flatMap returns an error
-        return ApiResult<int>.err(
-          ApiErr(
-            statusCode: 400,
-            message: HttpMessage(
-              success: false,
-              title: 'Level 1 Error',
-              details: 'Error at first level',
-            ),
-          ),
-        );
-      })
+            // First flatMap returns an error
+            return ApiResult<int>.err(
+              ApiErr(
+                statusCode: 400,
+                message: HttpMessage(
+                  success: false,
+                  title: 'Level 1 Error',
+                  details: 'Error at first level',
+                ),
+              ),
+            );
+          })
           .flatMap(
             (value) {
-          // This would transform the success value
-          return ApiResult<bool>.ok(value > 0);
-        },
+              // This would transform the success value
+              return ApiResult<bool>.ok(value > 0);
+            },
             (error) {
-          // This transforms the Level 1 error
-          return ApiResult<bool>.err(
-            ApiErr(
-              statusCode: error.statusCode,
-              message: HttpMessage(
-                success: false,
-                title: 'Transformed Level 1',
-                details: 'Transformed: ${error.message?.details}',
-              ),
-            ),
-          );
-        },
-      )
+              // This transforms the Level 1 error
+              return ApiResult<bool>.err(
+                ApiErr(
+                  statusCode: error.statusCode,
+                  message: HttpMessage(
+                    success: false,
+                    title: 'Transformed Level 1',
+                    details: 'Transformed: ${error.message?.details}',
+                  ),
+                ),
+              );
+            },
+          )
           .flatMap(
             (value) {
-          // This would transform the success value again
-          return ApiResult<String>.ok(value ? 'Yes' : 'No');
-        },
+              // This would transform the success value again
+              return ApiResult<String>.ok(value ? 'Yes' : 'No');
+            },
             (error) {
-          // This transforms the Level 2 error
-          return ApiResult<String>.err(
-            ApiErr(
-              statusCode: error.statusCode,
-              message: HttpMessage(
-                success: false,
-                title: 'Final Error',
-                details: 'Final: ${error.message?.details}',
-              ),
-            ),
+              // This transforms the Level 2 error
+              return ApiResult<String>.err(
+                ApiErr(
+                  statusCode: error.statusCode,
+                  message: HttpMessage(
+                    success: false,
+                    title: 'Final Error',
+                    details: 'Final: ${error.message?.details}',
+                  ),
+                ),
+              );
+            },
           );
-        },
-      );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.message?.title, equals('Final Error'));
-      expect(result.errorOrNull?.message?.details, contains('Final: Transformed: Error at first level'));
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Final: Transformed: Error at first level'),
+      );
     });
 
     test('Error recovery with fallback value in complex chain', () {
@@ -591,39 +672,43 @@ void main() {
 
       final result = initialValue
           .flatMap((value) {
-        if (value > 5) {
-          // Produce an error in the middle of the chain
-          return ApiResult<String>.err(
-            ApiErr(
-              statusCode: 400,
-              message: HttpMessage(
-                success: false,
-                title: 'Value Too Large',
-                details: 'Value $value exceeds maximum of 5',
-              ),
-            ),
-          );
-        }
-        return ApiResult<String>.ok('Value is $value');
-      })
+            if (value > 5) {
+              // Produce an error in the middle of the chain
+              return ApiResult<String>.err(
+                ApiErr(
+                  statusCode: 400,
+                  message: HttpMessage(
+                    success: false,
+                    title: 'Value Too Large',
+                    details: 'Value $value exceeds maximum of 5',
+                  ),
+                ),
+              );
+            }
+            return ApiResult<String>.ok('Value is $value');
+          })
           .recover((error) {
-        // Recover from the error with a fallback value
-        return ApiResult<String>.ok('Fallback: Error was ${error.message?.details}');
-      })
+            // Recover from the error with a fallback value
+            return ApiResult<String>.ok(
+              'Fallback: Error was ${error.message?.details}',
+            );
+          })
           .flatMap((value) {
-        // Continue the chain with the recovered value
-        return ApiResult<Map<String, dynamic>>.ok({
-          'originalOrFallback': value,
-          'processed': true,
-        });
-      });
+            // Continue the chain with the recovered value
+            return ApiResult<Map<String, dynamic>>.ok({
+              'originalOrFallback': value,
+              'processed': true,
+            });
+          });
 
       expect(result.isOk, isTrue);
       expect(result.data['originalOrFallback'], contains('Fallback'));
-      expect(result.data['originalOrFallback'], contains('Value 10 exceeds maximum of 5'));
+      expect(
+        result.data['originalOrFallback'],
+        contains('Value 10 exceeds maximum of 5'),
+      );
       expect(result.data['processed'], isTrue);
     });
-
   });
 
   group('ApiResult unexpected data handling', () {
@@ -641,7 +726,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
     });
 
     test('Handles API schema changes gracefully', () {
@@ -695,8 +783,14 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
-      expect(result.errorOrNull?.message?.details, contains('Missing required field: name'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Missing required field: name'),
+      );
     });
 
     test('Handles unexpected data types gracefully', () {

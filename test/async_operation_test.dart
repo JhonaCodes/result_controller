@@ -56,7 +56,7 @@ void main() {
       // Use tryAsyncMap to wrap the operation
       final result = await Result.tryAsyncMap<User, ApiErr>(
         fetchUser,
-            (error, stackTrace) => ApiErr(
+        (error, stackTrace) => ApiErr(
           statusCode: 500,
           message: HttpMessage(
             success: false,
@@ -80,39 +80,42 @@ void main() {
       }
 
       // Use tryAsyncMap to wrap the operation with error mapping
-      final result = await Result.tryAsyncMap<User, ApiErr>(
-        fetchUser,
-            (error, stackTrace) {
-          if (error is NetworkTimeoutException) {
-            return ApiErr(
-              statusCode: 408,
-              message: HttpMessage(
-                success: false,
-                title: 'Request Timeout',
-                details: 'The request timed out: ${error.message}',
-              ),
-              exception: error,
-              stackTrace: stackTrace,
-            );
-          }
-
+      final result = await Result.tryAsyncMap<User, ApiErr>(fetchUser, (
+        error,
+        stackTrace,
+      ) {
+        if (error is NetworkTimeoutException) {
           return ApiErr(
-            statusCode: 500,
+            statusCode: 408,
             message: HttpMessage(
               success: false,
-              title: 'Unknown Error',
-              details: 'An unexpected error occurred: $error',
+              title: 'Request Timeout',
+              details: 'The request timed out: ${error.message}',
             ),
             exception: error,
             stackTrace: stackTrace,
           );
-        },
-      );
+        }
+
+        return ApiErr(
+          statusCode: 500,
+          message: HttpMessage(
+            success: false,
+            title: 'Unknown Error',
+            details: 'An unexpected error occurred: $error',
+          ),
+          exception: error,
+          stackTrace: stackTrace,
+        );
+      });
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.statusCode, equals(408));
       expect(result.errorOrNull?.message?.title, equals('Request Timeout'));
-      expect(result.errorOrNull?.message?.details, contains('Connection timed out'));
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Connection timed out'),
+      );
       expect(result.errorOrNull?.exception, isA<NetworkTimeoutException>());
     });
 
@@ -124,34 +127,34 @@ void main() {
       }
 
       // Use tryAsyncMap to wrap the operation with error mapping
-      final result = await Result.tryAsyncMap<User, ApiErr>(
-        fetchUser,
-            (error, stackTrace) {
-          if (error is ApiException) {
-            return ApiErr(
-              statusCode: error.statusCode,
-              message: HttpMessage(
-                success: false,
-                title: 'API Error',
-                details: error.message,
-              ),
-              exception: error,
-              stackTrace: stackTrace,
-            );
-          }
-
+      final result = await Result.tryAsyncMap<User, ApiErr>(fetchUser, (
+        error,
+        stackTrace,
+      ) {
+        if (error is ApiException) {
           return ApiErr(
-            statusCode: 500,
+            statusCode: error.statusCode,
             message: HttpMessage(
               success: false,
-              title: 'Unknown Error',
-              details: 'An unexpected error occurred: $error',
+              title: 'API Error',
+              details: error.message,
             ),
             exception: error,
             stackTrace: stackTrace,
           );
-        },
-      );
+        }
+
+        return ApiErr(
+          statusCode: 500,
+          message: HttpMessage(
+            success: false,
+            title: 'Unknown Error',
+            details: 'An unexpected error occurred: $error',
+          ),
+          exception: error,
+          stackTrace: stackTrace,
+        );
+      });
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.statusCode, equals(404));
@@ -168,39 +171,45 @@ void main() {
       }
 
       // Use tryAsyncMap to wrap the operation with error mapping
-      final result = await Result.tryAsyncMap<User, ApiErr>(
-        fetchUser,
-            (error, stackTrace) {
-          if (error is AuthException) {
-            return ApiErr(
-              statusCode: 401,
-              message: HttpMessage(
-                success: false,
-                title: 'Authentication Failed',
-                details: error.message,
-              ),
-              exception: error,
-              stackTrace: stackTrace,
-            );
-          }
-
+      final result = await Result.tryAsyncMap<User, ApiErr>(fetchUser, (
+        error,
+        stackTrace,
+      ) {
+        if (error is AuthException) {
           return ApiErr(
-            statusCode: 500,
+            statusCode: 401,
             message: HttpMessage(
               success: false,
-              title: 'Unknown Error',
-              details: 'An unexpected error occurred: $error',
+              title: 'Authentication Failed',
+              details: error.message,
             ),
             exception: error,
             stackTrace: stackTrace,
           );
-        },
-      );
+        }
+
+        return ApiErr(
+          statusCode: 500,
+          message: HttpMessage(
+            success: false,
+            title: 'Unknown Error',
+            details: 'An unexpected error occurred: $error',
+          ),
+          exception: error,
+          stackTrace: stackTrace,
+        );
+      });
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.statusCode, equals(401));
-      expect(result.errorOrNull?.message?.title, equals('Authentication Failed'));
-      expect(result.errorOrNull?.message?.details, contains('Invalid or expired token'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Authentication Failed'),
+      );
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Invalid or expired token'),
+      );
       expect(result.errorOrNull?.exception, isA<AuthException>());
     });
 
@@ -214,7 +223,7 @@ void main() {
       // Use tryAsyncMap to wrap the operation
       final result = await Result.tryAsyncMap<User, ApiErr>(
         fetchUser,
-            (error, stackTrace) => ApiErr(
+        (error, stackTrace) => ApiErr(
           statusCode: 500,
           message: HttpMessage(
             success: false,
@@ -248,12 +257,17 @@ void main() {
         return Ok(User(id: id, name: 'User $id'));
       }
 
-      Future<Result<List<String>, ApiErr>> fetchUserPermissions(User user) async {
+      Future<Result<List<String>, ApiErr>> fetchUserPermissions(
+        User user,
+      ) async {
         await Future.delayed(Duration(milliseconds: 30));
         return Ok(['read', 'write', 'delete']);
       }
 
-      Future<Result<Map<String, dynamic>, ApiErr>> buildUserProfile(User user, List<String> permissions) async {
+      Future<Result<Map<String, dynamic>, ApiErr>> buildUserProfile(
+        User user,
+        List<String> permissions,
+      ) async {
         await Future.delayed(Duration(milliseconds: 40));
         return Ok({
           'user': user,
@@ -282,7 +296,10 @@ void main() {
 
       Result<Map<String, dynamic>, ApiErr> profileResult;
       if (permissionsResult.isOk) {
-        profileResult = await buildUserProfile(userResult.data, permissionsResult.data);
+        profileResult = await buildUserProfile(
+          userResult.data,
+          permissionsResult.data,
+        );
       } else {
         profileResult = Err(permissionsResult.errorOrNull!);
       }
@@ -291,7 +308,10 @@ void main() {
       expect(profileResult.data['user'], isA<User>());
       expect(profileResult.data['permissions'], isA<List<String>>());
       expect(profileResult.data['isAdmin'], isFalse);
-      expect((profileResult.data['permissions'] as List<String>).length, equals(3));
+      expect(
+        (profileResult.data['permissions'] as List<String>).length,
+        equals(3),
+      );
     });
 
     test('breaks chain at first error and preserves context', () async {
@@ -316,7 +336,9 @@ void main() {
         );
       }
 
-      Future<Result<List<String>, ApiErr>> fetchUserPermissions(User user) async {
+      Future<Result<List<String>, ApiErr>> fetchUserPermissions(
+        User user,
+      ) async {
         await Future.delayed(Duration(milliseconds: 30));
         return Ok(['read', 'write', 'delete']);
       }
@@ -350,7 +372,10 @@ void main() {
 
       expect(profileResult.isErr, isTrue);
       expect(profileResult.errorOrNull?.statusCode, equals(404));
-      expect(profileResult.errorOrNull?.message?.details, contains('User with ID 123 not found'));
+      expect(
+        profileResult.errorOrNull?.message?.details,
+        contains('User with ID 123 not found'),
+      );
     });
 
     test('allows error recovery in the middle of a chain', () async {
@@ -381,7 +406,9 @@ void main() {
         return Ok(User(id: 'default', name: 'Guest User'));
       }
 
-      Future<Result<List<String>, ApiErr>> fetchUserPermissions(User user) async {
+      Future<Result<List<String>, ApiErr>> fetchUserPermissions(
+        User user,
+      ) async {
         await Future.delayed(Duration(milliseconds: 30));
         if (user.id == 'default') {
           return Ok(['read']); // Limited permissions for guest
@@ -398,7 +425,9 @@ void main() {
       }
 
       // Second operation: fetch user details with recovery
-      Result<User, ApiErr> userResult = await fetchUserDetails(userIdResult.data);
+      Result<User, ApiErr> userResult = await fetchUserDetails(
+        userIdResult.data,
+      );
 
       // Recovery step: If user not found, use default user
       if (!userResult.isOk && userResult.errorOrNull?.statusCode == 404) {
@@ -449,7 +478,9 @@ void main() {
 
     test('preserves error in mapped Future<Result>', () async {
       // Create a Future<Result> with error
-      Future<Result<int, String>> futureResult = Future.value(Err('Test error'));
+      Future<Result<int, String>> futureResult = Future.value(
+        Err('Test error'),
+      );
 
       // Apply map
       final mappedFuture = futureResult.map((value) => value * 2);
@@ -477,7 +508,9 @@ void main() {
 
     test('flatMap preserves error in Future<Result> chain', () async {
       // Create a Future<Result> with error
-      Future<Result<int, String>> futureResult = Future.value(Err('Initial error'));
+      Future<Result<int, String>> futureResult = Future.value(
+        Err('Initial error'),
+      );
 
       // Apply flatMap
       final chainedFuture = futureResult.flatMap((value) async {
@@ -493,33 +526,31 @@ void main() {
 
     test('complex chain of async operations with different types', () async {
       // Start with a Future<Result>
-      Future<Result<int, ApiErr>> futureResult = Future.value(
-        Ok(42),
-      );
+      Future<Result<int, ApiErr>> futureResult = Future.value(Ok(42));
 
       // Build a complex chain
       final finalResult = await futureResult
           .map((value) => value.toString())
           .flatMap((strValue) async {
-        await Future.delayed(Duration(milliseconds: 50));
-        return Ok<double, ApiErr>(double.parse(strValue) / 10);
-      })
+            await Future.delayed(Duration(milliseconds: 50));
+            return Ok<double, ApiErr>(double.parse(strValue) / 10);
+          })
           .flatMap((doubleValue) async {
-        await Future.delayed(Duration(milliseconds: 50));
-        if (doubleValue < 1.0) {
-          return Err<String, ApiErr>(
-            ApiErr(
-              statusCode: 400,
-              message: HttpMessage(
-                success: false,
-                title: 'Invalid Value',
-                details: 'Value too small: $doubleValue',
-              ),
-            ),
-          );
-        }
-        return Ok<String, ApiErr>('Final: $doubleValue');
-      });
+            await Future.delayed(Duration(milliseconds: 50));
+            if (doubleValue < 1.0) {
+              return Err<String, ApiErr>(
+                ApiErr(
+                  statusCode: 400,
+                  message: HttpMessage(
+                    success: false,
+                    title: 'Invalid Value',
+                    details: 'Value too small: $doubleValue',
+                  ),
+                ),
+              );
+            }
+            return Ok<String, ApiErr>('Final: $doubleValue');
+          });
 
       expect(finalResult.isOk, isTrue);
       expect(finalResult.data, equals('Final: 4.2'));
@@ -536,7 +567,9 @@ void main() {
           // Set up a timer to complete after timeout
           Timer(timeout, () {
             if (!completer.isCompleted) {
-              completer.completeError(NetworkTimeoutException('Operation timed out'));
+              completer.completeError(
+                NetworkTimeoutException('Operation timed out'),
+              );
             }
           });
 
@@ -549,13 +582,14 @@ void main() {
 
           // Attempt to get the result, may throw if timer triggers first
           return Result.tryAsyncMap<String, ApiErr>(
-                () => completer.future,
-                (error, stackTrace) => ApiErr(
+            () => completer.future,
+            (error, stackTrace) => ApiErr(
               statusCode: 408,
               message: HttpMessage(
                 success: false,
                 title: 'Timeout',
-                details: 'Operation timed out after ${timeout.inMilliseconds}ms',
+                details:
+                    'Operation timed out after ${timeout.inMilliseconds}ms',
               ),
               exception: error,
               stackTrace: stackTrace,
@@ -650,12 +684,14 @@ void main() {
       expect(results[2].errorOrNull?.statusCode, equals(500));
 
       // Combine results handling both success and failures
-      final combinedResult = results.map((result) {
-        return result.when(
-          ok: (data) => 'Success: $data',
-          err: (error) => 'Error: ${error.message?.details}',
-        );
-      }).join(' | ');
+      final combinedResult = results
+          .map((result) {
+            return result.when(
+              ok: (data) => 'Success: $data',
+              err: (error) => 'Error: ${error.message?.details}',
+            );
+          })
+          .join(' | ');
 
       expect(combinedResult, contains('Success: Resource 1 data'));
       expect(combinedResult, contains('Success: Resource 2 data'));
@@ -664,7 +700,9 @@ void main() {
 
     test('handles specific network error scenarios', () async {
       // Simulate different network errors
-      Future<Result<String, ApiErr>> simulateNetworkError(String errorType) async {
+      Future<Result<String, ApiErr>> simulateNetworkError(
+        String errorType,
+      ) async {
         await Future.delayed(Duration(milliseconds: 50));
 
         switch (errorType) {
@@ -719,7 +757,10 @@ void main() {
       expect(dnsError.errorOrNull?.message?.title, equals('DNS Error'));
 
       expect(connectionError.isErr, isTrue);
-      expect(connectionError.errorOrNull?.message?.title, equals('Connection Error'));
+      expect(
+        connectionError.errorOrNull?.message?.title,
+        equals('Connection Error'),
+      );
 
       expect(timeoutError.isErr, isTrue);
       expect(timeoutError.errorOrNull?.statusCode, equals(408));
@@ -839,10 +880,14 @@ void main() {
 
       // Count by status
       final successCount = results.where((r) => r.isOk).length;
-      final notFoundCount = results.where((r) =>
-      r.isErr && r.errorOrNull?.statusCode == 404).length;
-      final serverErrorCount = results.where((r) =>
-      r.isErr && r.errorOrNull?.statusCode == 500).length;
+      final notFoundCount =
+          results
+              .where((r) => r.isErr && r.errorOrNull?.statusCode == 404)
+              .length;
+      final serverErrorCount =
+          results
+              .where((r) => r.isErr && r.errorOrNull?.statusCode == 500)
+              .length;
 
       // We should have 90 successes, 5 not founds, and 5 server errors
       expect(successCount, equals(90));

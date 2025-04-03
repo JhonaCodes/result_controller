@@ -10,10 +10,7 @@ class TestObject {
   TestObject({required this.id, required this.name});
 
   factory TestObject.fromJson(Map<String, dynamic> json) {
-    return TestObject(
-      id: json['id'].toString(),
-      name: json['name'] as String,
-    );
+    return TestObject(id: json['id'].toString(), name: json['name'] as String);
   }
 
   @override
@@ -212,13 +209,13 @@ void main() {
           'id': '1',
           'name': 'Item 1',
           'metadata': {'created': '2023-01-01', 'updated': '2023-01-02'},
-          'tags': ['tag1', 'tag2']
+          'tags': ['tag1', 'tag2'],
         },
         {
           'id': '2',
           'name': 'Item 2',
           'metadata': {'created': '2023-02-01', 'updated': '2023-02-02'},
-          'tags': ['tag3', 'tag4']
+          'tags': ['tag3', 'tag4'],
         },
       ]);
 
@@ -263,9 +260,10 @@ void main() {
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
-        err: (error) => <TestObject>[
-          TestObject(id: 'error', name: 'Error object')
-        ],
+        err:
+            (error) => <TestObject>[
+              TestObject(id: 'error', name: 'Error object'),
+            ],
       );
 
       expect(result.length, equals(1));
@@ -277,9 +275,10 @@ void main() {
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
-        err: (error) => <TestObject>[
-          TestObject(id: 'error', name: 'Error object')
-        ],
+        err:
+            (error) => <TestObject>[
+              TestObject(id: 'error', name: 'Error object'),
+            ],
       );
 
       expect(result, isEmpty);
@@ -290,9 +289,10 @@ void main() {
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
-        err: (error) => <TestObject>[
-          TestObject(id: 'error', name: 'Error object')
-        ],
+        err:
+            (error) => <TestObject>[
+              TestObject(id: 'error', name: 'Error object'),
+            ],
       );
 
       expect(result.length, equals(1));
@@ -304,9 +304,10 @@ void main() {
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
-        err: (error) => <TestObject>[
-          TestObject(id: 'error', name: 'Error object')
-        ],
+        err:
+            (error) => <TestObject>[
+              TestObject(id: 'error', name: 'Error object'),
+            ],
       );
 
       expect(result.length, equals(1));
@@ -318,9 +319,10 @@ void main() {
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
-        err: (error) => <TestObject>[
-          TestObject(id: 'error', name: 'Error object')
-        ],
+        err:
+            (error) => <TestObject>[
+              TestObject(id: 'error', name: 'Error object'),
+            ],
       );
 
       expect(result.length, equals(1));
@@ -335,13 +337,14 @@ void main() {
           'items': [
             {'id': '1', 'name': 'Item 1'},
             {'id': '2', 'name': 'Item 2'},
-          ]
-        }
+          ],
+        },
       });
 
       final result = response.when(
         ok: (data) {
-          final itemsList = (data['data']['items'] as List).cast<Map<String, dynamic>>();
+          final itemsList =
+              (data['data']['items'] as List).cast<Map<String, dynamic>>();
           return itemsList.map((item) => TestObject.fromJson(item)).toList();
         },
         err: (error) => <TestObject>[],
@@ -377,15 +380,21 @@ void main() {
           'id': '123',
           'name': null,
           'settings': null,
-          'friends': [null, {'id': '456', 'name': 'Friend'}]
-        }
+          'friends': [
+            null,
+            {'id': '456', 'name': 'Friend'},
+          ],
+        },
       });
 
       final result = response.when(
         ok: (data) {
           final userData = data['user'] as Map<String, dynamic>;
           final hasFriends = userData['friends'] != null;
-          final friendCount = hasFriends ? (userData['friends'] as List).where((f) => f != null).length : 0;
+          final friendCount =
+              hasFriends
+                  ? (userData['friends'] as List).where((f) => f != null).length
+                  : 0;
           return 'User ID: ${userData['id']}, Has name: ${userData['name'] != null}, Friend count: $friendCount';
         },
         err: (error) => 'Error',
@@ -395,24 +404,36 @@ void main() {
     });
 
     test('handles different status codes with appropriate responses', () {
-      final okResponse = ApiResponse.success({'status': 'success'}, statusCode: 200);
-      final createdResponse = ApiResponse.success({'id': 'new-id'}, statusCode: 201);
+      final okResponse = ApiResponse.success({
+        'status': 'success',
+      }, statusCode: 200);
+      final createdResponse = ApiResponse.success({
+        'id': 'new-id',
+      }, statusCode: 201);
       final notModifiedResponse = ApiResponse(statusCode: 304);
       final badRequestResponse = ApiResponse.failure(
-          HttpError(
-            exception: Exception('Bad request'),
-            stackTrace: TestStackTrace(),
-            data: HttpMessage(success: false, title: 'Error', details: 'Bad request'),
+        HttpError(
+          exception: Exception('Bad request'),
+          stackTrace: TestStackTrace(),
+          data: HttpMessage(
+            success: false,
+            title: 'Error',
+            details: 'Bad request',
           ),
-          statusCode: 400
+        ),
+        statusCode: 400,
       );
       final serverErrorResponse = ApiResponse.failure(
-          HttpError(
-            exception: Exception('Server error'),
-            stackTrace: TestStackTrace(),
-            data: HttpMessage(success: false, title: 'Error', details: 'Server error'),
+        HttpError(
+          exception: Exception('Server error'),
+          stackTrace: TestStackTrace(),
+          data: HttpMessage(
+            success: false,
+            title: 'Error',
+            details: 'Server error',
           ),
-          statusCode: 500
+        ),
+        statusCode: 500,
       );
 
       // Process different status codes
