@@ -20,8 +20,7 @@ import 'ok_handler.dart';
 ///   err: (error) => print('Error: $error')
 /// );
 /// ```
-abstract class Result<T,E>{
-
+abstract class Result<T, E> {
   /// Handles both success and error cases with appropriate functions.
   ///
   /// Example:
@@ -31,7 +30,10 @@ abstract class Result<T,E>{
   ///   err: (error) => showErrorMessage(error)
   /// );
   /// ```
-  R when<R>({required R Function(T value) ok, required R Function(E error) err});
+  R when<R>({
+    required R Function(T value) ok,
+    required R Function(E error) err,
+  });
 
   /// Transforms the success value while preserving the Result structure.
   ///
@@ -57,7 +59,10 @@ abstract class Result<T,E>{
   ///   err: (error) => showErrorMessage(error)
   /// );
   /// ```
-  Result<R, E> flatMap<R>(Result<R, E> Function(T value) ok, [Result<R, E> Function(E error)? err]);
+  Result<R, E> flatMap<R>(
+    Result<R, E> Function(T value) ok, [
+    Result<R, E> Function(E error)? err,
+  ]);
 
   /// Accesses the success value directly, throwing an error if the Result is an Err.
   ///
@@ -66,8 +71,9 @@ abstract class Result<T,E>{
   R whenData<R>(R Function(T) ok) {
     return this.when(
       ok: ok,
-      err: (error) =>
-      throw StateError('Cannot access data on Err value: $error'),
+      err:
+          (error) =>
+              throw StateError('Cannot access data on Err value: $error'),
     );
   }
 
@@ -75,10 +81,7 @@ abstract class Result<T,E>{
   ///
   /// Returns null for Ok results.
   R? whenError<R>(R Function(E) err) {
-    return this.when(
-      ok: (_) => null,
-      err: err,
-    );
+    return this.when(ok: (_) => null, err: err);
   }
 
   /// Executes a function that might throw and wraps the result.
@@ -95,13 +98,7 @@ abstract class Result<T,E>{
     try {
       return Ok(fn());
     } catch (e, stackTrace) {
-      return Err(
-        GenericResultError(
-          e.toString(),
-          e,
-          stackTrace: stackTrace,
-        ),
-      );
+      return Err(GenericResultError(e.toString(), e, stackTrace: stackTrace));
     }
   }
 
@@ -115,17 +112,13 @@ abstract class Result<T,E>{
   ///     err: (error) => handleApiError(error)
   ///   ));
   /// ```
-  static Future<Result<T, ResultError>> tryAsync<T>(Future<T> Function() fn) async {
+  static Future<Result<T, ResultError>> tryAsync<T>(
+    Future<T> Function() fn,
+  ) async {
     try {
       return Ok(await fn());
     } catch (e, stackTrace) {
-      return Err(
-        GenericResultError(
-          e.toString(),
-          e,
-          stackTrace: stackTrace,
-        ),
-      );
+      return Err(GenericResultError(e.toString(), e, stackTrace: stackTrace));
     }
   }
 
@@ -142,9 +135,9 @@ abstract class Result<T,E>{
   /// );
   /// ```
   static Result<T, E> trySyncMap<T, E>(
-      T Function() fn,
-      E Function(dynamic error, StackTrace stackTrace) errorMapper
-      ) {
+    T Function() fn,
+    E Function(dynamic error, StackTrace stackTrace) errorMapper,
+  ) {
     try {
       return Ok(fn());
     } catch (e, stackTrace) {
@@ -165,9 +158,9 @@ abstract class Result<T,E>{
   /// ));
   /// ```
   static Future<Result<T, E>> tryAsyncMap<T, E>(
-      Future<T> Function() fn,
-      E Function(dynamic error, StackTrace stackTrace) errorMapper
-      ) async {
+    Future<T> Function() fn,
+    E Function(dynamic error, StackTrace stackTrace) errorMapper,
+  ) async {
     try {
       return Ok(await fn());
     } catch (e, stackTrace) {
@@ -190,10 +183,8 @@ abstract class Result<T,E>{
   E? get errorOrNull => this.whenError((error) => error);
 
   @override
-  String toString() => this.when(
-    ok: (data) => 'Ok($data)',
-    err: (error) => 'Err($error)',
-  );
+  String toString() =>
+      this.when(ok: (data) => 'Ok($data)', err: (error) => 'Err($error)');
 
   @override
   bool operator ==(Object other) {
@@ -204,10 +195,8 @@ abstract class Result<T,E>{
   }
 
   @override
-  int get hashCode => this.when(
-    ok: (data) => data.hashCode,
-    err: (error) => error.hashCode,
-  );
+  int get hashCode =>
+      this.when(ok: (data) => data.hashCode, err: (error) => error.hashCode);
 }
 
 /// Base class for all result errors

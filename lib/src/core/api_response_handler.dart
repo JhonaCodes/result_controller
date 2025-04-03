@@ -1,5 +1,6 @@
 import 'api_err_handler.dart';
 import 'api_handler.dart';
+
 /// ApiResponse class that integrates with the Result pattern
 ///
 /// This class provides a lightweight container for API operation results,
@@ -96,10 +97,7 @@ class ApiResponse {
   /// );
   /// ```
   factory ApiResponse.success(dynamic data, {int? statusCode}) {
-    return ApiResponse(
-      data: data,
-      statusCode: statusCode,
-    );
+    return ApiResponse(data: data, statusCode: statusCode);
   }
 
   /// Creates an ApiResponse indicating failure
@@ -123,11 +121,7 @@ class ApiResponse {
   /// );
   /// ```
   factory ApiResponse.failure(HttpError error, {int? statusCode}) {
-    return ApiResponse(
-      error: error,
-      statusCode: statusCode,
-      data: null,
-    );
+    return ApiResponse(error: error, statusCode: statusCode, data: null);
   }
 
   /// Handles this response by applying the appropriate function
@@ -193,31 +187,38 @@ class ApiResponse {
 
     if (data is List) {
       try {
-        final List<Map<String, dynamic>> typedList = data.map((item) {
-          if (item is Map<String, dynamic>) {
-            return item;
-          } else {
-            throw FormatException('List item is not a Map<String, dynamic>');
-          }
-        }).toList();
+        final List<Map<String, dynamic>> typedList =
+            data.map((item) {
+              if (item is Map<String, dynamic>) {
+                return item;
+              } else {
+                throw FormatException(
+                  'List item is not a Map<String, dynamic>',
+                );
+              }
+            }).toList();
         return ok(typedList);
       } catch (e, stack) {
-        return err(HttpError(
-          exception: e,
-          stackTrace: stack,
-          data: HttpMessage.fromException(e),
-        ));
+        return err(
+          HttpError(
+            exception: e,
+            stackTrace: stack,
+            data: HttpMessage.fromException(e),
+          ),
+        );
       }
     }
 
-    return err(HttpError(
-      exception: Exception('Data is not a list'),
-      stackTrace: StackTrace.current,
-      data: HttpMessage(
-        success: false,
-        title: 'Format Error',
-        details: 'Expected a list but received a different type',
+    return err(
+      HttpError(
+        exception: Exception('Data is not a list'),
+        stackTrace: StackTrace.current,
+        data: HttpMessage(
+          success: false,
+          title: 'Format Error',
+          details: 'Expected a list but received a different type',
+        ),
       ),
-    ));
+    );
   }
 }

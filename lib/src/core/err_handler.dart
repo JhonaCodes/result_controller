@@ -32,10 +32,7 @@ class Err<T, E> extends Result<T, E> {
   ///
   /// Since this is an Err instance, the [ok] function is ignored.
   @override
-  R when<R>({
-    required R Function(T) ok,
-    required R Function(E) err,
-  }) {
+  R when<R>({required R Function(T) ok, required R Function(E) err}) {
     return err(error);
   }
 
@@ -49,7 +46,10 @@ class Err<T, E> extends Result<T, E> {
   /// Err<int, String>('Invalid input').map((x) => x * 2) // Results in Err('Invalid input')
   /// ```
   @override
-  Result<R, E> map<R>(R Function(T value) transform, [E Function(E error)? err]) {
+  Result<R, E> map<R>(
+    R Function(T value) transform, [
+    E Function(E error)? err,
+  ]) {
     if (err != null) {
       return Err(err(error));
     }
@@ -66,7 +66,10 @@ class Err<T, E> extends Result<T, E> {
   ///   .flatMap((user) => fetchUserPosts(user.id)) // This is never called
   /// ```
   @override
-  Result<R, E> flatMap<R>(Result<R, E> Function(T value) ok, [Result<R, E> Function(E error)? err]) {
+  Result<R, E> flatMap<R>(
+    Result<R, E> Function(T value) ok, [
+    Result<R, E> Function(E error)? err,
+  ]) {
     if (err != null) {
       return err(error);
     }

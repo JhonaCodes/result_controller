@@ -90,9 +90,9 @@ class ApiErr extends ResultError {
     this.message,
     StackTrace? stackTrace,
   }) : super(
-      message?.details ?? exception?.toString() ?? 'Unknown API error',
-      stackTrace: stackTrace
-  );
+         message?.details ?? exception?.toString() ?? 'Unknown API error',
+         stackTrace: stackTrace,
+       );
 
   /// Creates an API error from an HTTP error
   ///
@@ -241,9 +241,5 @@ class HttpError {
   ///   ),
   /// );
   /// ```
-  HttpError({
-    required this.exception,
-    required this.stackTrace,
-    this.data,
-  });
+  HttpError({required this.exception, required this.stackTrace, this.data});
 }

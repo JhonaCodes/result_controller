@@ -33,10 +33,7 @@ class Ok<T, E> extends Result<T, E> {
   ///
   /// Since this is an Ok instance, the [err] function is ignored.
   @override
-  R when<R>({
-    required R Function(T) ok,
-    required R Function(E) err,
-  }) {
+  R when<R>({required R Function(T) ok, required R Function(E) err}) {
     return ok(data);
   }
 
@@ -47,7 +44,10 @@ class Ok<T, E> extends Result<T, E> {
   /// Ok(5).map((x) => x * 2) // Results in Ok(10)
   /// ```
   @override
-  Result<R, E> map<R>(R Function(T value) transform, [E Function(E error)? err]) {
+  Result<R, E> map<R>(
+    R Function(T value) transform, [
+    E Function(E error)? err,
+  ]) {
     return Ok(transform(data));
   }
 
@@ -60,7 +60,10 @@ class Ok<T, E> extends Result<T, E> {
   /// fetchUser(id).flatMap((user) => fetchUserPosts(user.id))
   /// ```
   @override
-  Result<R, E> flatMap<R>(Result<R, E> Function(T value) ok, [Result<R, E> Function(E error)? err]) {
+  Result<R, E> flatMap<R>(
+    Result<R, E> Function(T value) ok, [
+    Result<R, E> Function(E error)? err,
+  ]) {
     return ok(data);
   }
 }

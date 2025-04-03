@@ -47,13 +47,10 @@ extension FutureResultExtensions<T, E> on Future<Result<T, E>> {
   ///   ));
   /// ```
   Future<Result<R, E>> flatMap<R>(
-      Future<Result<R, E>> Function(T value) transform,
-      ) async {
+    Future<Result<R, E>> Function(T value) transform,
+  ) async {
     final result = await this;
-    return result.when(
-      ok: transform,
-      err: (error) => Err(error),
-    );
+    return result.when(ok: transform, err: (error) => Err(error));
   }
 }
 
@@ -94,10 +91,7 @@ extension ResultExtensions<T, E> on Result<T, E> {
   ///   )
   /// ```
   Result<T, E> recover(Result<T, E> Function(E error) transform) {
-    return when(
-      ok: (value) => Ok(value),
-      err: transform,
-    );
+    return when(ok: (value) => Ok(value), err: transform);
   }
 
   /// Gets the success value or extracts a value from the error
@@ -112,10 +106,7 @@ extension ResultExtensions<T, E> on Result<T, E> {
   /// );
   /// ```
   T getOrElse(T Function(E error) orElse) {
-    return when(
-      ok: (value) => value,
-      err: orElse,
-    );
+    return when(ok: (value) => value, err: orElse);
   }
 
   /// Gets the success value or falls back to a default value
@@ -128,10 +119,7 @@ extension ResultExtensions<T, E> on Result<T, E> {
   /// final count = countItems().getOrDefault(0);
   /// ```
   T getOrDefault(T defaultValue) {
-    return when(
-      ok: (value) => value,
-      err: (_) => defaultValue,
-    );
+    return when(ok: (value) => value, err: (_) => defaultValue);
   }
 }
 
@@ -170,7 +158,6 @@ extension ResultCollectionExtensions<T, E> on Result<List<T>, E> {
   }
 }
 
-
 /// Extensions for creating [Result] objects from JSON data
 extension ResultFromJsonExtension on Result {
   /// Creates a Result from a JSON parsing operation
@@ -199,25 +186,22 @@ extension ResultFromJsonExtension on Result {
     required T Function(Map<dynamic, dynamic> json) fromJsonFn,
     required E Function(dynamic error) errorFn,
   }) {
-    return Result.trySyncMap<T, E>(
-          () {
-        // Handle different input types
-        if (json is String) {
-          // If input is a JSON string, decode it first
-          final decoded = jsonDecode(json);
-          if (decoded is! Map) {
-            throw FormatException('JSON root is not an object');
-          }
-          return fromJsonFn(decoded);
-        } else if (json is Map) {
-          // If input is already a Map
-          return fromJsonFn(json);
-        } else {
-          throw FormatException('Input is neither a JSON string nor a Map');
+    return Result.trySyncMap<T, E>(() {
+      // Handle different input types
+      if (json is String) {
+        // If input is a JSON string, decode it first
+        final decoded = jsonDecode(json);
+        if (decoded is! Map) {
+          throw FormatException('JSON root is not an object');
         }
-      },
-          (error, stack) => errorFn(error),
-    );
+        return fromJsonFn(decoded);
+      } else if (json is Map) {
+        // If input is already a Map
+        return fromJsonFn(json);
+      } else {
+        throw FormatException('Input is neither a JSON string nor a Map');
+      }
+    }, (error, stack) => errorFn(error));
   }
 
   /// Creates a Result from a JSON array parsing operation
@@ -246,25 +230,22 @@ extension ResultFromJsonExtension on Result {
     required T Function(List<dynamic> jsonList) fromJsonFn,
     required E Function(dynamic error) errorFn,
   }) {
-    return Result.trySyncMap<T, E>(
-          () {
-        // Handle different input types
-        if (json is String) {
-          // If input is a JSON string, decode it first
-          final decoded = jsonDecode(json);
-          if (decoded is! List) {
-            throw FormatException('JSON root is not an array');
-          }
-          return fromJsonFn(decoded);
-        } else if (json is List) {
-          // If input is already a List
-          return fromJsonFn(json);
-        } else {
-          throw FormatException('Input is neither a JSON string nor a List');
+    return Result.trySyncMap<T, E>(() {
+      // Handle different input types
+      if (json is String) {
+        // If input is a JSON string, decode it first
+        final decoded = jsonDecode(json);
+        if (decoded is! List) {
+          throw FormatException('JSON root is not an array');
         }
-      },
-          (error, stack) => errorFn(error),
-    );
+        return fromJsonFn(decoded);
+      } else if (json is List) {
+        // If input is already a List
+        return fromJsonFn(json);
+      } else {
+        throw FormatException('Input is neither a JSON string nor a List');
+      }
+    }, (error, stack) => errorFn(error));
   }
 
   /// Creates a Result where each list item is individually parsed
@@ -284,33 +265,30 @@ extension ResultFromJsonExtension on Result {
     required I Function(Map<dynamic, dynamic> json) itemFromJsonFn,
     required E Function(dynamic error) errorFn,
   }) {
-    return Result.trySyncMap<List<I>, E>(
-          () {
-        List<dynamic> list;
+    return Result.trySyncMap<List<I>, E>(() {
+      List<dynamic> list;
 
-        // Handle different input types
-        if (json is String) {
-          final decoded = jsonDecode(json);
-          if (decoded is! List) {
-            throw FormatException('JSON root is not an array');
-          }
-          list = decoded;
-        } else if (json is List) {
-          list = json;
-        } else {
-          throw FormatException('Input is neither a JSON string nor a List');
+      // Handle different input types
+      if (json is String) {
+        final decoded = jsonDecode(json);
+        if (decoded is! List) {
+          throw FormatException('JSON root is not an array');
         }
+        list = decoded;
+      } else if (json is List) {
+        list = json;
+      } else {
+        throw FormatException('Input is neither a JSON string nor a List');
+      }
 
-        // Convert each item in the list
-        return list.map((item) {
-          if (item is! Map) {
-            throw FormatException('Item in the array is not an object');
-          }
-          return itemFromJsonFn(item);
-        }).toList();
-      },
-          (error, stack) => errorFn(error),
-    );
+      // Convert each item in the list
+      return list.map((item) {
+        if (item is! Map) {
+          throw FormatException('Item in the array is not an object');
+        }
+        return itemFromJsonFn(item);
+      }).toList();
+    }, (error, stack) => errorFn(error));
   }
 
   /// Creates a Result with dynamic JSON decoding based on the input structure
@@ -340,19 +318,15 @@ extension ResultFromJsonExtension on Result {
     required dynamic json,
     required E Function(dynamic error) errorFn,
   }) {
-    return Result.trySyncMap<dynamic, E>(
-          () {
-        if (json is String) {
-          return jsonDecode(json);
-        }
-        // If already decoded, return as is
-        return json;
-      },
-          (error, stack) => errorFn(error),
-    );
+    return Result.trySyncMap<dynamic, E>(() {
+      if (json is String) {
+        return jsonDecode(json);
+      }
+      // If already decoded, return as is
+      return json;
+    }, (error, stack) => errorFn(error));
   }
 }
-
 
 /// Extensions for working with ApiResponse objects
 extension ApiResponseExtensions on ApiResponse {
@@ -365,10 +339,7 @@ extension ApiResponseExtensions on ApiResponse {
   /// );
   /// ```
   ApiResult<T> toResult<T>(T Function(Map<String, dynamic> data) onData) {
-    return ApiResult.from(
-      response: this,
-      onData: onData,
-    );
+    return ApiResult.from(response: this, onData: onData);
   }
 
   /// Converts this ApiResponse into an ApiResult containing a list
@@ -379,10 +350,9 @@ extension ApiResponseExtensions on ApiResponse {
   ///   onData: (items) => items.map(User.fromJson).toList(),
   /// );
   /// ```
-  ApiResult<List<T>> toListResult<T>(List<T> Function(List<Map<String, dynamic>> data) onData) {
-    return ApiResult.fromList(
-      response: this,
-      onData: onData,
-    );
+  ApiResult<List<T>> toListResult<T>(
+    List<T> Function(List<Map<String, dynamic>> data) onData,
+  ) {
+    return ApiResult.fromList(response: this, onData: onData);
   }
 }
