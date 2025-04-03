@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:result_handler/src/core/result_handler.dart';
+import 'package:result_handler/src/result_handler.dart';
 
 import 'api_err_handler.dart';
 import 'api_response_handler.dart';
@@ -298,7 +298,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// Utility method to ensure valid JSON map structures
   ///
   /// Handles different input types (Map or String) and converts them to a
-  /// standard Map<String, dynamic> format for consistent processing.
+  /// standard [Map<String, dynamic>] format for consistent processing.
   static Map<String, dynamic> _ensureJsonMap(dynamic data) {
     if (data is Map<String, dynamic>) {
       return data;
@@ -323,7 +323,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// Utility method to ensure valid JSON list structures
   ///
   /// Handles different input types (List or String) and converts them to a
-  /// standard List<Map<String, dynamic>> format for consistent processing.
+  /// standard [List<Map<String, dynamic>>] format for consistent processing.
   static List<Map<String, dynamic>> _ensureJsonList(dynamic data) {
     if (data is List<Map<String, dynamic>>) {
       return data;

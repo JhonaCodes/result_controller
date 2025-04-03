@@ -1,4 +1,4 @@
-import 'package:result_handler/src/core/result_handler.dart';
+import 'package:result_handler/src/result_handler.dart';
 
 /// Represents a failed operation with an error of type [E].
 ///

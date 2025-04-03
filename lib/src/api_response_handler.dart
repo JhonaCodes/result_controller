@@ -1,4 +1,4 @@
-import 'package:result_handler/src/core/api_err_handler.dart';
+import 'package:result_handler/src/api_err_handler.dart';
 
 /// Represents a response from an API operation
 ///
@@ -147,7 +147,7 @@ class ApiResponse {
 
   /// Processes a list response with flexible map conversion
   ///
-  /// Converts the list to a list of Map<String, dynamic>
+  /// Converts the list to a list of [Map<String, dynamic>]
   ///
   /// This method is particularly useful when:
   /// - Dealing with API responses containing lists of objects
@@ -169,7 +169,7 @@ class ApiResponse {
   /// ```
   ///
   /// Possible scenarios:
-  /// - Successful response: Converts list to Map<String, dynamic>
+  /// - Successful response: Converts list to [Map<String, dynamic>]
   /// - Error response: Calls error handler
   /// - Non-list data: Treats as an error condition
   T whenList<T>({
