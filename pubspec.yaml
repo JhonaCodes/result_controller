@@ -1,6 +1,7 @@
 name: result_handler
-description: "A package for result pattern."
-version: 0.0.1
+description: "Functional error handling with Result pattern. Safely manage operations that can fail, with clean, type-safe error control."
+
+version: 1.0.0
 homepage:
 
 environment:

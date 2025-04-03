@@ -145,7 +145,6 @@ void main() {
           expect(value, equals('Large number: 10'));
         },
         err: (error) {
-          print(error);
           fail('Should not reach error state');
         },
       );

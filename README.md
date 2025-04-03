@@ -1,39 +1,97 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Result Handler Library
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Functional error handling with `Result<T, E>` pattern
+- Comprehensive API error management
+- Async and sync error handling
+- Chainable operations
+- Flexible error transformation
 
-## Getting started
+## Installation
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add to your `pubspec.yaml`:
 
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+```yaml
+dependencies:
+  result_handler: ^latest_version
 ```
 
-## Additional information
+## Basic Usage
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+### Simple Result Handling
+
+```dart
+import 'package:result_handler/result_handler.dart';
+
+// Safe division function
+Result<double, String> divideNumbers(int a, int b) {
+  if (b == 0) {
+    return Err('Cannot divide by zero');
+  }
+  return Ok(a / b);
+}
+
+void main() {
+  final result = divideNumbers(10, 2);
+  
+  result.when(
+    ok: (value) => print('Result: $value'),
+    err: (error) => print('Error: $error'),
+  );
+}
+```
+
+### API Error Handling
+
+```dart
+Future<void> fetchUserData(String userId) async {
+  final response = await apiClient.get('/users/$userId');
+  
+  final userResult = response.toResult(User.fromJson);
+  
+  userResult.when(
+    ok: (user) => displayUser(user),
+    err: (apiError) => showErrorMessage(apiError.message),
+  );
+}
+```
+
+### Async Error Handling
+
+```dart
+Future<void> performAsyncOperation() async {
+  final result = await Result.tryAsync(() async {
+    // Some potentially failing async operation
+    return await complexNetworkCall();
+  });
+  
+  result.when(
+    ok: (data) => processData(data),
+    err: (error) => handleError(error),
+  );
+}
+```
+
+## Advanced Features
+
+- Transform success values
+- Chain operations
+- Custom error mapping
+- Recover from errors
+
+## Contribution
+
+Contributions are welcome! If you have ideas for new features or improvements, please open an [issue](https://github.com/JhonaCodes/multiselect_field/issues) or submit a pull request.
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/new-feature`).
+3. Commit your changes (`git commit -am 'Add new feature'`).
+4. Push to the branch (`git push origin feature/new-feature`).
+5. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

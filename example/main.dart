@@ -18,12 +18,7 @@ class User {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'age': age,
-  };
-
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'age': age};
 }
 
 void main() {
@@ -149,12 +144,10 @@ void demonstrateAsyncErrorHandling() {
 
   // Using tryAsync for safe async operations
   Future<void> safeDataFetch() async {
-    final result = await Result.tryAsync(
-          () async {
-        await Future.delayed(Duration(milliseconds: 100));
-        return 'Complex async operation';
-      },
-    );
+    final result = await Result.tryAsync(() async {
+      await Future.delayed(Duration(milliseconds: 100));
+      return 'Complex async operation';
+    });
 
     result.when(
       ok: (data) => log('Async operation succeeded: $data'),

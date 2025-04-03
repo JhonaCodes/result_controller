@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:result_handler/result_handler.dart';
 
-// Mocks para pruebas
 class MockStackTrace implements StackTrace {
   @override
   String toString() => 'mock stack trace';

@@ -84,8 +84,6 @@ void main() {
       final result = response.whenList(
         ok: (list) {
           final rr = list.map((item) => item['name']).toList();
-          print(rr);
-
           return rr;
         },
         err: (error) => <String>[],
