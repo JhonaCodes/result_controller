@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.3]
+## Refactor
+- `HttpError` to `HttpErr`
+
 ## [1.0.2]
 ## Refactor
 - Cleaning extensions in result.

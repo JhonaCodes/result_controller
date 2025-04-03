@@ -6,11 +6,11 @@ import 'package:result_controller/src/api_handler.dart';
 import 'package:result_controller/src/api_response_handler.dart';
 
 void main() {
-  late HttpError testError;
+  late HttpErr testError;
 
   setUp(() {
     // Create real HttpError instance instead of using Mockito
-    testError = HttpError(
+    testError = HttpErr(
       exception: Exception('Test exception'),
       stackTrace: StackTrace.current,
       data: HttpMessage(

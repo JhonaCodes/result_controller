@@ -166,7 +166,7 @@ void main() {
 
     test('toResult converts failed ApiResponse', () {
       final apiResponse = ApiResponse.failure(
-        HttpError(
+        HttpErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
           data: HttpMessage(
@@ -202,7 +202,7 @@ void main() {
 
     test('toListResult converts failed ApiResponse', () {
       final apiResponse = ApiResponse.failure(
-        HttpError(
+        HttpErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
           data: HttpMessage(

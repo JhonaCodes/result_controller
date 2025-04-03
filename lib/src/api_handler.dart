@@ -541,7 +541,7 @@ class HttpMessage {
   ///
   /// final message = HttpMessage.fromError(error);
   /// ```
-  factory HttpMessage.fromError(HttpError error) {
+  factory HttpMessage.fromError(HttpErr error) {
     return error.data ??
         HttpMessage.fromException(
           error.exception ?? Exception('Unknown error'),

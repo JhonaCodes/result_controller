@@ -113,7 +113,7 @@ class ApiErr extends ResultError {
   ///
   /// final apiError = ApiErr.fromHttpError(httpError);
   /// ```
-  factory ApiErr.fromHttpError(HttpError error) {
+  factory ApiErr.fromHttpError(HttpErr error) {
     return ApiErr(
       exception: error.exception,
       message: error.data,
@@ -203,7 +203,7 @@ class ApiErr extends ResultError {
 ///   );
 /// }
 /// ```
-class HttpError {
+class HttpErr {
   /// The original exception
   ///
   /// This can be any exception that was caught during the HTTP operation,
@@ -241,5 +241,5 @@ class HttpError {
   ///   ),
   /// );
   /// ```
-  HttpError({required this.exception, required this.stackTrace, this.data});
+  HttpErr({required this.exception, required this.stackTrace, this.data});
 }

@@ -40,7 +40,7 @@ void main() {
     });
 
     test('ApiErr.fromHttpError', () {
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
         data: HttpMessage(
@@ -126,7 +126,7 @@ void main() {
         details: 'Failed to connect to server',
       );
 
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: exception,
         stackTrace: stackTrace,
         data: data,
@@ -141,7 +141,7 @@ void main() {
       final stackTrace = MockStackTrace();
 
       // Debería compilar y ejecutarse sin errores
-      final httpError = HttpError(exception: null, stackTrace: stackTrace);
+      final httpError = HttpErr(exception: null, stackTrace: stackTrace);
 
       expect(httpError.exception, isNull);
       expect(httpError.stackTrace, equals(stackTrace));
@@ -152,7 +152,7 @@ void main() {
       final exception = Exception('Network error');
       final stackTrace = MockStackTrace();
 
-      final httpError = HttpError(exception: exception, stackTrace: stackTrace);
+      final httpError = HttpErr(exception: exception, stackTrace: stackTrace);
 
       expect(httpError.exception, equals(exception));
       expect(httpError.stackTrace, equals(stackTrace));
@@ -243,7 +243,7 @@ void main() {
     });
 
     test('HttpMessage.fromError with data', () {
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
         data: HttpMessage(
@@ -261,7 +261,7 @@ void main() {
     });
 
     test('HttpMessage.fromError without data', () {
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
       );
@@ -274,7 +274,7 @@ void main() {
     });
 
     test('HttpMessage.fromError with null exception', () {
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: null,
         stackTrace: MockStackTrace(),
       );

@@ -29,10 +29,10 @@ class TestStackTrace implements StackTrace {
 }
 
 void main() {
-  late HttpError testError;
+  late HttpErr testError;
 
   setUp(() {
-    testError = HttpError(
+    testError = HttpErr(
       exception: Exception('Test exception'),
       stackTrace: TestStackTrace(),
       data: HttpMessage(
@@ -412,7 +412,7 @@ void main() {
       }, statusCode: 201);
       final notModifiedResponse = ApiResponse(statusCode: 304);
       final badRequestResponse = ApiResponse.failure(
-        HttpError(
+        HttpErr(
           exception: Exception('Bad request'),
           stackTrace: TestStackTrace(),
           data: HttpMessage(
@@ -424,7 +424,7 @@ void main() {
         statusCode: 400,
       );
       final serverErrorResponse = ApiResponse.failure(
-        HttpError(
+        HttpErr(
           exception: Exception('Server error'),
           stackTrace: TestStackTrace(),
           data: HttpMessage(

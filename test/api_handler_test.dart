@@ -186,7 +186,7 @@ void main() {
 
     test('ApiResult.from with error response', () {
       final stackTrace = TestStackTrace();
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: Exception('Network error'),
         stackTrace: stackTrace,
         data: HttpMessage(
@@ -263,7 +263,7 @@ void main() {
 
     test('ApiResult.fromList with error response', () {
       final stackTrace = TestStackTrace();
-      final httpError = HttpError(
+      final httpError = HttpErr(
         exception: Exception('Network error'),
         stackTrace: stackTrace,
         data: HttpMessage(

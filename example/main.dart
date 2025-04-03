@@ -78,7 +78,7 @@ void demonstrateApiErrorHandling() {
     // Simulating different scenarios
     if (userId == 'error') {
       return ApiResponse.failure(
-        HttpError(
+        HttpErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
           data: HttpMessage(

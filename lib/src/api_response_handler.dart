@@ -41,7 +41,7 @@ class ApiResponse {
   /// Detailed error information if the API call failed
   ///
   /// Contains exception details, stack trace, and user-friendly error messages
-  final HttpError? error;
+  final HttpErr? error;
 
   /// Constructs an [ApiResponse] with optional data, status code, and error
   ///
@@ -94,7 +94,7 @@ class ApiResponse {
   ///   statusCode: 500
   /// );
   /// ```
-  factory ApiResponse.failure(HttpError error, {int? statusCode}) {
+  factory ApiResponse.failure(HttpErr error, {int? statusCode}) {
     return ApiResponse(error: error, statusCode: statusCode, data: null);
   }
 
@@ -127,7 +127,7 @@ class ApiResponse {
   /// - Null data: Treats as an error condition
   T when<T>({
     required T Function(dynamic data) ok,
-    required T Function(HttpError error) err,
+    required T Function(HttpErr error) err,
   }) {
     if (error != null) {
       return err(error!);
@@ -135,7 +135,7 @@ class ApiResponse {
 
     if (data == null) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('No data in response'),
           stackTrace: StackTrace.current,
         ),
@@ -174,7 +174,7 @@ class ApiResponse {
   /// - Non-list data: Treats as an error condition
   T whenList<T>({
     required T Function(List<Map<String, dynamic>> data) ok,
-    required T Function(HttpError error) err,
+    required T Function(HttpErr error) err,
   }) {
     if (error != null) {
       return err(error!);
@@ -182,7 +182,7 @@ class ApiResponse {
 
     if (data == null) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('No data in response'),
           stackTrace: StackTrace.current,
         ),
@@ -191,7 +191,7 @@ class ApiResponse {
 
     if (data is! List) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('Expected a list, got ${data.runtimeType}'),
           stackTrace: StackTrace.current,
         ),
@@ -243,7 +243,7 @@ class ApiResponse {
   /// - Non-list data: Treats as an error condition
   T whenListType<T, I>({
     required T Function(List<I> data) ok,
-    required T Function(HttpError error) err,
+    required T Function(HttpErr error) err,
     bool filterNulls = false,
   }) {
     if (error != null) {
@@ -252,7 +252,7 @@ class ApiResponse {
 
     if (data == null) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('No data in response'),
           stackTrace: StackTrace.current,
         ),
@@ -261,7 +261,7 @@ class ApiResponse {
 
     if (data is! List) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('Expected a list, got ${data.runtimeType}'),
           stackTrace: StackTrace.current,
         ),
@@ -281,7 +281,7 @@ class ApiResponse {
         }
       } catch (e) {
         return err(
-          HttpError(
+          HttpErr(
             exception: Exception('Error converting item: $e'),
             stackTrace: StackTrace.current,
           ),
@@ -330,7 +330,7 @@ class ApiResponse {
   /// - Invalid data: Throws format exception if data is not a list of maps
   T whenJsonListMap<T>({
     required T Function(List<Map<String, dynamic>> data) ok,
-    required T Function(HttpError error) err,
+    required T Function(HttpErr error) err,
   }) {
     if (error != null) {
       return err(error!);
@@ -338,7 +338,7 @@ class ApiResponse {
 
     if (data == null) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('No data in response'),
           stackTrace: StackTrace.current,
         ),
@@ -347,7 +347,7 @@ class ApiResponse {
 
     if (data is! List) {
       return err(
-        HttpError(
+        HttpErr(
           exception: Exception('Expected a list, got ${data.runtimeType}'),
           stackTrace: StackTrace.current,
         ),
@@ -364,7 +364,7 @@ class ApiResponse {
         typedList.add(Map<String, dynamic>.from(item));
       } else {
         return err(
-          HttpError(
+          HttpErr(
             exception: Exception('List contains non-map items'),
             stackTrace: StackTrace.current,
           ),

@@ -26,7 +26,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  result_controller: ^1.0.2
+  result_controller: ^1.0.3
 ```
 
 ## Basic Usage
@@ -122,7 +122,7 @@ final successResponse = ApiResponse.success(
 
 // Create an error response
 final errorResponse = ApiResponse.failure(
-  HttpError(
+  HttpErr(
     exception: Exception('Network timeout'),
     stackTrace: StackTrace.current,
     data: HttpMessage(
@@ -411,7 +411,7 @@ class ApiClient {
             );
           }
           
-          throw HttpError(
+          throw HttpErr(
             exception: Exception('HTTP error ${response.statusCode}'),
             stackTrace: StackTrace.current,
             data: errorMessage,
@@ -421,7 +421,7 @@ class ApiClient {
       (error, stackTrace) {
         // Convert any exception to a failure response
         return ApiResponse.failure(
-          HttpError(
+          HttpErr(
             exception: error,
             stackTrace: stackTrace,
             data: HttpMessage.fromException(error),
