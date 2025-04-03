@@ -1,4 +1,4 @@
-# Result Handler Library
+# Result Controller Library
 
 A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail. This library implements the Result/Either pattern for elegant error handling.
 
@@ -396,7 +396,7 @@ Result<User, ApiErr> parseUserJson(String jsonString) {
 
 ### Complete API Client Example
 
-Here's a more complete example showing how to use the Result Handler in an API client:
+Here's a more complete example showing how to use the Result Controller in an API client:
 
 ```dart
 class ApiClient {
@@ -478,7 +478,7 @@ void main() async {
 
 ## Error Handling Strategy
 
-The Result Handler library promotes a functional approach to error handling:
+The Result Controller library promotes a functional approach to error handling:
 
 1. **Explicit Error Types**: All possible errors are represented in the return type
 2. **No Surprise Exceptions**: Operations return errors rather than throwing exceptions
