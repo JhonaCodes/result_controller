@@ -5,7 +5,7 @@ import 'api_handler_test.dart';
 
 class CustomError extends Error {
   final String message;
-  CustomError(this.message);
+  CustomError(this.message, String part);
 
   @override
   String toString() => 'CustomError: $message';
@@ -24,7 +24,7 @@ void main() {
     test('Result.trySync handles complex synchronous errors', () {
       Result<int, ResultError> complexErrorResult = Result.trySync(() {
         if (DateTime.now().millisecondsSinceEpoch.isEven) {
-          throw CustomError('Random error on even timestamp');
+          throw CustomError('Random error on even timestamp', '1');
         }
         return 42;
       });
