@@ -1,6 +1,9 @@
 # Result Handler Library
 
-A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail. This library implements the Result/Either pattern for elegant error handling without exceptions.
+A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail. This library implements the Result/Either pattern for elegant error handling.
+
+![result_handler](https://github.com/user-attachments/assets/5988fe09-37ca-4cf2-ae85-ad72e1da9147)
+
 
 ## Features
 
