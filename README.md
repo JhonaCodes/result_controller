@@ -488,7 +488,7 @@ The Result Controller library promotes a functional approach to error handling:
 
 ## Contribution
 
-Contributions are welcome! If you have ideas for new features or improvements, please open an [issue](https://github.com/YourUsername/result_controller/issues) or submit a pull request.
+Contributions are welcome! If you have ideas for new features or improvements, please open an [issue](https://github.com/jhonacodes/result_controller/issues) or submit a pull request.
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/new-feature`).
