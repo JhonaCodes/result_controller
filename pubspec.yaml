@@ -2,7 +2,7 @@ name: result_controller
 description: "Functional error handling with Result pattern. Safely manage operations that can fail, with clean, type-safe error control."
 
 version: 1.0.0
-homepage:
+homepage: https://github.com/JhonaCodes/result_controller
 
 environment:
   sdk: ^3.7.2
