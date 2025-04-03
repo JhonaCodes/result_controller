@@ -4,6 +4,11 @@ A robust, functional error handling library for Dart and Flutter that provides a
 
 ![result_handler](https://github.com/user-attachments/assets/5988fe09-37ca-4cf2-ae85-ad72e1da9147)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![result_handler](https://img.shields.io/pub/v/result_handler.svg)](https://pub.dev/packages/result_handler)
+[![Dart 3](https://img.shields.io/badge/Dart-3%2B-blue.svg)](https://dart.dev/)
+[![Flutter 3.10](https://img.shields.io/badge/Flutter-3%2B-blue.svg)](https://flutter.dev/)
+
 
 ## Features
 
