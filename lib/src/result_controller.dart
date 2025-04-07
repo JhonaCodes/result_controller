@@ -6,7 +6,13 @@ import 'ok_handler.dart';
 /// This class implements the Result/Either pattern for error handling, allowing operations
 /// that might fail to be encapsulated without using exceptions.
 ///
-/// Example:
+/// Key Features:
+/// - Functional handling of successful results and errors
+/// - Safe value transformation
+/// - Operation chaining
+/// - Error handling with stack traces
+///
+/// Basic Example:
 /// ```dart
 /// // Handling a potential division by zero
 /// Result<double, String> divide(double a, double b) {
@@ -19,6 +25,25 @@ import 'ok_handler.dart';
 ///   ok: (result) => print('Result: $result'),
 ///   err: (error) => print('Error: $error')
 /// );
+/// ```
+///
+/// Example with transformations:
+/// ```dart
+/// Result<int, String> getAge(String input) {
+///   try {
+///     return Ok(int.parse(input));
+///   } catch (e) {
+///     return Err('Could not convert "$input" to number');
+///   }
+/// }
+///
+/// // Operation chaining
+/// getAge('25')
+///   .map((age) => age + 1)
+///   .when(
+///     ok: (age) => print('Age next year: $age'),
+///     err: (error) => print(error)
+///   );
 /// ```
 abstract class Result<T, E> {
   /// Handles both success and error cases with appropriate functions.
@@ -201,7 +226,25 @@ abstract class Result<T, E> {
 
 /// Base class for all result errors
 ///
-/// Provides common structure for error reporting with optional stack traces
+/// Provides a common structure for error reporting with optional stack traces
+///
+/// Features:
+/// - Descriptive error message
+/// - Optional stack trace for debugging
+/// - Custom string formatting
+///
+/// Example:
+/// ```dart
+/// final error = ResultErr(
+///   'Validation Error',
+///   stackTrace: StackTrace.current
+/// );
+///
+/// print(error.toString());
+/// // Output: Validation Error
+/// // StackTrace:
+/// // #0 main (file:///...)
+/// ```
 class ResultErr {
   /// Error message describing what went wrong
   final String text;
@@ -224,6 +267,29 @@ class ResultErr {
 /// Generic implementation of ResultError that captures the original error
 ///
 /// Useful for wrapping exceptions and preserving their context
+///
+/// Features:
+/// - Preserves original error
+/// - Maintains stack trace
+/// - Enhanced string formatting
+///
+/// Example:
+/// ```dart
+/// try {
+///   throw Exception('Network error');
+/// } catch (e, stack) {
+///   final error = GenericResultError(
+///     'Connection error',
+///     e,
+///     stackTrace: stack
+///   );
+///   print(error.toString());
+///   // Output: Connection error
+///   // StackTrace:
+///   // #0 main (file:///...)
+///   // Original error: Exception: Network error
+/// }
+/// ```
 class GenericResultError extends ResultErr {
   /// The original error object that was caught
   final dynamic originalError;

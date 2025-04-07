@@ -581,3 +581,70 @@ class HttpMessage {
         );
   }
 }
+
+/// Handles API requests with comprehensive error handling and response processing
+///
+/// This class provides a robust way to make HTTP requests with built-in error handling,
+/// response processing, and type safety. It supports various HTTP methods and data formats.
+///
+/// Key Features:
+/// - Type-safe request parameters
+/// - Comprehensive error handling
+/// - Response processing with type safety
+/// - Support for various HTTP methods
+///
+/// Basic Example:
+/// ```dart
+/// // Create an API handler
+/// final api = ApiHandler();
+///
+/// // Make a GET request
+/// final result = await api.get<User>(
+///   path: 'users/123',
+///   onData: (json) => User.fromJson(json),
+/// );
+///
+/// // Handle the result
+/// result.when(
+///   ok: (user) => print('Found user: ${user.name}'),
+///   err: (error) => print('Error: ${error.message?.details}'),
+/// );
+/// ```
+///
+/// POST Request Example:
+/// ```dart
+/// // Create a new user
+/// final newUser = {'name': 'John Doe', 'email': 'john@example.com'};
+/// final result = await api.post<User>(
+///   path: 'users',
+///   body: newUser,
+///   onData: (json) => User.fromJson(json),
+/// );
+///
+/// result.when(
+///   ok: (user) => print('Created user: ${user.name}'),
+///   err: (error) => print('Error: ${error.message?.details}'),
+/// );
+/// ```
+///
+/// Error Handling Example:
+/// ```dart
+/// // Handle specific error cases
+/// final result = await api.get<User>(
+///   path: 'users/123',
+///   onData: (json) => User.fromJson(json),
+/// );
+///
+/// result.when(
+///   ok: (user) => displayUser(user),
+///   err: (error) {
+///     if (error.statusCode == 404) {
+///       showNotFoundMessage();
+///     } else if (error.statusCode == 401) {
+///       navigateToLogin();
+///     } else {
+///       showGenericError(error.message?.details);
+///     }
+///   },
+/// );
+/// ```

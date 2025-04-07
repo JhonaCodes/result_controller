@@ -1,15 +1,83 @@
 import 'package:result_controller/src/api_err_handler.dart';
 
-/// Represents a response from an API operation
+/// Handles API responses with type safety and error handling
 ///
-/// Provides a comprehensive and flexible way to handle API responses
-/// with robust err management and type-safe data processing.
+/// This class provides a robust way to handle API responses, supporting various
+/// data types and providing comprehensive error handling. It includes methods for
+/// transforming responses and handling different data structures.
 ///
 /// Key Features:
-/// - Supports various data types (maps, lists, primitives)
+/// - Support for various data types (Map, List, primitive types)
 /// - Type-safe data processing
-/// - Comprehensive err handling
+/// - Comprehensive error handling
 /// - Flexible response transformation methods
+///
+/// Basic Example:
+/// ```dart
+/// // Fetch users from API and process response as a list
+/// final response = await http.get(Uri.parse('https://api.example.com/users'));
+/// final apiResponse = ApiResponse.fromResponse(response);
+///
+/// // Process the response
+/// final result = apiResponse.processAsList<User>((json) => User.fromJson(json));
+/// result.when(
+///   success: (users) => print('Found ${users.length} users'),
+///   error: (error) => print('Error: ${error.message}'),
+/// );
+/// ```
+///
+/// Error Handling Example:
+/// ```dart
+/// // Simulate network error
+/// final errorResponse = ApiResponse.error(
+///   ApiErr(
+///     message: HttpMessage(
+///       title: 'Network Error',
+///       details: 'Connection failed'
+///     )
+///   )
+/// );
+///
+/// final result = errorResponse.processAsList<User>((json) => User.fromJson(json));
+/// result.when(
+///   success: (_) => print('Success'),
+///   error: (error) => print('Error: ${error.message?.title}'),
+/// );
+/// ```
+///
+/// List Processing Example:
+/// ```dart
+/// // Process list with type safety
+/// final response = await http.get(Uri.parse('https://api.example.com/posts'));
+/// final apiResponse = ApiResponse.fromResponse(response);
+///
+/// final result = apiResponse.processAsList<Post>((json) => Post.fromJson(json));
+/// result.when(
+///   success: (posts) {
+///     for (final post in posts) {
+///       print('Post: ${post.title}');
+///     }
+///   },
+///   error: (error) => print('Error: ${error.message}'),
+/// );
+/// ```
+///
+/// Complex JSON Processing Example:
+/// ```dart
+/// // Process nested JSON structure
+/// final response = await http.get(Uri.parse('https://api.example.com/data'));
+/// final apiResponse = ApiResponse.fromResponse(response);
+///
+/// final result = apiResponse.processAsMap((json) {
+///   final nestedData = json['nested'] as Map<String, dynamic>;
+///   return ComplexData.fromJson(nestedData);
+/// });
+///
+/// result.when(
+///   success: (data) => print('Processed data: ${data.toString()}'),
+///   error: (error) => print('Error: ${error.message}'),
+/// );
+/// ```
 ///
 /// This class is designed to simplify API response parsing and
 /// provide a consistent approach to handling different response scenarios.

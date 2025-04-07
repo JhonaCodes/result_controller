@@ -1,6 +1,6 @@
 # Result Controller Library
 
-A robust, functional error handling library for Dart and Flutter that provides a type-safe way to manage operations that can fail. This library implements the Result/Either pattern for elegant error handling.
+A robust library for functional error handling in Dart and Flutter that provides a safe way to manage operations that may fail. This library implements the Result/Either pattern for elegant error handling.
 
 ![result_controller](https://github.com/user-attachments/assets/35b03a5c-e2e9-4a99-8c56-aa6084e82066)
 
@@ -9,16 +9,15 @@ A robust, functional error handling library for Dart and Flutter that provides a
 [![Dart 3](https://img.shields.io/badge/Dart-3%2B-blue.svg)](https://dart.dev/)
 [![Flutter 3.10](https://img.shields.io/badge/Flutter-3%2B-blue.svg)](https://flutter.dev/)
 
-
 ## Features
 
-- **Functional Error Handling**: Type-safe `Result<T, E>` pattern
+- **Functional Error Handling**: `Result<T, E>` pattern with type safety
 - **Comprehensive API Error Management**: Specialized tools for API responses
-- **Error Context Preservation**: Maintain stack traces and original errors
+- **Error Context Preservation**: Maintains stack traces and original errors
 - **Chainable Operations**: Fluent API for sequential operations
-- **Flexible Error Transformation**: Convert between error types
-- **Async Support**: Handle both synchronous and asynchronous operations
-- **JSON Processing Utilities**: Safely parse and transform JSON data
+- **Flexible Error Transformation**: Conversion between error types
+- **Async Support**: Handling of synchronous and asynchronous operations
+- **JSON Processing Utilities**: Safe JSON data parsing and transformation
 
 ## Installation
 
@@ -26,19 +25,19 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  result_controller: ^1.0.3
+  result_controller: ^1.1.0
 ```
 
 ## Basic Usage
 
-### Core Result Type
+### Base Result Type
 
-The foundation of this library is the `Result<T, E>` type which represents either a successful value of type `T` or an error of type `E`.
+The foundation of this library is the `Result<T, E>` type that represents either a successful value of type `T` or an error of type `E`.
 
 ```dart
 import 'package:result_controller/result_controller.dart';
 
-// Safe division function that can't throw exceptions
+// Safe division function that cannot throw exceptions
 Result<double, String> divideNumbers(int a, int b) {
   if (b == 0) {
     return Err('Cannot divide by zero');
@@ -49,7 +48,7 @@ Result<double, String> divideNumbers(int a, int b) {
 void main() {
   final result = divideNumbers(10, 2);
   
-  // Handle both success and error cases
+  // Handle success and error cases
   result.when(
     ok: (value) => print('Result: $value'),  // Prints: Result: 5.0
     err: (error) => print('Error: $error'),
@@ -109,35 +108,36 @@ stringResult.when(
 
 ### ApiResponse Class
 
-The `ApiResponse` class represents a response from an API operation, containing data, status code, and possible error information.
+The `ApiResponse` class represents an API operation response, containing data, status code, and possible error information.
 
 ```dart
 import 'package:result_controller/result_controller.dart';
 
 // Create a successful response
-final successResponse = ApiResponse.success(
+final successResponse = ApiResponse.ok(
   {'id': '123', 'name': 'John Doe'},
   statusCode: 200,
+  headers: {'Content-Type': 'application/json'},
 );
 
 // Create an error response
-final errorResponse = ApiResponse.failure(
-  HttpErr(
+final errorResponse = ApiResponse.err(
+  ApiErr(
     exception: Exception('Network timeout'),
     stackTrace: StackTrace.current,
-    data: HttpMessage(
-      success: false,
+    message: HttpMessage(
       title: 'Connection Error',
-      details: 'Could not connect to the server',
+      details: 'Could not connect to server',
     ),
   ),
   statusCode: 503,
+  headers: {},
 );
 ```
 
 ### Processing API Responses with when()
 
-Use the `when()` method to handle both success and error cases:
+Use the `when()` method to handle success and error cases:
 
 ```dart
 ApiResponse response = await apiClient.get('/users/123');
@@ -152,15 +152,15 @@ print('User name: $userName');
 
 ### Processing Lists with whenList()
 
-The `whenList()` method is specifically designed for API responses that contain lists of objects:
+The `whenList()` method is specifically designed for API responses containing lists of objects:
 
 ```dart
 ApiResponse response = await apiClient.get('/users');
 
 final users = response.whenList(
-  ok: (usersList) => usersList.map((userData) => User.fromJson(userData)).toList(),
+  ok: (userList) => userList.map((userData) => User.fromJson(userData)).toList(),
   err: (error) {
-    logError('Failed to fetch users', error);
+    logError('Error fetching users', error);
     return <User>[]; // Return empty list on error
   },
 );
@@ -173,16 +173,16 @@ for (final user in users) {
 
 ### Processing Typed Lists with whenListType()
 
-Use `whenListType()` when working with lists of primitive types or mixed content:
+Use `whenListType()` when working with primitive type lists or mixed content:
 
 ```dart
 ApiResponse response = await apiClient.get('/user/scores');
 
 // Extract a list of integers from the response
 final scores = response.whenListType<List<int>, int>(
-  ok: (scoresList) => scoresList,  // We already have the correct type
+  ok: (scoreList) => scoreList,  // Already have the correct type
   err: (error) => <int>[],
-  filterNulls: true,  // Remove any null values from the list
+  filterNulls: true,  // Remove null values from the list
 );
 
 final average = scores.isEmpty ? 0 : scores.reduce((a, b) => a + b) / scores.length;
@@ -191,12 +191,12 @@ print('Average score: $average');
 
 ### Processing Dynamic JSON Maps with whenJsonListMap()
 
-For handling complex, dynamic JSON structures:
+For handling complex and dynamic JSON structures:
 
 ```dart
 ApiResponse response = await apiClient.get('/configurations');
 
-final configs = response.whenJsonListMap(
+final configurations = response.whenJsonListMap(
   ok: (configList) => configList.map((config) {
     return UserConfiguration(
       id: config['id'],
@@ -206,15 +206,15 @@ final configs = response.whenJsonListMap(
   err: (error) => <UserConfiguration>[],
 );
 
-// Process the configurations
-for (final config in configs) {
+// Process configurations
+for (final config in configurations) {
   applyConfiguration(config);
 }
 ```
 
 ### Converting ApiResponse to ApiResult
 
-For more functional processing, convert to an `ApiResult`:
+For more functional processing, convert to `ApiResult`:
 
 ```dart
 ApiResponse response = await apiClient.get('/users/123');
@@ -254,16 +254,16 @@ result.when(
 Use `flatMap` to chain operations that might fail:
 
 ```dart
-Future<Result<User, ApiErr>> fetchUser(String id) async {
+Future<Result<User, ApiErr>> getUser(String id) async {
   // Implementation details...
 }
 
-Future<Result<List<Post>, ApiErr>> fetchUserPosts(User user) async {
+Future<Result<List<Post>, ApiErr>> getUserPosts(User user) async {
   // Implementation details...
 }
 
 // Chain operations
-final postsResult = await fetchUser('123').flatMap((user) => fetchUserPosts(user));
+final postsResult = await getUser('123').flatMap((user) => getUserPosts(user));
 
 postsResult.when(
   ok: (posts) => displayPosts(posts),
@@ -276,17 +276,17 @@ postsResult.when(
 Use `recover` to handle errors and potentially recover from them:
 
 ```dart
-Future<Result<List<Post>, ApiErr>> fetchPosts() async {
+Future<Result<List<Post>, ApiErr>> getPosts() async {
   // Implementation details...
 }
 
-// Try to fetch from network, fall back to cache on error
-final posts = await fetchPosts().recover((error) {
+// Try to get from network, fall back to cache on error
+final posts = await getPosts().recover((error) {
   if (error.statusCode == 503) {
     // Network unavailable, try to load from cache
     return loadPostsFromCache();
   }
-  // Any other error is propagated
+  // Propagate any other error
   return Err(error);
 });
 ```
@@ -296,14 +296,14 @@ final posts = await fetchPosts().recover((error) {
 Convert between error types with `mapError`:
 
 ```dart
-Result<User, ApiErr> fetchResult = await fetchUser('123');
+Result<User, ApiErr> fetchResult = await getUser('123');
 
 // Convert API errors to user-friendly messages
 Result<User, String> userResult = fetchResult.mapError((apiErr) {
   if (apiErr.statusCode == 404) {
     return 'User not found';
   } else if (apiErr.statusCode == 401) {
-    return 'You need to login first';
+    return 'You need to log in first';
   }
   return 'An unexpected error occurred';
 });
@@ -315,13 +315,13 @@ Special extensions for working with collections:
 
 ```dart
 // Filter a list result
-Result<List<Post>, ApiErr> postsResult = await fetchPosts();
+Result<List<Post>, ApiErr> postsResult = await getPosts();
 Result<List<Post>, ApiErr> recentPosts = postsResult.filter((post) => 
   post.date.isAfter(DateTime.now().subtract(Duration(days: 7)))
 );
 
-// Transform each item in a list result
-Result<List<Post>, ApiErr> postsResult = await fetchPosts();
+// Transform each element in a list result
+Result<List<Post>, ApiErr> postsResult = await getPosts();
 Result<List<String>, ApiErr> postTitles = postsResult.mapEach((post) => post.title);
 ```
 
@@ -335,35 +335,35 @@ Future<void> performAsyncOperation() async {
   final result = await Result.tryAsync(() async {
     final response = await http.get(Uri.parse('https://api.example.com/data'));
     if (response.statusCode != 200) {
-      throw Exception('Failed to load data: ${response.statusCode}');
+      throw Exception('Error loading data: ${response.statusCode}');
     }
     return json.decode(response.body);
   });
   
   result.when(
     ok: (data) => processData(data),
-    err: (error) => displayError(error),
+    err: (error) => showError(error),
   );
 }
 ```
 
 ### Custom Error Mapping
 
-Transform exceptions to your domain-specific errors:
+Transform exceptions to domain-specific errors:
 
 ```dart
-Future<Result<User, UserError>> fetchUser(String id) async {
+Future<Result<User, UserError>> getUser(String id) async {
   return Result.tryAsyncMap(
     () async {
       final response = await http.get(Uri.parse('https://api.example.com/users/$id'));
       if (response.statusCode != 200) {
-        throw HttpException('Failed with status: ${response.statusCode}');
+        throw HttpException('Error with status: ${response.statusCode}');
       }
       return User.fromJson(json.decode(response.body));
     },
     (error, stackTrace) {
       if (error is HttpException) {
-        return UserError.network('Failed to connect: $error');
+        return UserError.network('Connection error: $error');
       } else if (error is FormatException) {
         return UserError.parsing('Invalid data format: $error');
       }
@@ -372,9 +372,10 @@ Future<Result<User, UserError>> fetchUser(String id) async {
   );
 }
 ```
+
 ### Complete API Client Example
 
-Here's a more complete example showing how to use the Result Controller in an API client:
+Here's a more complete example showing how to use Result Controller in an API client:
 
 ```dart
 class ApiClient {
@@ -393,9 +394,10 @@ class ApiClient {
         );
         
         if (response.statusCode >= 200 && response.statusCode < 300) {
-          return ApiResponse.success(
+          return ApiResponse.ok(
             response.body,
             statusCode: response.statusCode,
+            headers: response.headers,
           );
         } else {
           // Parse error response
@@ -405,26 +407,25 @@ class ApiClient {
             errorMessage = HttpMessage.fromJson(errorData);
           } catch (_) {
             errorMessage = HttpMessage(
-              success: false,
               title: 'HTTP Error',
               details: 'Request failed with status: ${response.statusCode}',
             );
           }
           
           throw HttpErr(
-            exception: Exception('HTTP error ${response.statusCode}'),
+            exception: Exception('HTTP Error ${response.statusCode}'),
             stackTrace: StackTrace.current,
-            data: errorMessage,
+            message: errorMessage,
           );
         }
       },
       (error, stackTrace) {
         // Convert any exception to a failure response
-        return ApiResponse.failure(
-          HttpErr(
+        return ApiResponse.err(
+          ApiErr(
             exception: error,
             stackTrace: stackTrace,
-            data: HttpMessage.fromException(error),
+            message: HttpMessage.fromException(error),
           ),
         );
       },
@@ -435,7 +436,7 @@ class ApiClient {
 }
 
 // Usage
-Future<ApiResult<User>> fetchUser(String id) async {
+Future<ApiResult<User>> getUser(String id) async {
   final response = await apiClient.get(
     Params(path: 'users/$id', header: {'Authorization': 'Bearer $token'}),
   );
@@ -445,7 +446,7 @@ Future<ApiResult<User>> fetchUser(String id) async {
 
 // Using the API client
 void main() async {
-  final userResult = await fetchUser('123');
+  final userResult = await getUser('123');
   
   userResult.when(
     ok: (user) => print('User: ${user.name}'),
@@ -459,12 +460,12 @@ void main() async {
 The Result Controller library promotes a functional approach to error handling:
 
 1. **Explicit Error Types**: All possible errors are represented in the return type
-2. **No Surprise Exceptions**: Operations return errors rather than throwing exceptions
-3. **Error Context Preservation**: Stack traces and original errors are maintained
-4. **Composable Operations**: Chain operations together with proper error handling
+2. **No Surprise Exceptions**: Operations return errors instead of throwing exceptions
+3. **Error Context Preservation**: Maintains stack traces and original errors
+4. **Composable Operations**: Chain operations with appropriate error handling
 5. **Typed Error Handling**: Different error types for different contexts
 
-## Contribution
+## Contributing
 
 Contributions are welcome! If you have ideas for new features or improvements, please open an [issue](https://github.com/jhonacodes/result_controller/issues) or submit a pull request.
 

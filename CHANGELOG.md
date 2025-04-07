@@ -1,20 +1,45 @@
 # Changelog
 
+## [1.1.0]
+
+### Breaking Changes
+- Headers are now mandatory in `ok` and `err` constructors
+- Removed default constructor that allowed optional headers
+- Added status code validation (must be between 100 and 599)
+- Improved exception logging system in `ApiErr`
+- Added support for custom exception mapping
+- Modified `whenList` behavior to handle mixed types
+- Added `whenListType` method for better list typing
+- Improved null value handling in lists
+- Added `whenJsonListMap` method for processing dynamic JSON map lists
+- Added extension methods for `Future<Result>`
+- Improved async operation support
+- Added error transformation utilities
+
+### Added
+- Better type handling in async operations
+- Enhanced JSON processing support
+- Better error handling in chained operations
+- New data transformation utilities
+
+### Fixed
+- Null headers handling
+- Status code validation
+- Mixed list processing
+
 ## [1.0.3]
-## Refactor
+### Refactor
 - `HttpError` to `HttpErr`
 
 ## [1.0.2]
-## Refactor
+### Refactor
 - Cleaning extensions in result.
 ### Added
 - More test cases.
 
-
 ## [1.0.1] 
-## Readme
+### Documentation
 - Update readme
-
 
 ## [1.0.0] - Initial Release
 

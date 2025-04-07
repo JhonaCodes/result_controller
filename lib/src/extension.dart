@@ -5,10 +5,59 @@ import 'api_response_handler.dart';
 import 'err_handler.dart';
 import 'ok_handler.dart';
 
-/// Extensions for asynchronous [Result] operations
+/// Extensions for asynchronous Result operations
 ///
-/// These extensions make it easier to work with [Result] values wrapped in [Future]s,
-/// enabling clean chaining of async operations that may fail.
+/// Provides convenient methods for handling asynchronous operations with Result types,
+/// including transformation, chaining, and error handling for collections.
+///
+/// Key Features:
+/// - Transform successful values
+/// - Chain asynchronous operations
+/// - Handle errors in collections
+/// - Convert API responses
+///
+/// Basic Example:
+/// ```dart
+/// // Transform user data
+/// Future<Result<User>> fetchUserData(String id) async {
+///   return await fetchUser(id).then((result) => result.map((user) {
+///     return User(
+///       id: user.id,
+///       name: user.name.toUpperCase(),
+///       email: user.email.toLowerCase(),
+///     );
+///   }));
+/// }
+/// ```
+///
+/// Chaining Operations Example:
+/// ```dart
+/// // Chain async operations
+/// Future<Result<List<Post>>> fetchUserPosts(String userId) async {
+///   return await fetchUser(userId).then((userResult) => userResult.flatMap((user) {
+///     return fetchUserPosts(user.id);
+///   }));
+/// }
+/// ```
+///
+/// Collection Processing Example:
+/// ```dart
+/// // Process list of users
+/// Future<Result<List<User>>> fetchUsers(List<String> ids) async {
+///   return await Future.wait(
+///     ids.map((id) => fetchUser(id))
+///   ).then((results) => results.foldResults());
+/// }
+/// ```
+///
+/// API Response Conversion Example:
+/// ```dart
+/// // Convert API response to Result
+/// Future<Result<User>> fetchUserFromApi(String id) async {
+///   final response = await http.get(Uri.parse('https://api.example.com/users/$id'));
+///   return ApiResponse.fromResponse(response).toResult((json) => User.fromJson(json));
+/// }
+/// ```
 extension FutureResultExtensions<T, E> on Future<Result<T, E>> {
   /// Transforms the success value of an async Result
   ///

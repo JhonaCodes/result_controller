@@ -8,7 +8,13 @@ import 'package:result_controller/result_controller.dart';
 /// API-specific error information such as HTTP status codes and user-friendly messages.
 /// It can be used for comprehensive error handling and logging in API operations.
 ///
-/// Example:
+/// Key Features:
+/// - Original exception capture
+/// - User-friendly error messages
+/// - Stack traces for debugging
+/// - Exception mapping registry
+///
+/// Basic Example:
 /// ```dart
 /// // Create an API error with status code and message
 /// final error = ApiErr(
@@ -24,7 +30,7 @@ import 'package:result_controller/result_controller.dart';
 /// // Log the error
 /// print(error.toString());
 ///
-/// // Handle the error based on status code
+/// // Handle error based on status code
 /// if (error.statusCode == 401 || error.statusCode == 403) {
 ///   // Handle authentication/authorization errors
 ///   navigateToLogin();
@@ -34,6 +40,33 @@ import 'package:result_controller/result_controller.dart';
 /// } else {
 ///   // Handle other errors
 ///   showGenericErrorMessage(error.message?.details);
+/// }
+/// ```
+///
+/// Example with exception mapping:
+/// ```dart
+/// // Register exception mappings
+/// ApiErr.addAllExceptions({
+///   TimeoutException: ApiErr(
+///     message: HttpMessage(
+///       title: 'Timeout',
+///       details: 'Server took too long to respond'
+///     )
+///   ),
+///   SocketException: ApiErr(
+///     message: HttpMessage(
+///       title: 'Network Error',
+///       details: 'Could not connect to server'
+///     )
+///   ),
+/// });
+///
+/// // Use the mapping
+/// try {
+///   await fetchData();
+/// } catch (e) {
+///   final error = ApiErr.fromException(e);
+///   print(error.message?.title); // Will show the mapped title
 /// }
 /// ```
 class ApiErr extends ResultErr {
@@ -118,8 +151,6 @@ class ApiErr extends ResultErr {
 
     return result;
   }
-
-
 
   /// Registry of exception mappings for standardized error handling
   ///
