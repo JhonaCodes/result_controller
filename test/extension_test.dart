@@ -152,10 +152,11 @@ void main() {
 
   group('ApiResponseExtensions', () {
     test('toResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.ok({
-        'id': '123',
-        'name': 'John Doe',
-      }, statusCode: 200, headers: {});
+      final apiResponse = ApiResponse.ok(
+        {'id': '123', 'name': 'John Doe'},
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = apiResponse.toResult(User.fromJson);
 
@@ -169,10 +170,7 @@ void main() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          message: HttpMessage(
-            title: 'Error',
-            details: 'Connection failed',
-          ),
+          message: HttpMessage(title: 'Error', details: 'Connection failed'),
         ),
         statusCode: 500,
         headers: {},
@@ -185,10 +183,14 @@ void main() {
     });
 
     test('toListResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.ok([
-        {'id': '1', 'name': 'John'},
-        {'id': '2', 'name': 'Jane'},
-      ], statusCode: 200, headers: {});
+      final apiResponse = ApiResponse.ok(
+        [
+          {'id': '1', 'name': 'John'},
+          {'id': '2', 'name': 'Jane'},
+        ],
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = apiResponse.toListResult(
         (items) => items.map(User.fromJson).toList(),
@@ -205,10 +207,7 @@ void main() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          message: HttpMessage(
-            title: 'Error',
-            details: 'Connection failed',
-          ),
+          message: HttpMessage(title: 'Error', details: 'Connection failed'),
         ),
         statusCode: 500,
         headers: {},

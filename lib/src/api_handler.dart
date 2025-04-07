@@ -128,9 +128,9 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// ```
   @override
   Result<R, ApiErr> map<R>(
-      R Function(T value) transform, [
-        ApiErr Function(ApiErr error)? errorTransform,
-      ]) {
+    R Function(T value) transform, [
+    ApiErr Function(ApiErr error)? errorTransform,
+  ]) {
     if (_isOk) {
       return ApiResult<R>.ok(transform(_data as T), statusCode: statusCode);
     } else {
@@ -158,9 +158,9 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// ```
   @override
   Result<R, ApiErr> flatMap<R>(
-      Result<R, ApiErr> Function(T value) transform, [
-        Result<R, ApiErr> Function(ApiErr error)? errorTransform,
-      ]) {
+    Result<R, ApiErr> Function(T value) transform, [
+    Result<R, ApiErr> Function(ApiErr error)? errorTransform,
+  ]) {
     if (_isOk) {
       return transform(_data as T);
     } else {
@@ -202,10 +202,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   }) {
     try {
       if (response.err != null) {
-        return ApiResult.err(
-          response.err!,
-          statusCode: response.statusCode,
-        );
+        return ApiResult.err(response.err!, statusCode: response.statusCode);
       }
 
       if (response.data == null) {
@@ -281,10 +278,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   }) {
     try {
       if (response.err != null) {
-        return ApiResult.err(
-          response.err!,
-          statusCode: response.statusCode,
-        );
+        return ApiResult.err(response.err!, statusCode: response.statusCode);
       }
 
       if (response.data == null) {
@@ -317,7 +311,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
           exception: e,
           message: HttpMessage(
             title: 'Data Processing Error',
-            details: 'Could not process the server response list: ${e.toString()}',
+            details:
+                'Could not process the server response list: ${e.toString()}',
           ),
           stackTrace: stackTrace,
         ),
@@ -472,7 +467,6 @@ class Params {
 /// );
 /// ```
 class HttpMessage {
-
   /// Message title
   ///
   /// This should be a short, descriptive title for the message.
@@ -491,10 +485,7 @@ class HttpMessage {
   ///
   /// The [title] and [details] are required.
   /// The [success] flag defaults to true, set it to false for error messages.
-  HttpMessage({
-    required this.title,
-    required this.details,
-  });
+  HttpMessage({required this.title, required this.details});
 
   /// Creates an HttpMessage from a JSON map
   ///
@@ -535,7 +526,7 @@ class HttpMessage {
   }
 
   /// Just if you key is equal to  [message]
-  Map<String, dynamic> toJson(){
+  Map<String, dynamic> toJson() {
     return {'title': title, 'message': details};
   }
 
@@ -554,10 +545,7 @@ class HttpMessage {
   /// }
   /// ```
   factory HttpMessage.fromException(Object exception) {
-    return HttpMessage(
-      title: 'Error',
-      details: exception.toString(),
-    );
+    return HttpMessage(title: 'Error', details: exception.toString());
   }
 
   /// Creates an HttpMessage from an HttpError

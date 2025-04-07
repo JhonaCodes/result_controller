@@ -40,14 +40,15 @@ void main() {
     });
 
     test('Result.tryAsync handles complex asynchronous errors', () async {
-      Future<Result<int, ResultErr>> complexAsyncErrorResult =
-          Result.tryAsync(() async {
-            await Future.delayed(Duration(milliseconds: 100));
-            if (DateTime.now().millisecondsSinceEpoch.isEven) {
-              throw NetworkError('Simulated network failure');
-            }
-            return 42;
-          });
+      Future<Result<int, ResultErr>> complexAsyncErrorResult = Result.tryAsync(
+        () async {
+          await Future.delayed(Duration(milliseconds: 100));
+          if (DateTime.now().millisecondsSinceEpoch.isEven) {
+            throw NetworkError('Simulated network failure');
+          }
+          return 42;
+        },
+      );
 
       final result = await complexAsyncErrorResult;
       result.when(

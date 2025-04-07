@@ -46,10 +46,7 @@ void main() {
 
     test('ApiResult.err creation', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Not Found',
-          details: 'Resource not found',
-        ),
+        message: HttpMessage(title: 'Not Found', details: 'Resource not found'),
       );
 
       final result = ApiResult<int>.err(apiErr);
@@ -178,10 +175,11 @@ void main() {
     });
 
     test('ApiResult.from with successful response', () {
-      final response = ApiResponse.ok({
-        'id': '123',
-        'name': 'John Doe',
-      }, statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        {'id': '123', 'name': 'John Doe'},
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = ApiResult.from<User>(
         response: response,
@@ -229,15 +227,22 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
       expect(result.errorOrNull?.message?.details, contains('type'));
     });
 
     test('ApiResult.fromList with successful response', () {
-      final response = ApiResponse.ok([
-        {'id': '1', 'name': 'User 1'},
-        {'id': '2', 'name': 'User 2'},
-      ], statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        [
+          {'id': '1', 'name': 'User 1'},
+          {'id': '2', 'name': 'User 2'},
+        ],
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = ApiResult.fromList<User>(
         response: response,
@@ -273,10 +278,14 @@ void main() {
     });
 
     test('ApiResult.fromList with parsing error', () {
-      final response = ApiResponse.ok([
-        {'id': 1, 'name': 'User 1'}, // Invalid data types
-        {'id': '2'}, // Missing name
-      ], statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        [
+          {'id': 1, 'name': 'User 1'}, // Invalid data types
+          {'id': '2'}, // Missing name
+        ],
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = ApiResult.fromList<User>(
         response: response,
@@ -284,7 +293,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
       expect(result.errorOrNull?.message?.details, contains('type'));
     });
 
@@ -321,7 +333,11 @@ void main() {
 
     test('ApiResult.from with invalid JSON string', () {
       final invalidJson = '{id:"123",name:John}';
-      final response = ApiResponse.ok(invalidJson, statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        invalidJson,
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = ApiResult.from<User>(
         response: response,
@@ -329,13 +345,20 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
       expect(result.errorOrNull?.message?.details, contains('JSON'));
     });
 
     test('ApiResult.fromList with invalid JSON string', () {
       final invalidJson = '[{id:"1",name:User 1}]';
-      final response = ApiResponse.ok(invalidJson, statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        invalidJson,
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = ApiResult.fromList<User>(
         response: response,
@@ -343,7 +366,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(
+        result.errorOrNull?.message?.title,
+        equals('Data Processing Error'),
+      );
       expect(result.errorOrNull?.message?.details, contains('JSON'));
     });
   });

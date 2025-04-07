@@ -103,14 +103,11 @@ class ApiErr extends ResultErr {
   ///   stackTrace: stackTrace,
   /// );
   /// ```
-  ApiErr({
-    this.exception,
-    this.message,
-    StackTrace? stackTrace,
-  }) : super(
-    message?.details ?? exception?.toString() ?? 'Unknown API error',
-    stackTrace: stackTrace,
-  );
+  ApiErr({this.exception, this.message, StackTrace? stackTrace})
+    : super(
+        message?.details ?? exception?.toString() ?? 'Unknown API error',
+        stackTrace: stackTrace,
+      );
 
   /// Provides a formatted string representation of the error
   ///
@@ -138,7 +135,9 @@ class ApiErr extends ResultErr {
     if (message != null) {
       parts.add('${message!.title}: ${message!.details}');
     } else if (exception != null) {
-      parts.add('Error: ${exception is Exception ? (exception as Exception).toString().replaceAll('Exception: ', '') : exception.toString()}');
+      parts.add(
+        'Error: ${exception is Exception ? (exception as Exception).toString().replaceAll('Exception: ', '') : exception.toString()}',
+      );
     } else {
       parts.add('Unknown API error');
     }
@@ -209,11 +208,11 @@ class ApiErr extends ResultErr {
   /// }
   /// ```
   static ApiErr fromException(Object exception) =>
-      _currentMapExceptions[exception] ?? ApiErr(
-          message: HttpMessage(
-            title: 'Error',
-            details: 'An unexpected error occurred',
-          )
+      _currentMapExceptions[exception] ??
+      ApiErr(
+        message: HttpMessage(
+          title: 'Error',
+          details: 'An unexpected error occurred',
+        ),
       );
 }
-

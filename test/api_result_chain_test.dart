@@ -125,10 +125,7 @@ void main() {
       // Create an error result
       final errorResult = ApiResult<User>.err(
         ApiErr(
-          message: HttpMessage(
-            title: 'Not Found',
-            details: 'User not found',
-          ),
+          message: HttpMessage(title: 'Not Found', details: 'User not found'),
         ),
       );
 
@@ -147,10 +144,7 @@ void main() {
       // Create an error result
       final errorResult = ApiResult<User>.err(
         ApiErr(
-          message: HttpMessage(
-            title: 'Not Found',
-            details: 'User not found',
-          ),
+          message: HttpMessage(title: 'Not Found', details: 'User not found'),
         ),
       );
 
@@ -174,10 +168,7 @@ void main() {
       // Create an error result
       final errorResult = ApiResult<User>.err(
         ApiErr(
-          message: HttpMessage(
-            title: 'Not Found',
-            details: 'User not found',
-          ),
+          message: HttpMessage(title: 'Not Found', details: 'User not found'),
         ),
       );
 
@@ -301,7 +292,10 @@ void main() {
       });
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.details, contains('Failed to fetch posts for user 1'));
+      expect(
+        result.errorOrNull?.message?.details,
+        contains('Failed to fetch posts for user 1'),
+      );
     });
 
     test('Error recovery in the middle of a chain', () {
@@ -336,7 +330,8 @@ void main() {
       final result = getUser('1').flatMap((user) {
         return getUserPosts(user)
             .recover((error) {
-              if (error.message?.details == 'Failed to fetch posts for user 1') {
+              if (error.message?.details ==
+                  'Failed to fetch posts for user 1') {
                 // Recovery logic
                 return getFallbackPosts(user);
               }
@@ -352,7 +347,10 @@ void main() {
       });
 
       expect(result.isOk, isTrue);
-      expect((result.data['posts'] as List<Post>).first.title, equals('Fallback Post'));
+      expect(
+        (result.data['posts'] as List<Post>).first.title,
+        equals('Fallback Post'),
+      );
       expect(result.data['postsCount'], equals(1));
     });
 
@@ -505,10 +503,7 @@ void main() {
 
       final authError = ApiResult<User>.err(
         ApiErr(
-          message: HttpMessage(
-            title: 'Unauthorized',
-            details: 'Token expired',
-          ),
+          message: HttpMessage(title: 'Unauthorized', details: 'Token expired'),
         ),
       );
 
@@ -714,9 +709,7 @@ void main() {
 
     test('Handles missing required fields gracefully', () {
       // Mock a response with missing required fields
-      final missingFieldsResponse = ApiResponse.ok({
-        'id': '123',
-      }, headers: {});
+      final missingFieldsResponse = ApiResponse.ok({'id': '123'}, headers: {});
 
       // Try to convert with error handling for missing fields
       final result = ApiResult.from<User>(
@@ -751,10 +744,7 @@ void main() {
       final result = ApiResult.from<User>(
         response: wrongTypesResponse,
         onData: (data) {
-          return User(
-            id: data['id'].toString(),
-            name: data['name'].toString(),
-          );
+          return User(id: data['id'].toString(), name: data['name'].toString());
         },
       );
 

@@ -121,7 +121,12 @@ class ApiResponse {
   /// - [statusCode]: HTTP status code of the response
   /// - [data]: Raw response data
   /// - [err]: Detailed err information
-  ApiResponse({this.statusCode, this.data, this.err, Map<String, String>? headers }): headers = headers ?? {} {
+  ApiResponse({
+    this.statusCode,
+    this.data,
+    this.err,
+    Map<String, String>? headers,
+  }) : headers = headers ?? {} {
     if (statusCode != null && (statusCode! < 100 || statusCode! >= 600)) {
       throw ArgumentError('Status code must be between 100 and 599');
     }
@@ -142,7 +147,11 @@ class ApiResponse {
   ///   statusCode: 200
   /// );
   /// ```
-  factory ApiResponse.ok(dynamic data, {int? statusCode, required Map<String, String> headers}) {
+  factory ApiResponse.ok(
+    dynamic data, {
+    int? statusCode,
+    required Map<String, String> headers,
+  }) {
     return ApiResponse(data: data, statusCode: statusCode, headers: headers);
   }
 
@@ -167,8 +176,17 @@ class ApiResponse {
   ///   statusCode: 500
   /// );
   /// ```
-  factory ApiResponse.err(ApiErr err, {int? statusCode, required Map<String, String> headers}) {
-    return ApiResponse(err: err, statusCode: statusCode, headers: headers, data: null);
+  factory ApiResponse.err(
+    ApiErr err, {
+    int? statusCode,
+    required Map<String, String> headers,
+  }) {
+    return ApiResponse(
+      err: err,
+      statusCode: statusCode,
+      headers: headers,
+      data: null,
+    );
   }
 
   /// Processes the response with separate handlers for success and err cases

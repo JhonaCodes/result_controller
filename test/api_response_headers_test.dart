@@ -7,35 +7,33 @@ void main() {
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer token',
-        'Custom-Header': 'value'
+        'Custom-Header': 'value',
       };
-      
+
       final response = ApiResponse.ok(
-        {'data': 'value'}, 
-        statusCode: 200, 
-        headers: headers
+        {'data': 'value'},
+        statusCode: 200,
+        headers: headers,
       );
-      
+
       expect(response.headers, equals(headers));
       expect(response.headers['Content-Type'], equals('application/json'));
     });
-    
+
     test('headers are preserved in error response', () {
       final headers = {
         'Content-Type': 'application/json',
-        'WWW-Authenticate': 'Bearer error="invalid_token"'
+        'WWW-Authenticate': 'Bearer error="invalid_token"',
       };
-      
+
       final response = ApiResponse.err(
-        ApiErr(
-          message: HttpMessage(title: 'Error', details: 'Details')
-        ),
+        ApiErr(message: HttpMessage(title: 'Error', details: 'Details')),
         statusCode: 401,
-        headers: headers
+        headers: headers,
       );
-      
+
       expect(response.headers, equals(headers));
       expect(response.headers['WWW-Authenticate'], contains('invalid_token'));
     });
   });
-} 
+}

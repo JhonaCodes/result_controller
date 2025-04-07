@@ -21,7 +21,11 @@ void main() {
     });
 
     test('ok factory creates response with success data', () {
-      final response = ApiResponse.ok({'key': 'value'}, statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        {'key': 'value'},
+        statusCode: 200,
+        headers: {},
+      );
 
       expect(response.data, {'key': 'value'});
       expect(response.statusCode, 200);
@@ -46,7 +50,11 @@ void main() {
 
   group('when method', () {
     test('calls ok function when response has no error', () {
-      final response = ApiResponse.ok({'name': 'John'}, statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        {'name': 'John'},
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = response.when(
         ok: (data) => 'Success: ${data['name']}',
@@ -77,10 +85,14 @@ void main() {
 
   group('whenList method', () {
     test('processes list of maps correctly', () {
-      final response = ApiResponse.ok([
-        {'id': 1, 'name': 'John'},
-        {'id': 2, 'name': 'Jane'},
-      ], statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        [
+          {'id': 1, 'name': 'John'},
+          {'id': 2, 'name': 'Jane'},
+        ],
+        statusCode: 200,
+        headers: {},
+      );
       final result = response.whenList(
         ok: (list) {
           final rr = list.map((item) => item['name']).toList();
@@ -93,9 +105,11 @@ void main() {
     });
 
     test('converts mixed key map types to Map<String, dynamic>', () {
-      final response = ApiResponse.ok([
-        jsonDecode('{"id": 1, "name": "John"}'),
-      ], statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        [jsonDecode('{"id": 1, "name": "John"}')],
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = response.whenList(
         ok: (list) => list.map((item) => item['name']).toList(),
@@ -106,7 +120,11 @@ void main() {
     });
 
     test('handles error when data is not a list', () {
-      final response = ApiResponse.ok({'key': 'value'}, statusCode: 200, headers: {});
+      final response = ApiResponse.ok(
+        {'key': 'value'},
+        statusCode: 200,
+        headers: {},
+      );
 
       final result = response.whenList(
         ok: (list) => list.map((item) => item['name']).toList(),

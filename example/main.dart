@@ -11,7 +11,11 @@ class User {
   User({required this.id, required this.name, required this.age});
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(id: json['id'] as String, name: json['name'] as String, age: json['age'] as int);
+    return User(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      age: json['age'] as int,
+    );
   }
 
   Map<String, dynamic> toJson() => {'id': id, 'name': name, 'age': age};
@@ -42,15 +46,24 @@ void demonstrateBasicResult() {
 
   // Successful division
   final successResult = divideNumbers(10, 2);
-  successResult.when(ok: (value) => log('Division result: $value'), err: (error) => log('Error: $error'));
+  successResult.when(
+    ok: (value) => log('Division result: $value'),
+    err: (error) => log('Error: $error'),
+  );
 
   // Failed division
   final failureResult = divideNumbers(10, 0);
-  failureResult.when(ok: (value) => log('Division result: $value'), err: (error) => log('Error: $error'));
+  failureResult.when(
+    ok: (value) => log('Division result: $value'),
+    err: (error) => log('Error: $error'),
+  );
 
   // Transforming results
   final transformedResult = successResult.map((value) => value * 2);
-  transformedResult.when(ok: (value) => log('Transformed result: $value'), err: (error) => log('Error: $error'));
+  transformedResult.when(
+    ok: (value) => log('Transformed result: $value'),
+    err: (error) => log('Error: $error'),
+  );
 }
 
 /// Demonstrates API-specific error handling
@@ -70,13 +83,20 @@ void demonstrateApiErrorHandling() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          message: HttpMessage( title: 'Connection Error', details: 'Could not connect to the server'),
+          message: HttpMessage(
+            title: 'Connection Error',
+            details: 'Could not connect to the server',
+          ),
         ),
       );
     }
 
     // Successful response
-    return ApiResponse.ok({'id': userId, 'name': 'John Doe', 'age': 30}, headers: {}, statusCode: 200);
+    return ApiResponse.ok(
+      {'id': userId, 'name': 'John Doe', 'age': 30},
+      headers: {},
+      statusCode: 200,
+    );
   }
 
   // Fetch and process user data
@@ -129,7 +149,10 @@ void demonstrateAsyncErrorHandling() {
       return 'Complex async operation';
     });
 
-    result.when(ok: (data) => log('Async operation succeeded: $data'), err: (error) => log('Async operation failed: ${error.text}'));
+    result.when(
+      ok: (data) => log('Async operation succeeded: $data'),
+      err: (error) => log('Async operation failed: ${error.text}'),
+    );
   }
 
   // Chaining async operations
@@ -140,7 +163,10 @@ void demonstrateAsyncErrorHandling() {
       return Ok('Processed: $data');
     });
 
-    result.when(ok: (processedData) => log('Chained operation: $processedData'), err: (error) => log('Chained operation failed: $error'));
+    result.when(
+      ok: (processedData) => log('Chained operation: $processedData'),
+      err: (error) => log('Chained operation failed: $error'),
+    );
   }
 
   // Run async examples

@@ -35,10 +35,7 @@ void main() {
     testError = ApiErr(
       exception: Exception('Test exception'),
       stackTrace: TestStackTrace(),
-      message: HttpMessage(
-        title: 'Test Error',
-        details: 'Test error details',
-      ),
+      message: HttpMessage(title: 'Test Error', details: 'Test error details'),
     );
   });
 
@@ -77,7 +74,13 @@ void main() {
     });
 
     test('handles List<bool> correctly', () {
-      final response = ApiResponse.ok([true, false, true, false, true], headers: {});
+      final response = ApiResponse.ok([
+        true,
+        false,
+        true,
+        false,
+        true,
+      ], headers: {});
 
       final result = response.whenListType<List<bool>, bool>(
         ok: (list) => list,
@@ -188,7 +191,7 @@ void main() {
       final response = ApiResponse.ok([
         {'id': '1', 'name': 'Item 1'},
         {'id': '2', 'name': 'Item 2'},
-        {'id': '3', 'name': 'Item 3'}
+        {'id': '3', 'name': 'Item 3'},
       ], headers: {});
 
       final result = response.whenJsonListMap(
@@ -254,7 +257,7 @@ void main() {
       final response = ApiResponse.ok([
         {'id': '1', 'name': 'Item 1'},
         'not a map', // This is not a map
-        {'id': '3', 'name': 'Item 3'}
+        {'id': '3', 'name': 'Item 3'},
       ], headers: {});
 
       final result = response.whenJsonListMap(
@@ -401,21 +404,22 @@ void main() {
     });
 
     test('handles different status codes with appropriate responses', () {
-      final okResponse = ApiResponse.ok({
-        'status': 'success',
-      }, statusCode: 200, headers: {});
-      final createdResponse = ApiResponse.ok({
-        'id': 'new-id',
-      }, statusCode: 201, headers: {});
+      final okResponse = ApiResponse.ok(
+        {'status': 'success'},
+        statusCode: 200,
+        headers: {},
+      );
+      final createdResponse = ApiResponse.ok(
+        {'id': 'new-id'},
+        statusCode: 201,
+        headers: {},
+      );
       final notModifiedResponse = ApiResponse(statusCode: 304, headers: {});
       final badRequestResponse = ApiResponse.err(
         ApiErr(
           exception: Exception('Bad request'),
           stackTrace: TestStackTrace(),
-          message: HttpMessage(
-            title: 'Error',
-            details: 'Bad request',
-          ),
+          message: HttpMessage(title: 'Error', details: 'Bad request'),
         ),
         statusCode: 400,
         headers: {},
@@ -424,10 +428,7 @@ void main() {
         ApiErr(
           exception: Exception('Server error'),
           stackTrace: TestStackTrace(),
-          message: HttpMessage(
-            title: 'Error',
-            details: 'Server error',
-          ),
+          message: HttpMessage(title: 'Error', details: 'Server error'),
         ),
         statusCode: 500,
         headers: {},

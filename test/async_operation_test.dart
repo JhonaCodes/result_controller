@@ -58,10 +58,7 @@ void main() {
         (error, stackTrace) => ApiErr(
           exception: error,
           stackTrace: stackTrace,
-          message: HttpMessage(
-            title: 'Error',
-            details: error.toString(),
-          ),
+          message: HttpMessage(title: 'Error', details: error.toString()),
         ),
       );
 
@@ -97,10 +94,7 @@ void main() {
         (error, stackTrace) => ApiErr(
           exception: error,
           stackTrace: stackTrace,
-          message: HttpMessage(
-            title: 'API Error',
-            details: error.toString(),
-          ),
+          message: HttpMessage(title: 'API Error', details: error.toString()),
         ),
       );
 
@@ -143,30 +137,29 @@ void main() {
         (error, stackTrace) => ApiErr(
           exception: error,
           stackTrace: stackTrace,
-          message: HttpMessage(
-            title: 'Error',
-            details: error.toString(),
+          message: HttpMessage(title: 'Error', details: error.toString()),
+        ),
+      ).then(
+        (result) => Result.tryAsyncMap<ApiResponse, ApiErr>(
+          () async => ApiResponse.ok(
+            {'email': 'test@example.com', 'role': 'user'},
+            headers: {},
+            statusCode: 200,
+          ),
+          (error, stackTrace) => ApiErr(
+            exception: error,
+            stackTrace: stackTrace,
+            message: HttpMessage(title: 'Error', details: error.toString()),
           ),
         ),
-      ).then((result) => Result.tryAsyncMap<ApiResponse, ApiErr>(
-        () async => ApiResponse.ok(
-          {'email': 'test@example.com', 'role': 'user'},
-          headers: {},
-          statusCode: 200,
-        ),
-        (error, stackTrace) => ApiErr(
-          exception: error,
-          stackTrace: stackTrace,
-          message: HttpMessage(
-            title: 'Error',
-            details: error.toString(),
-          ),
-        ),
-      ));
+      );
 
       expect(result.isOk, isTrue);
       expect(result.data.statusCode, equals(200));
-      expect(result.data.data, equals({'email': 'test@example.com', 'role': 'user'}));
+      expect(
+        result.data.data,
+        equals({'email': 'test@example.com', 'role': 'user'}),
+      );
     });
 
     test('handles error in chain of async operations', () async {
@@ -179,22 +172,18 @@ void main() {
         (error, stackTrace) => ApiErr(
           exception: error,
           stackTrace: stackTrace,
-          message: HttpMessage(
-            title: 'Error',
-            details: error.toString(),
+          message: HttpMessage(title: 'Error', details: error.toString()),
+        ),
+      ).then(
+        (result) => Result.tryAsyncMap<ApiResponse, ApiErr>(
+          () async => throw ApiException('Failed to fetch user details', 404),
+          (error, stackTrace) => ApiErr(
+            exception: error,
+            stackTrace: stackTrace,
+            message: HttpMessage(title: 'Error', details: error.toString()),
           ),
         ),
-      ).then((result) => Result.tryAsyncMap<ApiResponse, ApiErr>(
-        () async => throw ApiException('Failed to fetch user details', 404),
-        (error, stackTrace) => ApiErr(
-          exception: error,
-          stackTrace: stackTrace,
-          message: HttpMessage(
-            title: 'Error',
-            details: error.toString(),
-          ),
-        ),
-      ));
+      );
 
       expect(result.isErr, isTrue);
       final error = result.errorOrNull;
@@ -216,10 +205,7 @@ void main() {
           (error, stackTrace) => ApiErr(
             exception: error,
             stackTrace: stackTrace,
-            message: HttpMessage(
-              title: 'Error',
-              details: error.toString(),
-            ),
+            message: HttpMessage(title: 'Error', details: error.toString()),
           ),
         ),
       );
@@ -227,8 +213,10 @@ void main() {
       final results = await Future.wait(operations);
       expect(results.length, equals(5));
       expect(results.every((result) => result.isOk), isTrue);
-      expect(results.map((result) => result.data.data['id']).toList(),
-          equals(['1', '2', '3', '4', '5']));
+      expect(
+        results.map((result) => result.data.data['id']).toList(),
+        equals(['1', '2', '3', '4', '5']),
+      );
     });
 
     test('handles concurrent error recovery', () async {
@@ -239,10 +227,7 @@ void main() {
           (error, stackTrace) => ApiErr(
             exception: error,
             stackTrace: stackTrace,
-            message: HttpMessage(
-              title: 'Error',
-              details: error.toString(),
-            ),
+            message: HttpMessage(title: 'Error', details: error.toString()),
           ),
         ),
       );
@@ -250,12 +235,15 @@ void main() {
       final results = await Future.wait(operations);
       expect(results.length, equals(5));
       expect(results.every((result) => result.isErr), isTrue);
-      expect(results.map((result) {
-        final error = result.errorOrNull;
-        expect(error, isNotNull);
-        expect(error!.message, isNotNull);
-        return error.message!.details;
-      }).toList(), equals(List.generate(5, (index) => 'Operation ${index + 1} failed')));
+      expect(
+        results.map((result) {
+          final error = result.errorOrNull;
+          expect(error, isNotNull);
+          expect(error!.message, isNotNull);
+          return error.message!.details;
+        }).toList(),
+        equals(List.generate(5, (index) => 'Operation ${index + 1} failed')),
+      );
     });
 
     test('preserves complete stack trace information', () async {
@@ -269,10 +257,7 @@ void main() {
       final result = await Result.tryAsyncMap<User, ApiErr>(
         () async => await fetchUser(),
         (error, stackTrace) => ApiErr(
-          message: HttpMessage(
-            title: 'Error',
-            details: 'Error occurred',
-          ),
+          message: HttpMessage(title: 'Error', details: 'Error occurred'),
           exception: error,
           stackTrace: stackTrace,
         ),
@@ -468,7 +453,8 @@ void main() {
       );
 
       // Recovery step: If user not found, use default user
-      if (!userResult.isOk && userResult.errorOrNull?.message?.title == 'Not Found') {
+      if (!userResult.isOk &&
+          userResult.errorOrNull?.message?.title == 'Not Found') {
         userResult = await fetchDefaultUser();
       }
 
@@ -622,7 +608,8 @@ void main() {
             (error, stackTrace) => ApiErr(
               message: HttpMessage(
                 title: 'Timeout',
-                details: 'Operation timed out after ${timeout.inMilliseconds}ms',
+                details:
+                    'Operation timed out after ${timeout.inMilliseconds}ms',
               ),
               exception: error,
               stackTrace: stackTrace,
@@ -899,11 +886,16 @@ void main() {
       final successCount = results.where((r) => r.isOk).length;
       final notFoundCount =
           results
-              .where((r) => r.isErr && r.errorOrNull?.message?.title == 'Not Found')
+              .where(
+                (r) => r.isErr && r.errorOrNull?.message?.title == 'Not Found',
+              )
               .length;
       final serverErrorCount =
           results
-              .where((r) => r.isErr && r.errorOrNull?.message?.title == 'Server Error')
+              .where(
+                (r) =>
+                    r.isErr && r.errorOrNull?.message?.title == 'Server Error',
+              )
               .length;
 
       // We should have 90 successes, 5 not founds, and 5 server errors
