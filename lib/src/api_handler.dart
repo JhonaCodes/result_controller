@@ -36,25 +36,40 @@ import 'api_response_handler.dart';
 /// );
 /// ```
 class ApiResult<T> extends Result<T, ApiErr> {
+  /// HTTP status code if available
+  ///
+  /// Common status codes:
+  /// - 200-299: Success responses
+  /// - 400: Bad request (client error)
+  /// - 401: Unauthorized (authentication needed)
+  /// - 403: Forbidden (authenticated but not authorized)
+  /// - 404: Not found
+  /// - 500-599: Server errors
+  final int? statusCode;
+
   final T? _data;
   final ApiErr? _error;
   final bool _isOk;
 
   /// Private constructor used internally by factories
-  ApiResult._internal(this._data, this._error, this._isOk);
+  ApiResult._internal(this.statusCode, this._data, this._error, this._isOk);
 
   /// Creates a successful API result
   ///
   /// Use this constructor when you have successfully retrieved and processed data
   /// from an API call.
   ///
+  /// Parameters:
+  /// - [data]: The processed data from the API response
+  /// - [statusCode]: Optional HTTP status code (defaults to 200)
+  ///
   /// Example:
   /// ```dart
   /// final user = User.fromJson(userData);
-  /// return ApiResult.ok(user);
+  /// return ApiResult.ok(user, statusCode: 201);
   /// ```
-  factory ApiResult.ok(T data) {
-    return ApiResult._internal(data, null, true);
+  factory ApiResult.ok(T data, {int? statusCode = 200}) {
+    return ApiResult._internal(statusCode, data, null, true);
   }
 
   /// Creates an API result with an error
@@ -62,21 +77,25 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// Use this constructor when an API call has failed or when data processing
   /// encounters an error.
   ///
+  /// Parameters:
+  /// - [error]: The API error that occurred
+  /// - [statusCode]: Optional HTTP status code (overrides any status in the error)
+  ///
   /// Example:
   /// ```dart
   /// return ApiResult.err(
   ///   ApiErr(
-  ///     statusCode: 500,
   ///     message: HttpMessage(
   ///       success: false,
   ///       title: 'Server Error',
   ///       details: 'An unexpected error occurred'
   ///     )
-  ///   )
+  ///   ),
+  ///   statusCode: 500
   /// );
   /// ```
-  factory ApiResult.err(ApiErr error) {
-    return ApiResult._internal(null, error, false);
+  factory ApiResult.err(ApiErr error, {int? statusCode}) {
+    return ApiResult._internal(statusCode, null, error, false);
   }
 
   /// Processes this result by applying the appropriate function
@@ -109,15 +128,16 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// ```
   @override
   Result<R, ApiErr> map<R>(
-    R Function(T value) transform, [
-    ApiErr Function(ApiErr error)? errorTransform,
-  ]) {
+      R Function(T value) transform, [
+        ApiErr Function(ApiErr error)? errorTransform,
+      ]) {
     if (_isOk) {
-      return ApiResult<R>.ok(transform(_data as T));
+      return ApiResult<R>.ok(transform(_data as T), statusCode: statusCode);
     } else {
       final error = _error as ApiErr;
       return ApiResult<R>.err(
         errorTransform != null ? errorTransform(error) : error,
+        statusCode: statusCode,
       );
     }
   }
@@ -138,16 +158,16 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// ```
   @override
   Result<R, ApiErr> flatMap<R>(
-    Result<R, ApiErr> Function(T value) transform, [
-    Result<R, ApiErr> Function(ApiErr error)? errorTransform,
-  ]) {
+      Result<R, ApiErr> Function(T value) transform, [
+        Result<R, ApiErr> Function(ApiErr error)? errorTransform,
+      ]) {
     if (_isOk) {
       return transform(_data as T);
     } else {
       final error = _error as ApiErr;
       return errorTransform != null
           ? errorTransform(error)
-          : ApiResult<R>.err(error);
+          : ApiResult<R>.err(error, statusCode: statusCode);
     }
   }
 
@@ -181,42 +201,50 @@ class ApiResult<T> extends Result<T, ApiErr> {
     required T Function(Map<String, dynamic> data) onData,
   }) {
     try {
-      if (response.error != null) {
-        return ApiResult.err(ApiErr.fromHttpError(response.error!));
+      if (response.err != null) {
+        return ApiResult.err(
+          ApiErr(
+            exception: response.err,
+            message: HttpMessage(
+              title: 'Request Error',
+              details: response.err.toString(),
+            ),
+          ),
+          statusCode: response.statusCode,
+        );
       }
 
       if (response.data == null) {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            statusCode: response.statusCode,
             stackTrace: StackTrace.current,
           ),
+          statusCode: response.statusCode,
         );
       }
 
       final jsonData = _ensureJsonMap(response.data);
       final result = onData(jsonData);
-      return ApiResult.ok(result);
+      return ApiResult.ok(result, statusCode: response.statusCode);
     } catch (e, stackTrace) {
       log('Error parsing API response ${e.toString()}');
       log(stackTrace.toString());
 
       if (e is ApiErr) {
-        return ApiResult.err(e);
+        return ApiResult.err(e, statusCode: response.statusCode);
       }
 
       return ApiResult.err(
         ApiErr(
           exception: e,
           message: HttpMessage(
-            success: false,
             title: 'Data Processing Error',
             details: 'Could not process the server response: ${e.toString()}',
           ),
-          statusCode: response.statusCode,
           stackTrace: stackTrace,
         ),
+        statusCode: response.statusCode,
       );
     }
   }
@@ -254,43 +282,51 @@ class ApiResult<T> extends Result<T, ApiErr> {
     required List<T> Function(List<Map<String, dynamic>> data) onData,
   }) {
     try {
-      if (response.error != null) {
-        return ApiResult.err(ApiErr.fromHttpError(response.error!));
+      if (response.err != null) {
+        return ApiResult.err(
+          ApiErr(
+            exception: response.err,
+            message: HttpMessage(
+              title: 'Request Error',
+              details: response.err.toString(),
+            ),
+          ),
+          statusCode: response.statusCode,
+        );
       }
 
       if (response.data == null) {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            statusCode: response.statusCode,
             stackTrace: StackTrace.current,
           ),
+          statusCode: response.statusCode,
         );
       }
 
       final jsonList = _ensureJsonList(response.data);
       final result = onData(jsonList);
-      return ApiResult.ok(result);
+      return ApiResult.ok(result, statusCode: response.statusCode);
     } catch (e, stackTrace) {
       log('Error parsing API response list ${e.toString()}');
       log(stackTrace.toString());
 
       if (e is ApiErr) {
-        return ApiResult.err(e);
+        return ApiResult.err(e, statusCode: response.statusCode);
       }
 
       return ApiResult.err(
         ApiErr(
           exception: e,
           message: HttpMessage(
-            success: false,
             title: 'Data Processing Error',
             details:
-                'Could not process the server response list: ${e.toString()}',
+            'Could not process the server response list: ${e.toString()}',
           ),
-          statusCode: response.statusCode,
           stackTrace: stackTrace,
         ),
+        statusCode: response.statusCode,
       );
     }
   }
@@ -441,8 +477,6 @@ class Params {
 /// );
 /// ```
 class HttpMessage {
-  /// Indicates whether the operation was successful
-  final bool success;
 
   /// Message title
   ///
@@ -463,7 +497,6 @@ class HttpMessage {
   /// The [title] and [details] are required.
   /// The [success] flag defaults to true, set it to false for error messages.
   HttpMessage({
-    this.success = true,
     required this.title,
     required this.details,
   });
@@ -480,9 +513,8 @@ class HttpMessage {
   /// ```
   factory HttpMessage.fromJson(Map<String, dynamic> json) {
     return HttpMessage(
-      success: json['success'] ?? false,
       title: json['title'] ?? 'Error',
-      details: json['content'] ?? json['message'] ?? 'Unknown error',
+      details: json['details'] ?? json['message'] ?? 'Unknown error',
     );
   }
 
@@ -501,8 +533,15 @@ class HttpMessage {
   ///
   /// final jsonData = message.toJson();
   /// ```
-  Map<String, dynamic> toJson() {
-    return {'success': success, 'title': title, 'content': details};
+  ///
+  /// Just if you key is equal to  [details]
+  Map<String, dynamic> toJsonDetails() {
+    return {'title': title, 'details': details};
+  }
+
+  /// Just if you key is equal to  [message]
+  Map<String, dynamic> toJson(){
+    return {'title': title, 'message': details};
   }
 
   /// Creates an HttpMessage from an exception
@@ -521,7 +560,6 @@ class HttpMessage {
   /// ```
   factory HttpMessage.fromException(Object exception) {
     return HttpMessage(
-      success: false,
       title: 'Error',
       details: exception.toString(),
     );
@@ -541,8 +579,8 @@ class HttpMessage {
   ///
   /// final message = HttpMessage.fromError(error);
   /// ```
-  factory HttpMessage.fromError(HttpErr error) {
-    return error.data ??
+  factory HttpMessage.fromError(ApiErr error) {
+    return error.message ??
         HttpMessage.fromException(
           error.exception ?? Exception('Unknown error'),
         );

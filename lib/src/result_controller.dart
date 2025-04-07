@@ -94,7 +94,7 @@ abstract class Result<T, E> {
   ///     err: (error) => handleParsingError(error)
   ///   );
   /// ```
-  static Result<T, ResultError> trySync<T>(T Function() fn) {
+  static Result<T, ResultErr> trySync<T>(T Function() fn) {
     try {
       return Ok(fn());
     } catch (e, stackTrace) {
@@ -112,7 +112,7 @@ abstract class Result<T, E> {
   ///     err: (error) => handleApiError(error)
   ///   ));
   /// ```
-  static Future<Result<T, ResultError>> tryAsync<T>(
+  static Future<Result<T, ResultErr>> tryAsync<T>(
     Future<T> Function() fn,
   ) async {
     try {
@@ -202,34 +202,34 @@ abstract class Result<T, E> {
 /// Base class for all result errors
 ///
 /// Provides common structure for error reporting with optional stack traces
-class ResultError {
+class ResultErr {
   /// Error message describing what went wrong
-  final String error;
+  final String text;
 
   /// Stack trace from when the error occurred (optional)
   final StackTrace? stackTrace;
 
   /// Creates a new ResultError with an error message and optional stack trace
-  ResultError(this.error, {this.stackTrace});
+  ResultErr(this.text, {this.stackTrace});
 
   @override
   String toString() {
     if (stackTrace != null) {
-      return '$error\nStackTrace:\n$stackTrace';
+      return '$text\nStackTrace:\n$stackTrace';
     }
-    return error;
+    return text;
   }
 }
 
 /// Generic implementation of ResultError that captures the original error
 ///
 /// Useful for wrapping exceptions and preserving their context
-class GenericResultError extends ResultError {
+class GenericResultError extends ResultErr {
   /// The original error object that was caught
   final dynamic originalError;
 
   /// Creates a new GenericResultError with a message, the original error, and optional stack trace
-  GenericResultError(super.message, this.originalError, {super.stackTrace});
+  GenericResultError(super.err, this.originalError, {super.stackTrace});
 
   @override
   String toString() {

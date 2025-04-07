@@ -8,73 +8,62 @@ class MockStackTrace implements StackTrace {
 }
 
 void main() {
+  final header = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer token',
+  };
   group('ApiErr Tests', () {
     test('ApiErr basic creation', () {
-      final apiErr = ApiErr(
+      final apiResponse =  ApiResponse(
+          headers:header,
         statusCode: 404,
-        exception: Exception('Not found'),
-        message: HttpMessage(
-          success: false,
-          title: 'Not Found',
-          details: 'The requested resource could not be found',
-        ),
+        err: ApiErr(
+          exception: Exception('Not found'),
+          message: HttpMessage(
+            title: 'Not Found',
+            details: 'The requested resource could not be found',
+          ),
+        )
       );
 
-      expect(apiErr.statusCode, equals(404));
-      expect(apiErr.exception.toString(), equals('Exception: Not found'));
-      expect(apiErr.message?.title, equals('Not Found'));
+      expect(apiResponse.statusCode, equals(404));
+      expect(apiResponse.err?.exception.toString(), equals('Exception: Not found'));
+      expect(apiResponse.err?.message?.title, equals('Not Found'));
       expect(
-        apiErr.message?.details,
+        apiResponse.err?.message?.details,
         equals('The requested resource could not be found'),
       );
-      expect(apiErr.error, equals('The requested resource could not be found'));
+      expect(apiResponse.err?.message?.details, equals('The requested resource could not be found'));
     });
 
     test('ApiErr creation with null values', () {
-      final apiErr = ApiErr();
-
-      expect(apiErr.statusCode, isNull);
-      expect(apiErr.exception, isNull);
-      expect(apiErr.message, isNull);
-      expect(apiErr.error, equals('Unknown API error'));
-    });
-
-    test('ApiErr.fromHttpError', () {
-      final httpError = HttpErr(
-        exception: Exception('Network timeout'),
-        stackTrace: MockStackTrace(),
-        data: HttpMessage(
-          success: false,
-          title: 'Connection Error',
-          details: 'Could not connect to the server',
-        ),
+      final apiResponse =  ApiResponse(
+          headers:header,
+          err: ApiErr()
       );
 
-      final apiErr = ApiErr.fromHttpError(httpError);
-
-      expect(apiErr.exception.toString(), equals('Exception: Network timeout'));
-      expect(apiErr.message?.title, equals('Connection Error'));
-      expect(
-        apiErr.message?.details,
-        equals('Could not connect to the server'),
-      );
-      expect(apiErr.error, equals('Could not connect to the server'));
-      expect(apiErr.stackTrace, equals(httpError.stackTrace));
+      expect(apiResponse.statusCode, isNull);
+      expect(apiResponse.err?.exception, isNull);
+      expect(apiResponse.err?.message, isNull);
+      expect(apiResponse.err?.text, equals('Unknown API error'));
     });
 
     test('ApiErr toString formatting', () {
-      final apiErr = ApiErr(
-        statusCode: 400,
-        message: HttpMessage(
-          success: false,
-          title: 'Validation Error',
-          details: 'Invalid email format',
-        ),
+      final apiResponse =  ApiResponse(
+          headers:header,
+          statusCode: 400,
+          err: ApiErr(
+            message: HttpMessage(
+              title: 'Validation err',
+              details: 'Invalid email format',
+            ),
+          )
       );
 
+
       expect(
-        apiErr.toString(),
-        equals('Status: 400 | Validation Error: Invalid email format'),
+        apiResponse.err.toString(),
+        equals('Validation err: Invalid email format'),
       );
     });
 
@@ -90,85 +79,69 @@ void main() {
       expect(apiErr.toString(), equals('Error: Exception: Test exception'));
     });
 
-    test('ApiErr toString with status code only', () {
-      final apiErr = ApiErr(statusCode: 500);
-
-      expect(apiErr.toString(), equals('Status: 500 | Unknown API error'));
-    });
-
-    test('ApiErr toString with stack trace', () {
-      final stackTrace = MockStackTrace();
-      final apiErr = ApiErr(
-        statusCode: 500,
-        message: HttpMessage(
-          success: false,
-          title: 'Server Error',
-          details: 'Internal server error',
-        ),
-        stackTrace: stackTrace,
-      );
-
-      expect(
-        apiErr.toString(),
-        contains('Status: 500 | Server Error: Internal server error'),
-      );
-      expect(apiErr.toString(), contains('mock stack trace'));
-    });
   });
 
-  group('HttpError Tests', () {
-    test('HttpError basic creation', () {
-      final exception = Exception('Network error');
+  group('Httperr Tests', () {
+    test('Httperr basic creation', () {
+      final exception = Exception('Network err');
       final stackTrace = MockStackTrace();
       final data = HttpMessage(
-        success: false,
-        title: 'Connection Error',
+        title: 'Connection err',
         details: 'Failed to connect to server',
       );
 
-      final httpError = HttpErr(
-        exception: exception,
-        stackTrace: stackTrace,
+      final response = ApiResponse(
         data: data,
+        err: ApiErr(
+          exception: exception,
+          stackTrace: stackTrace,
+
+        ),
       );
 
-      expect(httpError.exception, equals(exception));
-      expect(httpError.stackTrace, equals(stackTrace));
-      expect(httpError.data, equals(data));
+      expect(response.err?.exception, equals(exception));
+      expect(response.err?.stackTrace, equals(stackTrace));
+      expect(response.data, equals(data));
     });
 
-    test('HttpError with null exception', () {
+    test('Httperr with null exception', () {
       final stackTrace = MockStackTrace();
 
-      // Debería compilar y ejecutarse sin errores
-      final httpError = HttpErr(exception: null, stackTrace: stackTrace);
+      // Debería compilar y ejecutarse sin erres
+      final httperr = ApiErr(exception: null, stackTrace: stackTrace);
 
-      expect(httpError.exception, isNull);
-      expect(httpError.stackTrace, equals(stackTrace));
-      expect(httpError.data, isNull);
+      final response = ApiResponse(
+        err: httperr
+      );
+
+      expect(response.err?.exception, isNull);
+      expect(response.err?.stackTrace, equals(stackTrace));
+      expect(response.data, isNull);
     });
 
-    test('HttpError with null data', () {
-      final exception = Exception('Network error');
+    test('Httperr with null data', () {
+      final exception = Exception('Network err');
       final stackTrace = MockStackTrace();
+      final response = ApiResponse(
+          err: ApiErr(
+            exception: exception,
+            stackTrace: stackTrace,
+          )
+      );
 
-      final httpError = HttpErr(exception: exception, stackTrace: stackTrace);
-
-      expect(httpError.exception, equals(exception));
-      expect(httpError.stackTrace, equals(stackTrace));
-      expect(httpError.data, isNull);
+      expect(response.err?.exception, equals(exception));
+      expect(response.err?.stackTrace, equals(stackTrace));
+      expect(response.data, isNull);
     });
   });
 
   group('HttpMessage Tests', () {
     test('HttpMessage basic creation', () {
       final message = HttpMessage(
-        success: true,
         title: 'Success',
         details: 'Operation completed successfully',
       );
 
-      expect(message.success, isTrue);
       expect(message.title, equals('Success'));
       expect(message.details, equals('Operation completed successfully'));
     });
@@ -176,37 +149,32 @@ void main() {
     test('HttpMessage with default success value', () {
       final message = HttpMessage(title: 'Title', details: 'Details');
 
-      expect(message.success, isTrue);
       expect(message.title, equals('Title'));
       expect(message.details, equals('Details'));
     });
 
     test('HttpMessage.fromJson with all fields', () {
       final json = {
-        'success': false,
-        'title': 'Error Title',
-        'content': 'Error details',
+        'title': 'err Title',
+        'details': 'err details',
       };
 
       final message = HttpMessage.fromJson(json);
 
-      expect(message.success, isFalse);
-      expect(message.title, equals('Error Title'));
-      expect(message.details, equals('Error details'));
+      expect(message.title, equals('err Title'));
+      expect(message.details, equals('err details'));
     });
 
     test('HttpMessage.fromJson with message field instead of content', () {
       final json = {
-        'success': false,
-        'title': 'Error Title',
-        'message': 'Error message',
+        'title': 'err Title',
+        'message': 'err message',
       };
 
       final message = HttpMessage.fromJson(json);
 
-      expect(message.success, isFalse);
-      expect(message.title, equals('Error Title'));
-      expect(message.details, equals('Error message'));
+      expect(message.title, equals('err Title'));
+      expect(message.details, equals('err message'));
     });
 
     test('HttpMessage.fromJson with default values', () {
@@ -214,73 +182,66 @@ void main() {
 
       final message = HttpMessage.fromJson(json);
 
-      expect(message.success, isFalse);
       expect(message.title, equals('Error'));
       expect(message.details, equals('Unknown error'));
     });
 
     test('HttpMessage.toJson', () {
       final message = HttpMessage(
-        success: true,
         title: 'Success',
         details: 'Operation completed successfully',
       );
 
       final json = message.toJson();
 
-      expect(json['success'], isTrue);
       expect(json['title'], equals('Success'));
-      expect(json['content'], equals('Operation completed successfully'));
+      expect(json['message'], equals('Operation completed successfully'));
     });
 
     test('HttpMessage.fromException', () {
       final exception = Exception('Test exception');
       final message = HttpMessage.fromException(exception);
 
-      expect(message.success, isFalse);
       expect(message.title, equals('Error'));
       expect(message.details, equals('Exception: Test exception'));
     });
 
-    test('HttpMessage.fromError with data', () {
-      final httpError = HttpErr(
+    test('HttpMessage.fromerr with data', () {
+      final apiError = ApiErr(
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
-        data: HttpMessage(
-          success: false,
-          title: 'Connection Error',
+        message: HttpMessage(
+          title: 'Connection err',
           details: 'Could not connect to the server',
         ),
       );
 
-      final message = HttpMessage.fromError(httpError);
+      final response = ApiResponse( err: apiError );
 
-      expect(message.success, isFalse);
-      expect(message.title, equals('Connection Error'));
-      expect(message.details, equals('Could not connect to the server'));
+
+      expect(response.err?.message?.title, equals('Connection err'));
+      expect(response.err?.message?.details, equals('Could not connect to the server'));
     });
 
-    test('HttpMessage.fromError without data', () {
-      final httpError = HttpErr(
+    test('HttpMessage.ApiErr without data', () {
+      final apiErr = ApiErr(
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
       );
 
-      final message = HttpMessage.fromError(httpError);
+      final message = HttpMessage.fromError(apiErr);
 
-      expect(message.success, isFalse);
       expect(message.title, equals('Error'));
       expect(message.details, equals('Exception: Network timeout'));
     });
 
-    test('HttpMessage.fromError with null exception', () {
-      final httpError = HttpErr(exception: null, stackTrace: MockStackTrace());
+    test('HttpMessage.fromException with null exception', () {
+      final apiErr = ApiErr(exception: null, stackTrace: MockStackTrace());
 
-      final message = HttpMessage.fromError(httpError);
+      final message = HttpMessage.fromException(apiErr);
 
-      expect(message.success, isFalse);
       expect(message.title, equals('Error'));
-      expect(message.details, equals('Exception: Unknown error'));
+      expect(apiErr.message?.details, equals(null));
     });
   });
 }

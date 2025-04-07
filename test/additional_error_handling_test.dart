@@ -22,7 +22,7 @@ class NetworkError implements Exception {
 void main() {
   group('Advanced Error Handling Scenarios', () {
     test('Result.trySync handles complex synchronous errors', () {
-      Result<int, ResultError> complexErrorResult = Result.trySync(() {
+      Result<int, ResultErr> complexErrorResult = Result.trySync(() {
         if (DateTime.now().millisecondsSinceEpoch.isEven) {
           throw CustomError('Random error on even timestamp', '1');
         }
@@ -34,13 +34,13 @@ void main() {
           expect(value, equals(42));
         },
         err: (error) {
-          expect(error.error, contains('CustomError'));
+          expect(error.text, contains('CustomError'));
         },
       );
     });
 
     test('Result.tryAsync handles complex asynchronous errors', () async {
-      Future<Result<int, ResultError>> complexAsyncErrorResult =
+      Future<Result<int, ResultErr>> complexAsyncErrorResult =
           Result.tryAsync(() async {
             await Future.delayed(Duration(milliseconds: 100));
             if (DateTime.now().millisecondsSinceEpoch.isEven) {
@@ -55,7 +55,7 @@ void main() {
           expect(value, equals(42));
         },
         err: (error) {
-          expect(error.error, contains('NetworkError'));
+          expect(error.text, contains('NetworkError'));
         },
       );
     });
