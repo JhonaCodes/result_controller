@@ -152,10 +152,10 @@ void main() {
 
   group('ApiResponseExtensions', () {
     test('toResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.success({
+      final apiResponse = ApiResponse.ok({
         'id': '123',
         'name': 'John Doe',
-      }, statusCode: 200);
+      }, statusCode: 200, headers: {});
 
       final result = apiResponse.toResult(User.fromJson);
 
@@ -165,17 +165,17 @@ void main() {
     });
 
     test('toResult converts failed ApiResponse', () {
-      final apiResponse = ApiResponse.failure(
-        HttpErr(
+      final apiResponse = ApiResponse.err(
+        ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          data: HttpMessage(
-            success: false,
+          message: HttpMessage(
             title: 'Error',
             details: 'Connection failed',
           ),
         ),
         statusCode: 500,
+        headers: {},
       );
 
       final result = apiResponse.toResult(User.fromJson);
@@ -185,10 +185,10 @@ void main() {
     });
 
     test('toListResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.success([
+      final apiResponse = ApiResponse.ok([
         {'id': '1', 'name': 'John'},
         {'id': '2', 'name': 'Jane'},
-      ], statusCode: 200);
+      ], statusCode: 200, headers: {});
 
       final result = apiResponse.toListResult(
         (items) => items.map(User.fromJson).toList(),
@@ -201,17 +201,17 @@ void main() {
     });
 
     test('toListResult converts failed ApiResponse', () {
-      final apiResponse = ApiResponse.failure(
-        HttpErr(
+      final apiResponse = ApiResponse.err(
+        ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          data: HttpMessage(
-            success: false,
+          message: HttpMessage(
             title: 'Error',
             details: 'Connection failed',
           ),
         ),
         statusCode: 500,
+        headers: {},
       );
 
       final result = apiResponse.toListResult(

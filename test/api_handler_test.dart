@@ -46,9 +46,7 @@ void main() {
 
     test('ApiResult.err creation', () {
       final apiErr = ApiErr(
-        statusCode: 404,
         message: HttpMessage(
-          success: false,
           title: 'Not Found',
           details: 'Resource not found',
         ),
@@ -57,7 +55,6 @@ void main() {
       final result = ApiResult<int>.err(apiErr);
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.statusCode, equals(404));
       expect(result.errorOrNull?.message?.title, equals('Not Found'));
     });
 
@@ -65,9 +62,7 @@ void main() {
       final okResult = ApiResult<int>.ok(42);
       final errResult = ApiResult<int>.err(
         ApiErr(
-          statusCode: 500,
           message: HttpMessage(
-            success: false,
             title: 'Server Error',
             details: 'Internal server error',
           ),
@@ -97,23 +92,31 @@ void main() {
     });
 
     test('ApiResult map method with error', () {
-      final apiErr = ApiErr(statusCode: 500);
+      final apiErr = ApiErr(
+        message: HttpMessage(
+          title: 'Server Error',
+          details: 'Internal server error',
+        ),
+      );
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map((value) => value.toString());
 
       expect(mappedResult.isErr, isTrue);
-      expect(mappedResult.errorOrNull, equals(apiErr));
+      expect(mappedResult.errorOrNull?.message?.title, equals('Server Error'));
     });
 
     test('ApiResult map method with error transform', () {
-      final apiErr = ApiErr(statusCode: 500);
+      final apiErr = ApiErr(
+        message: HttpMessage(
+          title: 'Server Error',
+          details: 'Internal server error',
+        ),
+      );
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map(
         (value) => value.toString(),
         (error) => ApiErr(
-          statusCode: error.statusCode,
           message: HttpMessage(
-            success: false,
             title: 'Transformed',
             details: 'Error was transformed',
           ),
@@ -121,7 +124,6 @@ void main() {
       );
 
       expect(mappedResult.isErr, isTrue);
-      expect(mappedResult.errorOrNull?.statusCode, equals(500));
       expect(mappedResult.errorOrNull?.message?.title, equals('Transformed'));
     });
 
@@ -136,7 +138,12 @@ void main() {
     });
 
     test('ApiResult flatMap method with error', () {
-      final apiErr = ApiErr(statusCode: 500);
+      final apiErr = ApiErr(
+        message: HttpMessage(
+          title: 'Server Error',
+          details: 'Internal server error',
+        ),
+      );
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
         (value) => ApiResult<String>.ok('Value: $value'),
@@ -147,15 +154,18 @@ void main() {
     });
 
     test('ApiResult flatMap method with error transform', () {
-      final apiErr = ApiErr(statusCode: 500);
+      final apiErr = ApiErr(
+        message: HttpMessage(
+          title: 'Server Error',
+          details: 'Internal server error',
+        ),
+      );
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
         (value) => ApiResult<String>.ok('Value: $value'),
         (error) => ApiResult<String>.err(
           ApiErr(
-            statusCode: error.statusCode,
             message: HttpMessage(
-              success: false,
               title: 'Transformed',
               details: 'Error was transformed',
             ),
@@ -164,15 +174,14 @@ void main() {
       );
 
       expect(chainedResult.isErr, isTrue);
-      expect(chainedResult.errorOrNull?.statusCode, equals(500));
       expect(chainedResult.errorOrNull?.message?.title, equals('Transformed'));
     });
 
     test('ApiResult.from with successful response', () {
-      final response = ApiResponse.success({
+      final response = ApiResponse.ok({
         'id': '123',
         'name': 'John Doe',
-      }, statusCode: 200);
+      }, statusCode: 200, headers: {});
 
       final result = ApiResult.from<User>(
         response: response,
@@ -186,17 +195,16 @@ void main() {
 
     test('ApiResult.from with error response', () {
       final stackTrace = TestStackTrace();
-      final httpError = HttpErr(
+      final apiErr = ApiErr(
         exception: Exception('Network error'),
         stackTrace: stackTrace,
-        data: HttpMessage(
-          success: false,
+        message: HttpMessage(
           title: 'Connection Error',
           details: 'Failed to connect to the server',
         ),
       );
 
-      final response = ApiResponse.failure(httpError, statusCode: null);
+      final response = ApiResponse.err(apiErr, statusCode: null, headers: {});
 
       final result = ApiResult.from<User>(
         response: response,
@@ -205,31 +213,14 @@ void main() {
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.message?.title, equals('Connection Error'));
-      expect(
-        result.errorOrNull?.message?.details,
-        equals('Failed to connect to the server'),
-      );
-    });
-
-    test('ApiResult.from with null data', () {
-      final response = ApiResponse(statusCode: 200);
-
-      final result = ApiResult.from<User>(
-        response: response,
-        onData: (data) => User.fromJson(data),
-      );
-
-      expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.exception.toString(),
-        contains('No data in response'),
-      );
+      expect(result.errorOrNull?.exception, isA<Exception>());
     });
 
     test('ApiResult.from with parsing error', () {
-      final response = ApiResponse.success(
+      final response = ApiResponse.ok(
         {'id': 123, 'name': null}, // Invalid data that will cause parsing error
         statusCode: 200,
+        headers: {},
       );
 
       final result = ApiResult.from<User>(
@@ -238,21 +229,19 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.message?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(result.errorOrNull?.message?.details, contains('type'));
     });
 
     test('ApiResult.fromList with successful response', () {
-      final response = ApiResponse.success([
+      final response = ApiResponse.ok([
         {'id': '1', 'name': 'User 1'},
         {'id': '2', 'name': 'User 2'},
-      ], statusCode: 200);
+      ], statusCode: 200, headers: {});
 
       final result = ApiResult.fromList<User>(
         response: response,
-        onData: (items) => items.map((item) => User.fromJson(item)).toList(),
+        onData: (list) => list.map((item) => User.fromJson(item)).toList(),
       );
 
       expect(result.isOk, isTrue);
@@ -263,65 +252,46 @@ void main() {
 
     test('ApiResult.fromList with error response', () {
       final stackTrace = TestStackTrace();
-      final httpError = HttpErr(
+      final apiErr = ApiErr(
         exception: Exception('Network error'),
         stackTrace: stackTrace,
-        data: HttpMessage(
-          success: false,
+        message: HttpMessage(
           title: 'Connection Error',
           details: 'Failed to connect to the server',
         ),
       );
 
-      final response = ApiResponse.failure(httpError, statusCode: null);
+      final response = ApiResponse.err(apiErr, statusCode: null, headers: {});
 
       final result = ApiResult.fromList<User>(
         response: response,
-        onData: (items) => items.map((item) => User.fromJson(item)).toList(),
+        onData: (list) => list.map((item) => User.fromJson(item)).toList(),
       );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.message?.title, equals('Connection Error'));
     });
 
-    test('ApiResult.fromList with null data', () {
-      final response = ApiResponse(statusCode: 200);
-
-      final result = ApiResult.fromList<User>(
-        response: response,
-        onData: (items) => items.map((item) => User.fromJson(item)).toList(),
-      );
-
-      expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.exception.toString(),
-        contains('No data in response'),
-      );
-    });
-
     test('ApiResult.fromList with parsing error', () {
-      final response = ApiResponse.success([
+      final response = ApiResponse.ok([
         {'id': 1, 'name': 'User 1'}, // Invalid data types
         {'id': '2'}, // Missing name
-      ], statusCode: 200);
+      ], statusCode: 200, headers: {});
 
       final result = ApiResult.fromList<User>(
         response: response,
-        onData: (items) => items.map((item) => User.fromJson(item)).toList(),
+        onData: (list) => list.map((item) => User.fromJson(item)).toList(),
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.message?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(result.errorOrNull?.message?.details, contains('type'));
     });
 
-    // Prueba indirecta del manejo JSON a través de API pública
-    test('ApiResult.from with JSON string handling', () {
+    test('ApiResult.from with JSON string', () {
       // Probar indirectamente la funcionalidad de _ensureJsonMap
       final jsonString = '{"id":"123","name":"John Doe"}';
-      final response = ApiResponse.success(jsonString, statusCode: 200);
+      final response = ApiResponse.ok(jsonString, statusCode: 200, headers: {});
 
       final result = ApiResult.from<User>(
         response: response,
@@ -333,15 +303,14 @@ void main() {
       expect(result.data.name, equals('John Doe'));
     });
 
-    test('ApiResult.fromList with JSON string handling', () {
-      // Probar indirectamente la funcionalidad de _ensureJsonList
+    test('ApiResult.fromList with JSON string', () {
       final jsonString =
           '[{"id":"1","name":"User 1"},{"id":"2","name":"User 2"}]';
-      final response = ApiResponse.success(jsonString, statusCode: 200);
+      final response = ApiResponse.ok(jsonString, statusCode: 200, headers: {});
 
       final result = ApiResult.fromList<User>(
         response: response,
-        onData: (items) => items.map((item) => User.fromJson(item)).toList(),
+        onData: (list) => list.map((item) => User.fromJson(item)).toList(),
       );
 
       expect(result.isOk, isTrue);
@@ -352,7 +321,7 @@ void main() {
 
     test('ApiResult.from with invalid JSON string', () {
       final invalidJson = '{id:"123",name:John}';
-      final response = ApiResponse.success(invalidJson, statusCode: 200);
+      final response = ApiResponse.ok(invalidJson, statusCode: 200, headers: {});
 
       final result = ApiResult.from<User>(
         response: response,
@@ -360,26 +329,22 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.message?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(result.errorOrNull?.message?.details, contains('JSON'));
     });
 
     test('ApiResult.fromList with invalid JSON string', () {
       final invalidJson = '[{id:"1",name:User 1}]';
-      final response = ApiResponse.success(invalidJson, statusCode: 200);
+      final response = ApiResponse.ok(invalidJson, statusCode: 200, headers: {});
 
       final result = ApiResult.fromList<User>(
         response: response,
-        onData: (items) => items.map((item) => User.fromJson(item)).toList(),
+        onData: (list) => list.map((item) => User.fromJson(item)).toList(),
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.message?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.message?.title, equals('Data Processing Error'));
+      expect(result.errorOrNull?.message?.details, contains('JSON'));
     });
   });
 

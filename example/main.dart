@@ -64,7 +64,7 @@ void demonstrateApiErrorHandling() {
 
     // Simulating different scenarios
     if (userId == 'error') {
-      return ApiResponse.failure(
+      return ApiResponse.err(
         statusCode: 500,
         headers: {},
         ApiErr(
@@ -76,7 +76,7 @@ void demonstrateApiErrorHandling() {
     }
 
     // Successful response
-    return ApiResponse.success({'id': userId, 'name': 'John Doe', 'age': 30}, headers: {}, statusCode: 200);
+    return ApiResponse.ok({'id': userId, 'name': 'John Doe', 'age': 30}, headers: {}, statusCode: 200);
   }
 
   // Fetch and process user data
@@ -129,7 +129,7 @@ void demonstrateAsyncErrorHandling() {
       return 'Complex async operation';
     });
 
-    result.when(ok: (data) => log('Async operation succeeded: $data'), err: (error) => log('Async operation failed: ${error.errMessage}'));
+    result.when(ok: (data) => log('Async operation succeeded: $data'), err: (error) => log('Async operation failed: ${error.text}'));
   }
 
   // Chaining async operations

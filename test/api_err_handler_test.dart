@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:result_controller/result_controller.dart';
+import 'package:result_controller/src/api_err_handler.dart';
+import 'package:result_controller/src/api_handler.dart';
+import 'package:result_controller/src/api_response_handler.dart';
 
 class MockStackTrace implements StackTrace {
   @override
@@ -8,77 +9,148 @@ class MockStackTrace implements StackTrace {
 }
 
 void main() {
-  final header = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer token',
-  };
   group('ApiErr Tests', () {
-    test('ApiErr basic creation', () {
-      final apiResponse =  ApiResponse(
-          headers:header,
-        statusCode: 404,
-        err: ApiErr(
-          exception: Exception('Not found'),
-          message: HttpMessage(
-            title: 'Not Found',
-            details: 'The requested resource could not be found',
-          ),
-        )
+    test('ApiErr creation with all fields', () {
+      final stackTrace = StackTrace.current;
+      final exception = Exception('Test exception');
+      final message = HttpMessage(
+        title: 'Test Error',
+        details: 'Test error details',
       );
 
-      expect(apiResponse.statusCode, equals(404));
-      expect(apiResponse.err?.exception.toString(), equals('Exception: Not found'));
-      expect(apiResponse.err?.message?.title, equals('Not Found'));
-      expect(
-        apiResponse.err?.message?.details,
-        equals('The requested resource could not be found'),
-      );
-      expect(apiResponse.err?.message?.details, equals('The requested resource could not be found'));
-    });
-
-    test('ApiErr creation with null values', () {
-      final apiResponse =  ApiResponse(
-          headers:header,
-          err: ApiErr()
+      final error = ApiErr(
+        exception: exception,
+        message: message,
+        stackTrace: stackTrace,
       );
 
-      expect(apiResponse.statusCode, isNull);
-      expect(apiResponse.err?.exception, isNull);
-      expect(apiResponse.err?.message, isNull);
-      expect(apiResponse.err?.text, equals('Unknown API error'));
+      expect(error.exception, equals(exception));
+      expect(error.message, equals(message));
+      expect(error.stackTrace, equals(stackTrace));
+      expect(error.toString(), contains('Test Error: Test error details'));
     });
 
-    test('ApiErr toString formatting', () {
-      final apiResponse =  ApiResponse(
-          headers:header,
-          statusCode: 400,
-          err: ApiErr(
-            message: HttpMessage(
-              title: 'Validation err',
-              details: 'Invalid email format',
-            ),
-          )
+    test('ApiErr creation with minimal fields', () {
+      final error = ApiErr(
+        message: HttpMessage(
+          title: 'Server Error',
+          details: 'Internal server error',
+        ),
       );
 
+      expect(error.exception, isNull);
+      expect(error.message?.title, equals('Server Error'));
+      expect(error.message?.details, equals('Internal server error'));
+      expect(error.stackTrace, isNull);
+      expect(error.toString(), equals('Server Error: Internal server error'));
+    });
 
-      expect(
-        apiResponse.err.toString(),
-        equals('Validation err: Invalid email format'),
+    test('ApiErr creation with exception only', () {
+      final exception = Exception('Test exception');
+      final error = ApiErr(exception: exception);
+
+      expect(error.exception, equals(exception));
+      expect(error.message, isNull);
+      expect(error.stackTrace, isNull);
+      expect(error.toString(), equals('Error: Test exception'));
+    });
+
+    test('ApiErr toString with stack trace', () {
+      final stackTrace = StackTrace.current;
+      final error = ApiErr(
+        message: HttpMessage(
+          title: 'Test Error',
+          details: 'Test error details',
+        ),
+        stackTrace: stackTrace,
       );
+
+      final errorString = error.toString();
+      expect(errorString, contains('Test Error: Test error details'));
+      expect(errorString, contains('StackTrace:'));
+      expect(errorString, contains(stackTrace.toString()));
     });
 
-    test('ApiErr toString with null values', () {
-      final apiErr = ApiErr();
+    test('ApiErr toString with exception and message', () {
+      final error = ApiErr(
+        exception: Exception('Test exception'),
+        message: HttpMessage(
+          title: 'Validation Error',
+          details: 'Invalid input',
+        ),
+      );
 
-      expect(apiErr.toString(), equals('Unknown API error'));
+      expect(error.toString(), equals('Validation Error: Invalid input'));
     });
 
-    test('ApiErr toString with only exception', () {
-      final apiErr = ApiErr(exception: Exception('Test exception'));
+    test('ApiErr toString with exception only', () {
+      final error = ApiErr(
+        exception: Exception('Test exception'),
+      );
 
-      expect(apiErr.toString(), equals('Error: Exception: Test exception'));
+      expect(error.toString(), equals('Error: Test exception'));
     });
 
+    test('ApiErr toString with no fields', () {
+      final error = ApiErr();
+
+      expect(error.toString(), equals('Unknown API error'));
+    });
+
+    test('ApiErr registry operations', () {
+      // Clear any existing mappings
+      ApiErr.addAllExceptions({});
+
+      final testException = Exception('Test');
+      final testError = ApiErr(
+        message: HttpMessage(
+          title: 'Test Error',
+          details: 'Test details',
+        ),
+      );
+
+      // Add a mapping
+      ApiErr.addAllExceptions({testException: testError});
+
+      // Verify the mapping was added
+      final mappedError = ApiErr.fromException(testException);
+      expect(mappedError.message?.title, equals('Test Error'));
+      expect(mappedError.message?.details, equals('Test details'));
+    });
+
+    test('ApiErr registry with multiple mappings', () {
+      // Clear any existing mappings
+      ApiErr.addAllExceptions({});
+
+      final exception1 = Exception('Test 1');
+      final exception2 = Exception('Test 2');
+      final error1 = ApiErr(
+        message: HttpMessage(
+          title: 'Error 1',
+          details: 'Details 1',
+        ),
+      );
+      final error2 = ApiErr(
+        message: HttpMessage(
+          title: 'Error 2',
+          details: 'Details 2',
+        ),
+      );
+
+      // Add multiple mappings
+      ApiErr.addAllExceptions({
+        exception1: error1,
+        exception2: error2,
+      });
+
+      // Verify the mappings were added
+      final mappedError1 = ApiErr.fromException(exception1);
+      final mappedError2 = ApiErr.fromException(exception2);
+      expect(mappedError1.message?.title, equals('Error 1'));
+      expect(mappedError1.message?.details, equals('Details 1'));
+      expect(mappedError2.message?.title, equals('Error 2'));
+      expect(mappedError2.message?.details, equals('Details 2'));
+    });
   });
 
   group('Httperr Tests', () {
@@ -95,8 +167,12 @@ void main() {
         err: ApiErr(
           exception: exception,
           stackTrace: stackTrace,
-
+          message: HttpMessage(
+            title: 'Connection err',
+            details: 'Failed to connect to server',
+          ),
         ),
+        headers: {},
       );
 
       expect(response.err?.exception, equals(exception));
@@ -111,7 +187,8 @@ void main() {
       final httperr = ApiErr(exception: null, stackTrace: stackTrace);
 
       final response = ApiResponse(
-        err: httperr
+        err: httperr,
+        headers: {},
       );
 
       expect(response.err?.exception, isNull);
@@ -126,7 +203,8 @@ void main() {
           err: ApiErr(
             exception: exception,
             stackTrace: stackTrace,
-          )
+          ),
+          headers: {},
       );
 
       expect(response.err?.exception, equals(exception));
@@ -216,8 +294,10 @@ void main() {
         ),
       );
 
-      final response = ApiResponse( err: apiError );
-
+      final response = ApiResponse(
+        err: apiError,
+        headers: {},
+      );
 
       expect(response.err?.message?.title, equals('Connection err'));
       expect(response.err?.message?.details, equals('Could not connect to the server'));

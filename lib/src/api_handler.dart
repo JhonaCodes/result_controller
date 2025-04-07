@@ -203,13 +203,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
     try {
       if (response.err != null) {
         return ApiResult.err(
-          ApiErr(
-            exception: response.err,
-            message: HttpMessage(
-              title: 'Request Error',
-              details: response.err.toString(),
-            ),
-          ),
+          response.err!,
           statusCode: response.statusCode,
         );
       }
@@ -218,6 +212,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
+            message: HttpMessage(
+              title: 'Error',
+              details: 'No data in response',
+            ),
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -284,13 +282,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
     try {
       if (response.err != null) {
         return ApiResult.err(
-          ApiErr(
-            exception: response.err,
-            message: HttpMessage(
-              title: 'Request Error',
-              details: response.err.toString(),
-            ),
-          ),
+          response.err!,
           statusCode: response.statusCode,
         );
       }
@@ -299,6 +291,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
+            message: HttpMessage(
+              title: 'Error',
+              details: 'No data in response',
+            ),
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -321,8 +317,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
           exception: e,
           message: HttpMessage(
             title: 'Data Processing Error',
-            details:
-            'Could not process the server response list: ${e.toString()}',
+            details: 'Could not process the server response list: ${e.toString()}',
           ),
           stackTrace: stackTrace,
         ),

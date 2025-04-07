@@ -64,7 +64,6 @@ class ApiErr extends ResultErr {
   /// final apiError = ApiErr(
   ///   exception: e,
   ///   message: HttpMessage(
-  ///     success: false,
   ///     title: 'Server Error',
   ///     details: 'An unexpected error occurred on the server'
   ///   ),
@@ -106,7 +105,7 @@ class ApiErr extends ResultErr {
     if (message != null) {
       parts.add('${message!.title}: ${message!.details}');
     } else if (exception != null) {
-      parts.add('Error: ${exception.toString()}');
+      parts.add('Error: ${exception is Exception ? (exception as Exception).toString().replaceAll('Exception: ', '') : exception.toString()}');
     } else {
       parts.add('Unknown API error');
     }

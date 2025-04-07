@@ -29,14 +29,13 @@ class TestStackTrace implements StackTrace {
 }
 
 void main() {
-  late HttpErr testError;
+  late ApiErr testError;
 
   setUp(() {
-    testError = HttpErr(
+    testError = ApiErr(
       exception: Exception('Test exception'),
       stackTrace: TestStackTrace(),
-      data: HttpMessage(
-        success: false,
+      message: HttpMessage(
         title: 'Test Error',
         details: 'Test error details',
       ),
@@ -45,7 +44,7 @@ void main() {
 
   group('ApiResponse.whenListType exhaustive tests', () {
     test('handles List<int> correctly', () {
-      final response = ApiResponse.success([1, 2, 3, 4, 5]);
+      final response = ApiResponse.ok([1, 2, 3, 4, 5], headers: {});
 
       final result = response.whenListType<List<int>, int>(
         ok: (list) => list,
@@ -56,7 +55,7 @@ void main() {
     });
 
     test('handles List<double> correctly', () {
-      final response = ApiResponse.success([1.1, 2.2, 3.3, 4.4, 5.5]);
+      final response = ApiResponse.ok([1.1, 2.2, 3.3, 4.4, 5.5], headers: {});
 
       final result = response.whenListType<List<double>, double>(
         ok: (list) => list,
@@ -67,7 +66,7 @@ void main() {
     });
 
     test('handles List<String> correctly', () {
-      final response = ApiResponse.success(['a', 'b', 'c', 'd', 'e']);
+      final response = ApiResponse.ok(['a', 'b', 'c', 'd', 'e'], headers: {});
 
       final result = response.whenListType<List<String>, String>(
         ok: (list) => list,
@@ -78,7 +77,7 @@ void main() {
     });
 
     test('handles List<bool> correctly', () {
-      final response = ApiResponse.success([true, false, true, false, true]);
+      final response = ApiResponse.ok([true, false, true, false, true], headers: {});
 
       final result = response.whenListType<List<bool>, bool>(
         ok: (list) => list,
@@ -90,7 +89,7 @@ void main() {
 
     test('handles mixed list types with appropriate conversions', () {
       // A list with mixed numeric types
-      final response = ApiResponse.success([1.0, 2.5, 3.0, 4.2, 5.0]);
+      final response = ApiResponse.ok([1.0, 2.5, 3.0, 4.2, 5.0], headers: {});
 
       // Should automatically convert all to double
       final result = response.whenListType<List<double>, double>(
@@ -104,7 +103,7 @@ void main() {
     });
 
     test('filters nulls when filterNulls is true', () {
-      final response = ApiResponse.success([1, null, 3, null, 5]);
+      final response = ApiResponse.ok([1, null, 3, null, 5], headers: {});
 
       final result = response.whenListType<List<int>, int>(
         ok: (list) => list,
@@ -116,7 +115,7 @@ void main() {
     });
 
     test('preserves nulls when filterNulls is false', () {
-      final response = ApiResponse.success([1, null, 3, null, 5]);
+      final response = ApiResponse.ok([1, null, 3, null, 5], headers: {});
 
       final result = response.whenListType<List<int?>, int?>(
         ok: (list) => list,
@@ -128,7 +127,7 @@ void main() {
     });
 
     test('handles empty list correctly', () {
-      final response = ApiResponse.success([]);
+      final response = ApiResponse.ok([], headers: {});
 
       final result = response.whenListType<List<int>, int>(
         ok: (list) => list,
@@ -139,7 +138,7 @@ void main() {
     });
 
     test('handles error response correctly', () {
-      final response = ApiResponse.failure(testError);
+      final response = ApiResponse.err(testError, headers: {});
 
       final result = response.whenListType<List<int>, int>(
         ok: (list) => list,
@@ -150,7 +149,7 @@ void main() {
     });
 
     test('handles non-list data as error', () {
-      final response = ApiResponse.success({'key': 'value'});
+      final response = ApiResponse.ok({'key': 'value'}, headers: {});
 
       final result = response.whenListType<List<String>, String>(
         ok: (list) => list,
@@ -172,7 +171,7 @@ void main() {
     });
 
     test('handles incompatible type conversions as error', () {
-      final response = ApiResponse.success(['a', 'b', 'c']);
+      final response = ApiResponse.ok(['a', 'b', 'c'], headers: {});
 
       // Attempt to convert strings to ints should fail
       final result = response.whenListType<List<int>, int>(
@@ -186,11 +185,11 @@ void main() {
 
   group('ApiResponse.whenJsonListMap tests', () {
     test('processes valid list of JSON maps correctly', () {
-      final response = ApiResponse.success([
+      final response = ApiResponse.ok([
         {'id': '1', 'name': 'Item 1'},
         {'id': '2', 'name': 'Item 2'},
-        {'id': '3', 'name': 'Item 3'},
-      ]);
+        {'id': '3', 'name': 'Item 3'}
+      ], headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
@@ -204,7 +203,7 @@ void main() {
     });
 
     test('handles complex nested JSON structures', () {
-      final response = ApiResponse.success([
+      final response = ApiResponse.ok([
         {
           'id': '1',
           'name': 'Item 1',
@@ -217,7 +216,7 @@ void main() {
           'metadata': {'created': '2023-02-01', 'updated': '2023-02-02'},
           'tags': ['tag3', 'tag4'],
         },
-      ]);
+      ], headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) {
@@ -239,7 +238,7 @@ void main() {
       // A response with maps that have dynamic keys
       final jsonStr = '[{"id":1,"name":"Item 1"},{"id":"2","name":"Item 2"}]';
       final decodedList = jsonDecode(jsonStr);
-      final response = ApiResponse.success(decodedList);
+      final response = ApiResponse.ok(decodedList, headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
@@ -252,11 +251,11 @@ void main() {
     });
 
     test('handles list with non-map items as error', () {
-      final response = ApiResponse.success([
+      final response = ApiResponse.ok([
         {'id': '1', 'name': 'Item 1'},
         'not a map', // This is not a map
-        {'id': '3', 'name': 'Item 3'},
-      ]);
+        {'id': '3', 'name': 'Item 3'}
+      ], headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
@@ -271,7 +270,7 @@ void main() {
     });
 
     test('handles empty list correctly', () {
-      final response = ApiResponse.success([]);
+      final response = ApiResponse.ok([], headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
@@ -285,7 +284,7 @@ void main() {
     });
 
     test('handles error response correctly', () {
-      final response = ApiResponse.failure(testError);
+      final response = ApiResponse.err(testError, headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
@@ -300,7 +299,7 @@ void main() {
     });
 
     test('handles non-list data as error', () {
-      final response = ApiResponse.success({'key': 'value'});
+      final response = ApiResponse.ok({'key': 'value'}, headers: {});
 
       final result = response.whenJsonListMap(
         ok: (list) => list.map((item) => TestObject.fromJson(item)).toList(),
@@ -332,14 +331,14 @@ void main() {
 
   group('ApiResponse edge cases and error handling', () {
     test('handles deeply nested JSON structures correctly', () {
-      final response = ApiResponse.success({
+      final response = ApiResponse.ok({
         'data': {
           'items': [
             {'id': '1', 'name': 'Item 1'},
             {'id': '2', 'name': 'Item 2'},
           ],
         },
-      });
+      }, headers: {});
 
       final result = response.when(
         ok: (data) {
@@ -356,11 +355,9 @@ void main() {
     });
 
     test('handles unexpected data types gracefully', () {
-      // Create a response with an unexpected data type (e.g., binary data)
       final bytes = [0, 1, 2, 3, 4, 5];
-      final response = ApiResponse.success(bytes);
+      final response = ApiResponse.ok(bytes, headers: {});
 
-      // Should handle this gracefully in the when method
       final result = response.when(
         ok: (data) {
           if (data is List<int>) {
@@ -375,7 +372,7 @@ void main() {
     });
 
     test('handles null values in nested structures', () {
-      final response = ApiResponse.success({
+      final response = ApiResponse.ok({
         'user': {
           'id': '123',
           'name': null,
@@ -385,7 +382,7 @@ void main() {
             {'id': '456', 'name': 'Friend'},
           ],
         },
-      });
+      }, headers: {});
 
       final result = response.when(
         ok: (data) {
@@ -404,36 +401,36 @@ void main() {
     });
 
     test('handles different status codes with appropriate responses', () {
-      final okResponse = ApiResponse.success({
+      final okResponse = ApiResponse.ok({
         'status': 'success',
-      }, statusCode: 200);
-      final createdResponse = ApiResponse.success({
+      }, statusCode: 200, headers: {});
+      final createdResponse = ApiResponse.ok({
         'id': 'new-id',
-      }, statusCode: 201);
-      final notModifiedResponse = ApiResponse(statusCode: 304);
-      final badRequestResponse = ApiResponse.failure(
-        HttpErr(
+      }, statusCode: 201, headers: {});
+      final notModifiedResponse = ApiResponse(statusCode: 304, headers: {});
+      final badRequestResponse = ApiResponse.err(
+        ApiErr(
           exception: Exception('Bad request'),
           stackTrace: TestStackTrace(),
-          data: HttpMessage(
-            success: false,
+          message: HttpMessage(
             title: 'Error',
             details: 'Bad request',
           ),
         ),
         statusCode: 400,
+        headers: {},
       );
-      final serverErrorResponse = ApiResponse.failure(
-        HttpErr(
+      final serverErrorResponse = ApiResponse.err(
+        ApiErr(
           exception: Exception('Server error'),
           stackTrace: TestStackTrace(),
-          data: HttpMessage(
-            success: false,
+          message: HttpMessage(
             title: 'Error',
             details: 'Server error',
           ),
         ),
         statusCode: 500,
+        headers: {},
       );
 
       // Process different status codes
@@ -453,9 +450,8 @@ void main() {
     });
 
     test('handles json data conversion between string and object format', () {
-      // Test with JSON as string
       final jsonString = '{"id":"1","name":"Test Object"}';
-      final stringResponse = ApiResponse.success(jsonString);
+      final stringResponse = ApiResponse.ok(jsonString, headers: {});
 
       final stringResult = stringResponse.when(
         ok: (data) {
@@ -471,9 +467,8 @@ void main() {
       expect(stringResult.id, equals('1'));
       expect(stringResult.name, equals('Test Object'));
 
-      // Test with JSON as object
       final jsonObject = {'id': '1', 'name': 'Test Object'};
-      final objectResponse = ApiResponse.success(jsonObject);
+      final objectResponse = ApiResponse.ok(jsonObject, headers: {});
 
       final objectResult = objectResponse.when(
         ok: (data) {

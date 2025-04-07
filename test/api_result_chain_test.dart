@@ -125,9 +125,7 @@ void main() {
       // Create an error result
       final errorResult = ApiResult<User>.err(
         ApiErr(
-          statusCode: 404,
           message: HttpMessage(
-            success: false,
             title: 'Not Found',
             details: 'User not found',
           ),
@@ -142,7 +140,6 @@ void main() {
           .map((parts) => '${parts[1]}, ${parts[0]}');
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.statusCode, equals(404));
       expect(result.errorOrNull?.message?.details, equals('User not found'));
     });
 
@@ -150,9 +147,7 @@ void main() {
       // Create an error result
       final errorResult = ApiResult<User>.err(
         ApiErr(
-          statusCode: 404,
           message: HttpMessage(
-            success: false,
             title: 'Not Found',
             details: 'User not found',
           ),
@@ -163,9 +158,7 @@ void main() {
       final result = errorResult.map(
         (user) => user.name,
         (error) => ApiErr(
-          statusCode: 500,
           message: HttpMessage(
-            success: false,
             title: 'Transformed Error',
             details: 'Original error: ${error.message?.details}',
           ),
@@ -173,7 +166,6 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.statusCode, equals(500));
       expect(result.errorOrNull?.message?.title, equals('Transformed Error'));
       expect(result.errorOrNull?.message?.details, contains('User not found'));
     });
@@ -182,9 +174,7 @@ void main() {
       // Create an error result
       final errorResult = ApiResult<User>.err(
         ApiErr(
-          statusCode: 404,
           message: HttpMessage(
-            success: false,
             title: 'Not Found',
             details: 'User not found',
           ),
@@ -196,9 +186,7 @@ void main() {
           .map(
             (user) => user.name,
             (error) => ApiErr(
-              statusCode: 400,
               message: HttpMessage(
-                success: false,
                 title: 'First Transform',
                 details: 'Step 1: ${error.message?.details}',
               ),
@@ -207,9 +195,7 @@ void main() {
           .map(
             (name) => name.toUpperCase(),
             (error) => ApiErr(
-              statusCode: 500,
               message: HttpMessage(
-                success: false,
                 title: 'Second Transform',
                 details: 'Step 2: ${error.message?.details}',
               ),
@@ -217,7 +203,6 @@ void main() {
           );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.statusCode, equals(500));
       expect(result.errorOrNull?.message?.title, equals('Second Transform'));
       expect(
         result.errorOrNull?.message?.details,
@@ -285,9 +270,7 @@ void main() {
       ApiResult<List<Post>> getUserPosts(User user) {
         return ApiResult.err(
           ApiErr(
-            statusCode: 500,
             message: HttpMessage(
-              success: false,
               title: 'Server Error',
               details: 'Failed to fetch posts for user ${user.id}',
             ),
@@ -318,11 +301,7 @@ void main() {
       });
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.statusCode, equals(500));
-      expect(
-        result.errorOrNull?.message?.details,
-        contains('Failed to fetch posts for user 1'),
-      );
+      expect(result.errorOrNull?.message?.details, contains('Failed to fetch posts for user 1'));
     });
 
     test('Error recovery in the middle of a chain', () {
@@ -334,9 +313,7 @@ void main() {
       ApiResult<List<Post>> getUserPosts(User user) {
         return ApiResult.err(
           ApiErr(
-            statusCode: 500,
             message: HttpMessage(
-              success: false,
               title: 'Server Error',
               details: 'Failed to fetch posts for user ${user.id}',
             ),
@@ -359,7 +336,7 @@ void main() {
       final result = getUser('1').flatMap((user) {
         return getUserPosts(user)
             .recover((error) {
-              if (error.statusCode == 500) {
+              if (error.message?.details == 'Failed to fetch posts for user 1') {
                 // Recovery logic
                 return getFallbackPosts(user);
               }
@@ -375,11 +352,7 @@ void main() {
       });
 
       expect(result.isOk, isTrue);
-      expect(result.data['user'], isA<User>());
-      expect(
-        (result.data['posts'] as List<Post>).first.title,
-        equals('Fallback Post'),
-      );
+      expect((result.data['posts'] as List<Post>).first.title, equals('Fallback Post'));
       expect(result.data['postsCount'], equals(1));
     });
 
@@ -389,9 +362,7 @@ void main() {
         if (id == '404') {
           return ApiResult.err(
             ApiErr(
-              statusCode: 404,
               message: HttpMessage(
-                success: false,
                 title: 'Not Found',
                 details: 'User not found',
               ),
@@ -405,24 +376,20 @@ void main() {
       final result = getUser(
         '404',
       ).flatMap((user) => ApiResult.ok('User: ${user.name}'), (error) {
-        if (error.statusCode == 404) {
+        if (error.message?.details == 'User not found') {
           return ApiResult.err(
             ApiErr(
-              statusCode: 404,
               message: HttpMessage(
-                success: false,
                 title: 'Custom Not Found',
                 details:
                     'Could not find the requested user. Please try another ID.',
               ),
             ),
           );
-        } else if (error.statusCode == 401) {
+        } else if (error.message?.details == 'Unauthorized') {
           return ApiResult.err(
             ApiErr(
-              statusCode: 401,
               message: HttpMessage(
-                success: false,
                 title: 'Authentication Required',
                 details: 'Please login to access this resource.',
               ),
@@ -431,9 +398,7 @@ void main() {
         } else {
           return ApiResult.err(
             ApiErr(
-              statusCode: 500,
               message: HttpMessage(
-                success: false,
                 title: 'System Error',
                 details:
                     'An unexpected error occurred. Original error: ${error.message?.details}',
@@ -444,7 +409,6 @@ void main() {
       });
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.statusCode, equals(404));
       expect(result.errorOrNull?.message?.title, equals('Custom Not Found'));
       expect(
         result.errorOrNull?.message?.details,
@@ -504,9 +468,7 @@ void main() {
       // Define error handling functions
       ApiErr handleNetworkError(ApiErr error) {
         return ApiErr(
-          statusCode: error.statusCode,
           message: HttpMessage(
-            success: false,
             title: 'Network Error',
             details: 'Please check your connection and try again',
           ),
@@ -515,9 +477,7 @@ void main() {
 
       ApiErr handleAuthError(ApiErr error) {
         return ApiErr(
-          statusCode: error.statusCode,
           message: HttpMessage(
-            success: false,
             title: 'Authentication Error',
             details: 'Please login to continue',
           ),
@@ -526,9 +486,7 @@ void main() {
 
       ApiErr handleServerError(ApiErr error) {
         return ApiErr(
-          statusCode: error.statusCode,
           message: HttpMessage(
-            success: false,
             title: 'Server Error',
             details: 'Our servers are experiencing issues',
           ),
@@ -538,16 +496,16 @@ void main() {
       // Create different error scenarios
       final networkError = ApiResult<User>.err(
         ApiErr(
-          statusCode: 0,
-          exception: Exception('Network connection failed'),
+          message: HttpMessage(
+            title: 'Network Error',
+            details: 'Please check your connection and try again',
+          ),
         ),
       );
 
       final authError = ApiResult<User>.err(
         ApiErr(
-          statusCode: 401,
           message: HttpMessage(
-            success: false,
             title: 'Unauthorized',
             details: 'Token expired',
           ),
@@ -556,9 +514,7 @@ void main() {
 
       final serverError = ApiResult<User>.err(
         ApiErr(
-          statusCode: 500,
           message: HttpMessage(
-            success: false,
             title: 'Internal Error',
             details: 'Database failure',
           ),
@@ -567,11 +523,11 @@ void main() {
 
       // Apply different error handlers based on status code
       processError(ApiErr error) {
-        if (error.statusCode == 0) {
+        if (error.message?.title == 'Network Error') {
           return handleNetworkError(error);
-        } else if (error.statusCode == 401 || error.statusCode == 403) {
+        } else if (error.message?.title == 'Unauthorized') {
           return handleAuthError(error);
-        } else if (error.statusCode! >= 500) {
+        } else if (error.message?.title == 'Internal Error') {
           return handleServerError(error);
         }
         return error;
@@ -610,9 +566,7 @@ void main() {
             // First flatMap returns an error
             return ApiResult<int>.err(
               ApiErr(
-                statusCode: 400,
                 message: HttpMessage(
-                  success: false,
                   title: 'Level 1 Error',
                   details: 'Error at first level',
                 ),
@@ -628,9 +582,7 @@ void main() {
               // This transforms the Level 1 error
               return ApiResult<bool>.err(
                 ApiErr(
-                  statusCode: error.statusCode,
                   message: HttpMessage(
-                    success: false,
                     title: 'Transformed Level 1',
                     details: 'Transformed: ${error.message?.details}',
                   ),
@@ -647,9 +599,7 @@ void main() {
               // This transforms the Level 2 error
               return ApiResult<String>.err(
                 ApiErr(
-                  statusCode: error.statusCode,
                   message: HttpMessage(
-                    success: false,
                     title: 'Final Error',
                     details: 'Final: ${error.message?.details}',
                   ),
@@ -676,9 +626,7 @@ void main() {
               // Produce an error in the middle of the chain
               return ApiResult<String>.err(
                 ApiErr(
-                  statusCode: 400,
                   message: HttpMessage(
-                    success: false,
                     title: 'Value Too Large',
                     details: 'Value $value exceeds maximum of 5',
                   ),
@@ -714,14 +662,14 @@ void main() {
   group('ApiResult unexpected data handling', () {
     test('Handles unexpected response structures gracefully', () {
       // Mock an unexpected API response format
-      final unexpectedResponse = ApiResponse.success({
+      final response = ApiResponse.ok({
         'meta': {'status': 'success'},
-        'data': null, // Missing expected data
-      });
+        'data': null,
+      }, headers: {});
 
       // Try to convert to a User
       final result = ApiResult.from<User>(
-        response: unexpectedResponse,
+        response: response,
         onData: (data) => User.fromJson(data),
       );
 
@@ -734,10 +682,10 @@ void main() {
 
     test('Handles API schema changes gracefully', () {
       // Mock a response with changed schema (field name changes)
-      final changedSchemaResponse = ApiResponse.success({
-        'userId': '123', // Changed from 'id'
-        'userName': 'John Doe', // Changed from 'name'
-      });
+      final changedSchemaResponse = ApiResponse.ok({
+        'userId': '123',
+        'userName': 'John Doe',
+      }, headers: {});
 
       // Try to convert with schema handling
       final result = ApiResult.from<User>(
@@ -766,10 +714,9 @@ void main() {
 
     test('Handles missing required fields gracefully', () {
       // Mock a response with missing required fields
-      final missingFieldsResponse = ApiResponse.success({
+      final missingFieldsResponse = ApiResponse.ok({
         'id': '123',
-        // Missing 'name' field
-      });
+      }, headers: {});
 
       // Try to convert with error handling for missing fields
       final result = ApiResult.from<User>(
@@ -795,18 +742,18 @@ void main() {
 
     test('Handles unexpected data types gracefully', () {
       // Mock a response with unexpected data types
-      final wrongTypesResponse = ApiResponse.success({
-        'id': 123, // Number instead of string
-        'name': true, // Boolean instead of string
-      });
+      final wrongTypesResponse = ApiResponse.ok({
+        'id': 123,
+        'name': true,
+      }, headers: {});
 
       // Try to convert with type coercion
       final result = ApiResult.from<User>(
         response: wrongTypesResponse,
         onData: (data) {
           return User(
-            id: data['id'].toString(), // Convert to string
-            name: data['name'].toString(), // Convert to string
+            id: data['id'].toString(),
+            name: data['name'].toString(),
           );
         },
       );

@@ -53,7 +53,11 @@ class ApiResponse {
   /// - [statusCode]: HTTP status code of the response
   /// - [data]: Raw response data
   /// - [err]: Detailed err information
-  ApiResponse({this.statusCode, this.data, this.err, Map<String, String>? headers }): headers = headers ?? {};
+  ApiResponse({this.statusCode, this.data, this.err, Map<String, String>? headers }): headers = headers ?? {} {
+    if (statusCode != null && (statusCode! < 100 || statusCode! >= 600)) {
+      throw ArgumentError('Status code must be between 100 and 599');
+    }
+  }
 
   /// Creates a successful API response
   ///
@@ -65,12 +69,12 @@ class ApiResponse {
   ///
   /// Example:
   /// ```dart
-  /// final response = ApiResponse.success(
+  /// final response = ApiResponse.ok(
   ///   {'name': 'John', 'age': 30},
   ///   statusCode: 200
   /// );
   /// ```
-  factory ApiResponse.success(dynamic data, {int? statusCode, required Map<String, String> headers}) {
+  factory ApiResponse.ok(dynamic data, {int? statusCode, required Map<String, String> headers}) {
     return ApiResponse(data: data, statusCode: statusCode, headers: headers);
   }
 
@@ -84,20 +88,19 @@ class ApiResponse {
   ///
   /// Example:
   /// ```dart
-  /// final response = ApiResponse.failure(
-  ///   Httperr(
-  ///     exception: Exception('Network err'),
-  ///     data: HttpMessage(
-  ///       success: false,
-  ///       title: 'Connection err',
+  /// final response = ApiResponse.err(
+  ///   ApiErr(
+  ///     exception: Exception('Network error'),
+  ///     message: HttpMessage(
+  ///       title: 'Connection Error',
   ///       details: 'Could not connect to server'
   ///     )
   ///   ),
   ///   statusCode: 500
   /// );
   /// ```
-  factory ApiResponse.failure(ApiErr err, {int? statusCode, required Map<String, String> headers}) {
-    return ApiResponse(err: err, statusCode: statusCode, headers: headers,data: null);
+  factory ApiResponse.err(ApiErr err, {int? statusCode, required Map<String, String> headers}) {
+    return ApiResponse(err: err, statusCode: statusCode, headers: headers, data: null);
   }
 
   /// Processes the response with separate handlers for success and err cases
