@@ -127,18 +127,12 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// // nameResult is ApiResult<String>.ok('John')
   /// ```
   @override
-  Result<R, ApiErr> map<R>(
-    R Function(T value) transform, [
-    ApiErr Function(ApiErr error)? errorTransform,
-  ]) {
+  Result<R, ApiErr> map<R>(R Function(T value) transform, [ApiErr Function(ApiErr error)? errorTransform]) {
     if (_isOk) {
       return ApiResult<R>.ok(transform(_data as T), statusCode: statusCode);
     } else {
       final error = _error as ApiErr;
-      return ApiResult<R>.err(
-        errorTransform != null ? errorTransform(error) : error,
-        statusCode: statusCode,
-      );
+      return ApiResult<R>.err(errorTransform != null ? errorTransform(error) : error, statusCode: statusCode);
     }
   }
 
@@ -157,17 +151,12 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// final postsResult = await fetchUser('123').flatMap((user) => fetchUserPosts(user));
   /// ```
   @override
-  Result<R, ApiErr> flatMap<R>(
-    Result<R, ApiErr> Function(T value) transform, [
-    Result<R, ApiErr> Function(ApiErr error)? errorTransform,
-  ]) {
+  Result<R, ApiErr> flatMap<R>(Result<R, ApiErr> Function(T value) transform, [Result<R, ApiErr> Function(ApiErr error)? errorTransform]) {
     if (_isOk) {
       return transform(_data as T);
     } else {
       final error = _error as ApiErr;
-      return errorTransform != null
-          ? errorTransform(error)
-          : ApiResult<R>.err(error, statusCode: statusCode);
+      return errorTransform != null ? errorTransform(error) : ApiResult<R>.err(error, statusCode: statusCode);
     }
   }
 
@@ -196,10 +185,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   err: (error) => throw error, // Or handle differently
   /// );
   /// ```
-  static ApiResult<T> from<T>({
-    required ApiResponse response,
-    required T Function(Map<String, dynamic> data) onData,
-  }) {
+  static ApiResult<T> from<T>({required ApiResponse response, required T Function(Map<String, dynamic> data) onData}) {
     try {
       if (response.err != null) {
         return ApiResult.err(response.err!, statusCode: response.statusCode);
@@ -209,10 +195,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            message: HttpMessage(
-              title: 'Error',
-              details: 'No data in response',
-            ),
+            message: HttpMessage(title: 'Error', details: 'No data in response'),
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -233,10 +216,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
       return ApiResult.err(
         ApiErr(
           exception: e,
-          message: HttpMessage(
-            title: 'Data Processing Error',
-            details: 'Could not process the server response: ${e.toString()}',
-          ),
+          message: HttpMessage(title: 'Data Processing Error', details: 'Could not process the server response: ${e.toString()}'),
           stackTrace: stackTrace,
         ),
         statusCode: response.statusCode,
@@ -272,10 +252,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   },
   /// );
   /// ```
-  static ApiResult<List<T>> fromList<T>({
-    required ApiResponse response,
-    required List<T> Function(List<Map<String, dynamic>> data) onData,
-  }) {
+  static ApiResult<List<T>> fromList<T>({required ApiResponse response, required List<T> Function(List<Map<String, dynamic>> data) onData}) {
     try {
       if (response.err != null) {
         return ApiResult.err(response.err!, statusCode: response.statusCode);
@@ -285,10 +262,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            message: HttpMessage(
-              title: 'Error',
-              details: 'No data in response',
-            ),
+            message: HttpMessage(title: 'Error', details: 'No data in response'),
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -309,11 +283,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
       return ApiResult.err(
         ApiErr(
           exception: e,
-          message: HttpMessage(
-            title: 'Data Processing Error',
-            details:
-                'Could not process the server response list: ${e.toString()}',
-          ),
+          message: HttpMessage(title: 'Data Processing Error', details: 'Could not process the server response list: ${e.toString()}'),
           stackTrace: stackTrace,
         ),
         statusCode: response.statusCode,
@@ -341,9 +311,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
       }
     }
 
-    throw FormatException(
-      'Expected Map or JSON string, got ${data.runtimeType}',
-    );
+    throw FormatException('Expected Map or JSON string, got ${data.runtimeType}');
   }
 
   /// Utility method to ensure valid JSON list structures
@@ -373,9 +341,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
       }
     }
 
-    throw FormatException(
-      'Expected List or JSON string, got ${data.runtimeType}',
-    );
+    throw FormatException('Expected List or JSON string, got ${data.runtimeType}');
   }
 }
 
@@ -423,11 +389,17 @@ class Params {
   /// For form data, you can provide key-value pairs.
   final Map<String, dynamic>? body;
 
+  /// Optional query parameters to append to the URL
+  ///
+  /// Example: {'page': '1', 'limit': '10', 'sort': 'desc'}
+  /// Would result in ?page=1&limit=10&sort=desc
+  final Map<String, String>? queryParams;
+
   /// Creates a new set of API request parameters
   ///
   /// The [path] parameter is required and defines the endpoint URL path.
   /// Optional [body] and [header] can be provided for request data and headers.
-  Params({required this.path, this.body, this.header});
+  Params({required this.path, this.body, this.header, this.queryParams});
 }
 
 /// User-friendly HTTP error message
@@ -498,10 +470,7 @@ class HttpMessage {
   /// final message = HttpMessage.fromJson(responseData);
   /// ```
   factory HttpMessage.fromJson(Map<String, dynamic> json) {
-    return HttpMessage(
-      title: json['title'] ?? 'Error',
-      details: json['details'] ?? json['message'] ?? 'Unknown error',
-    );
+    return HttpMessage(title: json['title'] ?? 'Error', details: json['details'] ?? json['message'] ?? 'Unknown error');
   }
 
   /// Converts this message to a JSON map
@@ -563,10 +532,7 @@ class HttpMessage {
   /// final message = HttpMessage.fromError(error);
   /// ```
   factory HttpMessage.fromError(ApiErr error) {
-    return error.message ??
-        HttpMessage.fromException(
-          error.exception ?? Exception('Unknown error'),
-        );
+    return error.message ?? HttpMessage.fromException(error.exception ?? Exception('Unknown error'));
   }
 }
 
