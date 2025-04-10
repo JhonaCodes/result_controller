@@ -106,7 +106,7 @@ class ApiResponse {
   /// - 500-599: Server err
   final int? statusCode;
 
-  final Map<String, String> headers;
+  final Map<String, dynamic> headers;
 
   /// Detailed err information if the API call failed
   ///
@@ -125,7 +125,7 @@ class ApiResponse {
     this.statusCode,
     this.data,
     this.err,
-    Map<String, String>? headers,
+    Map<String, dynamic>? headers,
   }) : headers = headers ?? {} {
     if (statusCode != null && (statusCode! < 100 || statusCode! >= 600)) {
       throw ArgumentError('Status code must be between 100 and 599');
@@ -150,7 +150,7 @@ class ApiResponse {
   factory ApiResponse.ok(
     dynamic data, {
     int? statusCode,
-    required Map<String, String> headers,
+    required Map<String, dynamic> headers,
   }) {
     return ApiResponse(data: data, statusCode: statusCode, headers: headers);
   }
