@@ -179,7 +179,7 @@ class ApiResponse {
   factory ApiResponse.err(
     ApiErr err, {
     int? statusCode,
-    required Map<String, String> headers,
+    required Map<String, dynamic> headers,
   }) {
     return ApiResponse(
       err: err,
