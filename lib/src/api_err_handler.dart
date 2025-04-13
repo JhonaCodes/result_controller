@@ -76,6 +76,13 @@ class ApiErr extends ResultErr {
   /// such as a network error, parsing error, etc.
   final Object? exception;
 
+  /// HTTP status code
+  ///
+  /// This indicates the status of the API response, such as 200 for success
+  /// or 404 for not found, etc.
+  ///
+  final int? statusCode;
+
   /// User-friendly message
   ///
   /// This provides a structured message that can be displayed to the user.
@@ -103,7 +110,7 @@ class ApiErr extends ResultErr {
   ///   stackTrace: stackTrace,
   /// );
   /// ```
-  ApiErr({this.exception, this.message, StackTrace? stackTrace})
+  ApiErr({this.statusCode, this.exception, this.message, StackTrace? stackTrace})
     : super(
         message?.details ?? exception?.toString() ?? 'Unknown API error',
         stackTrace: stackTrace,
@@ -133,7 +140,7 @@ class ApiErr extends ResultErr {
     final parts = <String>[];
 
     if (message != null) {
-      parts.add('${message!.title}: ${message!.details}');
+      parts.add('Code: $statusCode ${message!.title}: ${message!.details}');
     } else if (exception != null) {
       parts.add(
         'Error: ${exception is Exception ? (exception as Exception).toString().replaceAll('Exception: ', '') : exception.toString()}',
