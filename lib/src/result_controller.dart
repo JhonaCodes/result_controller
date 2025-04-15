@@ -245,7 +245,9 @@ abstract class Result<T, E> {
 /// // StackTrace:
 /// // #0 main (file:///...)
 /// ```
-class ResultErr {
+class ResultErr<T> {
+  final T? type;
+
   /// Error message describing what went wrong
   final String text;
 
@@ -253,12 +255,12 @@ class ResultErr {
   final StackTrace? stackTrace;
 
   /// Creates a new ResultError with an error message and optional stack trace
-  ResultErr(this.text, {this.stackTrace});
+  ResultErr(this.text, {this.stackTrace, this.type});
 
   @override
   String toString() {
     if (stackTrace != null) {
-      return '$text\nStackTrace:\n$stackTrace';
+      return '$type\n$text\nStackTrace:\n$stackTrace';
     }
     return text;
   }

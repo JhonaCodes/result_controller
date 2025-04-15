@@ -48,11 +48,13 @@ class ApiResult<T> extends Result<T, ApiErr> {
   final int? statusCode;
 
   final T? _data;
+
+  final Map<String, String> headers;
   final ApiErr? _error;
   final bool _isOk;
 
   /// Private constructor used internally by factories
-  ApiResult._internal(this.statusCode, this._data, this._error, this._isOk);
+  ApiResult._internal(this.statusCode, this.headers, this._data, this._error, this._isOk);
 
   /// Creates a successful API result
   ///
@@ -68,8 +70,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// final user = User.fromJson(userData);
   /// return ApiResult.ok(user, statusCode: 201);
   /// ```
-  factory ApiResult.ok(T data, {int? statusCode = 200}) {
-    return ApiResult._internal(statusCode, data, null, true);
+  factory ApiResult.ok(T data, {Map<String, String>? headers,int? statusCode = 200}) {
+    return ApiResult._internal(statusCode, headers ?? {}, data, null, true);
   }
 
   /// Creates an API result with an error
@@ -94,8 +96,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   statusCode: 500
   /// );
   /// ```
-  factory ApiResult.err(ApiErr error, {int? statusCode}) {
-    return ApiResult._internal(statusCode, null, error, false);
+  factory ApiResult.err(ApiErr error, {Map<String, String>? headers,int? statusCode}) {
+    return ApiResult._internal(statusCode, headers ?? {},null, error, false);
   }
 
   /// Processes this result by applying the appropriate function
