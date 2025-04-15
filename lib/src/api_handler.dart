@@ -49,7 +49,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
 
   final T? _data;
 
-  final Map<String, String> headers;
+  final Map<String, dynamic> headers;
   final ApiErr? _error;
   final bool _isOk;
 
