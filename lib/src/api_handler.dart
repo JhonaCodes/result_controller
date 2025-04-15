@@ -78,7 +78,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// ```
   factory ApiResult.ok(
     T data, {
-    Map<String, String>? headers,
+    Map<String, dynamic>? headers,
     int? statusCode = 200,
   }) {
     return ApiResult._internal(statusCode, headers ?? {}, data, null, true);
@@ -108,7 +108,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// ```
   factory ApiResult.err(
     ApiErr error, {
-    Map<String, String>? headers,
+    Map<String, dynamic>? headers,
     int? statusCode,
   }) {
     return ApiResult._internal(statusCode, headers ?? {}, null, error, false);
@@ -431,7 +431,7 @@ class Params {
   /// Common headers include:
   /// - 'Content-Type': 'application/json'
   /// - 'Authorization': 'Bearer $token'
-  final Map<String, String>? header;
+  final Map<String, dynamic>? header;
 
   /// Optional body data for the request (used in POST, PUT, PATCH)
   ///
