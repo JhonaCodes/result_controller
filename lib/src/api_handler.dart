@@ -54,7 +54,13 @@ class ApiResult<T> extends Result<T, ApiErr> {
   final bool _isOk;
 
   /// Private constructor used internally by factories
-  ApiResult._internal(this.statusCode, this.headers, this._data, this._error, this._isOk);
+  ApiResult._internal(
+    this.statusCode,
+    this.headers,
+    this._data,
+    this._error,
+    this._isOk,
+  );
 
   /// Creates a successful API result
   ///
@@ -70,7 +76,11 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// final user = User.fromJson(userData);
   /// return ApiResult.ok(user, statusCode: 201);
   /// ```
-  factory ApiResult.ok(T data, {Map<String, String>? headers,int? statusCode = 200}) {
+  factory ApiResult.ok(
+    T data, {
+    Map<String, String>? headers,
+    int? statusCode = 200,
+  }) {
     return ApiResult._internal(statusCode, headers ?? {}, data, null, true);
   }
 
@@ -96,8 +106,12 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   statusCode: 500
   /// );
   /// ```
-  factory ApiResult.err(ApiErr error, {Map<String, String>? headers,int? statusCode}) {
-    return ApiResult._internal(statusCode, headers ?? {},null, error, false);
+  factory ApiResult.err(
+    ApiErr error, {
+    Map<String, String>? headers,
+    int? statusCode,
+  }) {
+    return ApiResult._internal(statusCode, headers ?? {}, null, error, false);
   }
 
   /// Processes this result by applying the appropriate function
@@ -129,12 +143,18 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// // nameResult is ApiResult<String>.ok('John')
   /// ```
   @override
-  Result<R, ApiErr> map<R>(R Function(T value) transform, [ApiErr Function(ApiErr error)? errorTransform]) {
+  Result<R, ApiErr> map<R>(
+    R Function(T value) transform, [
+    ApiErr Function(ApiErr error)? errorTransform,
+  ]) {
     if (_isOk) {
       return ApiResult<R>.ok(transform(_data as T), statusCode: statusCode);
     } else {
       final error = _error as ApiErr;
-      return ApiResult<R>.err(errorTransform != null ? errorTransform(error) : error, statusCode: statusCode);
+      return ApiResult<R>.err(
+        errorTransform != null ? errorTransform(error) : error,
+        statusCode: statusCode,
+      );
     }
   }
 
@@ -153,12 +173,17 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// final postsResult = await fetchUser('123').flatMap((user) => fetchUserPosts(user));
   /// ```
   @override
-  Result<R, ApiErr> flatMap<R>(Result<R, ApiErr> Function(T value) transform, [Result<R, ApiErr> Function(ApiErr error)? errorTransform]) {
+  Result<R, ApiErr> flatMap<R>(
+    Result<R, ApiErr> Function(T value) transform, [
+    Result<R, ApiErr> Function(ApiErr error)? errorTransform,
+  ]) {
     if (_isOk) {
       return transform(_data as T);
     } else {
       final error = _error as ApiErr;
-      return errorTransform != null ? errorTransform(error) : ApiResult<R>.err(error, statusCode: statusCode);
+      return errorTransform != null
+          ? errorTransform(error)
+          : ApiResult<R>.err(error, statusCode: statusCode);
     }
   }
 
@@ -187,7 +212,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   err: (error) => throw error, // Or handle differently
   /// );
   /// ```
-  static ApiResult<T> from<T>({required ApiResponse response, required T Function(Map<String, dynamic> data) onData}) {
+  static ApiResult<T> from<T>({
+    required ApiResponse response,
+    required T Function(Map<String, dynamic> data) onData,
+  }) {
     try {
       if (response.err != null) {
         return ApiResult.err(response.err!, statusCode: response.statusCode);
@@ -197,7 +225,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            message: HttpMessage(title: 'Error', details: 'No data in response'),
+            message: HttpMessage(
+              title: 'Error',
+              details: 'No data in response',
+            ),
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -218,7 +249,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
       return ApiResult.err(
         ApiErr(
           exception: e,
-          message: HttpMessage(title: 'Data Processing Error', details: 'Could not process the server response: ${e.toString()}'),
+          message: HttpMessage(
+            title: 'Data Processing Error',
+            details: 'Could not process the server response: ${e.toString()}',
+          ),
           stackTrace: stackTrace,
         ),
         statusCode: response.statusCode,
@@ -254,7 +288,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   },
   /// );
   /// ```
-  static ApiResult<List<T>> fromList<T>({required ApiResponse response, required List<T> Function(List<Map<String, dynamic>> data) onData}) {
+  static ApiResult<List<T>> fromList<T>({
+    required ApiResponse response,
+    required List<T> Function(List<Map<String, dynamic>> data) onData,
+  }) {
     try {
       if (response.err != null) {
         return ApiResult.err(response.err!, statusCode: response.statusCode);
@@ -264,7 +301,10 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            message: HttpMessage(title: 'Error', details: 'No data in response'),
+            message: HttpMessage(
+              title: 'Error',
+              details: 'No data in response',
+            ),
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -285,7 +325,11 @@ class ApiResult<T> extends Result<T, ApiErr> {
       return ApiResult.err(
         ApiErr(
           exception: e,
-          message: HttpMessage(title: 'Data Processing Error', details: 'Could not process the server response list: ${e.toString()}'),
+          message: HttpMessage(
+            title: 'Data Processing Error',
+            details:
+                'Could not process the server response list: ${e.toString()}',
+          ),
           stackTrace: stackTrace,
         ),
         statusCode: response.statusCode,
@@ -313,7 +357,9 @@ class ApiResult<T> extends Result<T, ApiErr> {
       }
     }
 
-    throw FormatException('Expected Map or JSON string, got ${data.runtimeType}');
+    throw FormatException(
+      'Expected Map or JSON string, got ${data.runtimeType}',
+    );
   }
 
   /// Utility method to ensure valid JSON list structures
@@ -343,7 +389,9 @@ class ApiResult<T> extends Result<T, ApiErr> {
       }
     }
 
-    throw FormatException('Expected List or JSON string, got ${data.runtimeType}');
+    throw FormatException(
+      'Expected List or JSON string, got ${data.runtimeType}',
+    );
   }
 }
 
@@ -472,7 +520,10 @@ class HttpMessage {
   /// final message = HttpMessage.fromJson(responseData);
   /// ```
   factory HttpMessage.fromJson(Map<String, dynamic> json) {
-    return HttpMessage(title: json['title'] ?? 'Error', details: json['details'] ?? json['message'] ?? 'Unknown error');
+    return HttpMessage(
+      title: json['title'] ?? 'Error',
+      details: json['details'] ?? json['message'] ?? 'Unknown error',
+    );
   }
 
   /// Converts this message to a JSON map
@@ -534,7 +585,10 @@ class HttpMessage {
   /// final message = HttpMessage.fromError(error);
   /// ```
   factory HttpMessage.fromError(ApiErr error) {
-    return error.message ?? HttpMessage.fromException(error.exception ?? Exception('Unknown error'));
+    return error.message ??
+        HttpMessage.fromException(
+          error.exception ?? Exception('Unknown error'),
+        );
   }
 }
 

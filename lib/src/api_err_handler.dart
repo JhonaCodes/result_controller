@@ -10,7 +10,6 @@ import 'package:result_controller/result_controller.dart';
 /// Type parameter [E] represents the type used for categorizing errors (e.g., an enum like `HttpError`).
 ///
 class ApiErr<E> extends ResultErr<E> {
-
   // --- Properties ---
 
   /// Optional field-specific validation errors, often from form submissions (e.g., {'email': 'Invalid format'}).
@@ -59,13 +58,13 @@ class ApiErr<E> extends ResultErr<E> {
     this.message,
     this.validations,
     StackTrace? stackTrace,
-    E? errorType
+    E? errorType,
   }) : super(
-    // Use message details, fallback to exception string, then to generic message
-      message?.details ?? exception?.toString() ?? 'Unknown API error',
-      stackTrace: stackTrace,
-      type: errorType // Pass the error type to the base class
-  );
+         // Use message details, fallback to exception string, then to generic message
+         message?.details ?? exception?.toString() ?? 'Unknown API error',
+         stackTrace: stackTrace,
+         type: errorType, // Pass the error type to the base class
+       );
 
   // --- toString Implementation ---
 
@@ -101,12 +100,15 @@ class ApiErr<E> extends ResultErr<E> {
       parts.add('${message!.title}: ${message!.details}');
     } else if (exception != null) {
       // Format exception message cleanly
-      final exceptionString = exception is Exception
-          ? (exception as Exception).toString()
-          : exception.toString();
+      final exceptionString =
+          exception is Exception
+              ? (exception as Exception).toString()
+              : exception.toString();
       parts.add('Error: $exceptionString');
     } else {
-      parts.add('Unknown API error${statusCode != null ? " (Code: $statusCode)" : ""}');
+      parts.add(
+        'Unknown API error${statusCode != null ? " (Code: $statusCode)" : ""}',
+      );
     }
 
     // Optionally add validation errors
@@ -213,16 +215,17 @@ class ApiErr<E> extends ResultErr<E> {
   /// );
   /// ```
   static void registerStatusTypeErrors<E>(
-      Type exceptionType, // Use Type for clarity
-      List<int> statusCodes,
-      List<E> errorTypes,
-      ApiErr<E> error
-      ) {
+    Type exceptionType, // Use Type for clarity
+    List<int> statusCodes,
+    List<E> errorTypes,
+    ApiErr<E> error,
+  ) {
     _errorRegistry[_StatusTypeKey<E>(
-      exceptionType: exceptionType,
-      statusCodes: statusCodes,
-      errorTypes: errorTypes,
-    )] = error;
+          exceptionType: exceptionType,
+          statusCodes: statusCodes,
+          errorTypes: errorTypes,
+        )] =
+        error;
   }
 
   /// Registers multiple error mappings for combinations of exception types, status codes, and error types.
@@ -253,13 +256,16 @@ class ApiErr<E> extends ResultErr<E> {
   ///   (TimeoutException, [408], [NetworkError.timeout]): ApiErr<NetworkError>(...), // Another template example
   /// });
   /// ```
-  static void registerAllStatusTypeErrors<E>(Map<(Type, List<int>, List<E>), ApiErr<E>> statusTypeMap) {
+  static void registerAllStatusTypeErrors<E>(
+    Map<(Type, List<int>, List<E>), ApiErr<E>> statusTypeMap,
+  ) {
     statusTypeMap.forEach((key, value) {
       _errorRegistry[_StatusTypeKey<E>(
-        exceptionType: key.$1, // Item1: Exception Type
-        statusCodes: key.$2,   // Item2: Status Codes List
-        errorTypes: key.$3,    // Item3: Error Types List
-      )] = value;
+            exceptionType: key.$1, // Item1: Exception Type
+            statusCodes: key.$2, // Item2: Status Codes List
+            errorTypes: key.$3, // Item3: Error Types List
+          )] =
+          value;
     });
   }
 
@@ -297,19 +303,25 @@ class ApiErr<E> extends ResultErr<E> {
   ///   },
   /// );
   /// ```
-  static void setupErrorHandling<E1, E2>({ // Allow different types E for each map if needed
+  static void setupErrorHandling<E1, E2>({
+    // Allow different types E for each map if needed
     Map<dynamic, ApiErr<E1>>? exceptionTypeMap,
-    Map<(Type, List<int>, List<dynamic>), ApiErr<E2>>? statusTypeMap, // Use dynamic for List<E> here
+    Map<(Type, List<int>, List<dynamic>), ApiErr<E2>>?
+    statusTypeMap, // Use dynamic for List<E> here
   }) {
     if (exceptionTypeMap != null) {
-      registerAllExceptionTypes<dynamic>(exceptionTypeMap); // Register with dynamic type T
+      registerAllExceptionTypes<dynamic>(
+        exceptionTypeMap,
+      ); // Register with dynamic type T
     }
     if (statusTypeMap != null) {
       // Cast needed because the method expects specific E, but setup handles potentially mixed types.
       // This assumes the caller provides maps with compatible ApiErr<E> types.
-      registerAllStatusTypeErrors<dynamic>(statusTypeMap.map(
-              (key, value) => MapEntry(key, value as ApiErr<dynamic>)
-      ));
+      registerAllStatusTypeErrors<dynamic>(
+        statusTypeMap.map(
+          (key, value) => MapEntry(key, value as ApiErr<dynamic>),
+        ),
+      );
     }
   }
 
@@ -337,15 +349,14 @@ class ApiErr<E> extends ResultErr<E> {
       // Fallback if no template is registered for this type
       return ApiErr<T>(
         // exception: exceptionType, // Avoid putting the type itself as the exception object
-          errorType: exceptionType, // Keep the type for categorization
-          message: HttpMessage(
-              title: 'Error',
-              details: 'An unexpected error occurred for type $exceptionType'
-          )
+        errorType: exceptionType, // Keep the type for categorization
+        message: HttpMessage(
+          title: 'Error',
+          details: 'An unexpected error occurred for type $exceptionType',
+        ),
       );
     }
   }
-
 
   /// Creates an [ApiErr] based on context: HTTP status code, error type, and optionally the original exception.
   ///
@@ -388,8 +399,13 @@ class ApiErr<E> extends ResultErr<E> {
   ///   }
   /// }
   /// ```
-  static ApiErr<E> fromStatusAndType<E>(int statusCode, E errorType, [Object? exception]) {
-    ApiErr<E>? matchedTemplate; // Variable to store the best matching template found
+  static ApiErr<E> fromStatusAndType<E>(
+    int statusCode,
+    E errorType, [
+    Object? exception,
+  ]) {
+    ApiErr<E>?
+    matchedTemplate; // Variable to store the best matching template found
 
     // 1. Iterate ONCE through the registry looking for the best match
     for (var entry in _errorRegistry.entries) {
@@ -397,7 +413,8 @@ class ApiErr<E> extends ResultErr<E> {
         final key = entry.key as _StatusTypeKey<E>;
 
         // 2. Priority 1: Match with specific Exception Type context
-        if (exception != null && key.matches(statusCode, errorType, exception)) {
+        if (exception != null &&
+            key.matches(statusCode, errorType, exception)) {
           // Most specific match found based on exception type + status/type.
           matchedTemplate = entry.value as ApiErr<E>;
           break; // Exit loop, best match found.
@@ -407,7 +424,8 @@ class ApiErr<E> extends ResultErr<E> {
         // This check might be less useful if 'matches' already requires exceptionType match.
         // Consider if _StatusTypeKey needs separate logic or if this check is redundant.
         // Keeping it for now based on previous structure, assuming _StatusTypeKey might evolve.
-        if (matchedTemplate == null && key.matchesWithoutException(statusCode, errorType)) {
+        if (matchedTemplate == null &&
+            key.matchesWithoutException(statusCode, errorType)) {
           // Found a potential match based on status/type for the registered exception type.
           // Store it but continue searching for a potential Priority 1 match later in the loop.
           matchedTemplate = entry.value as ApiErr<E>;
@@ -422,8 +440,9 @@ class ApiErr<E> extends ResultErr<E> {
       // This ensures the returned error reflects the *actual* status code and exception.
       return ApiErr<E>(
         statusCode: statusCode, // Use actual status code
-        errorType: errorType,   // Use actual error type
-        exception: exception ?? matchedTemplate.exception, // Use actual exception
+        errorType: errorType, // Use actual error type
+        exception:
+            exception ?? matchedTemplate.exception, // Use actual exception
         message: matchedTemplate.message, // Use template message
         validations: matchedTemplate.validations, // Use template validations
         // stackTrace: stackTrace, // Optionally add current stackTrace if needed
@@ -436,10 +455,13 @@ class ApiErr<E> extends ResultErr<E> {
       // Found a simple template by type. Create a specific instance.
       return ApiErr<E>(
         statusCode: statusCode, // Use actual status code
-        errorType: errorType,   // Use actual error type
+        errorType: errorType, // Use actual error type
         message: typeErrorTemplate.message, // Template message
         validations: typeErrorTemplate.validations, // Template validations
-        exception: exception ?? typeErrorTemplate.exception, // Include actual exception if available
+        exception:
+            exception ??
+            typeErrorTemplate
+                .exception, // Include actual exception if available
         // stackTrace: stackTrace, // Optionally add current stackTrace
       );
     }
@@ -531,7 +553,6 @@ class _StatusTypeKey<E> {
     return statusMatch || typeMatch;
   }
 
-
   /// Equality operator.
   ///
   /// IMPORTANT: This implementation considers two keys equal if they target the
@@ -543,7 +564,9 @@ class _StatusTypeKey<E> {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (other is! _StatusTypeKey<E>) return false; // Check generic type E as well
+    if (other is! _StatusTypeKey<E>) {
+      return false; // Check generic type E as well
+    }
 
     // Check for same exception type
     if (exceptionType != other.exceptionType) return false;
@@ -573,16 +596,15 @@ class _StatusTypeKey<E> {
 
     // Combine hash codes of the components. Use list hash codes.
     _hashCode = Object.hash(
-        exceptionType,
-        Object.hashAll(statusCodes), // Hash based on list content
-        Object.hashAll(errorTypes)   // Hash based on list content
+      exceptionType,
+      Object.hashAll(statusCodes), // Hash based on list content
+      Object.hashAll(errorTypes), // Hash based on list content
     );
     // Note: The complex overlap-based equality makes consistent hashing difficult.
     // The standard Object.hashAll used here assumes value equality of the lists.
 
     return _hashCode!;
   }
-
 
   @override
   String toString() {

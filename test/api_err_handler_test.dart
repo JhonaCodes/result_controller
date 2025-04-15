@@ -17,9 +17,16 @@ void main() {
     test('ApiErr creation with all fields', () {
       final stackTrace = StackTrace.current;
       final exception = Exception('Test exception');
-      final message = HttpMessage(title: 'Test Error', details: 'Test error details');
+      final message = HttpMessage(
+        title: 'Test Error',
+        details: 'Test error details',
+      );
 
-      final error = ApiErr(exception: exception, message: message, stackTrace: stackTrace);
+      final error = ApiErr(
+        exception: exception,
+        message: message,
+        stackTrace: stackTrace,
+      );
 
       expect(error.exception, equals(exception));
       expect(error.message, equals(message));
@@ -28,7 +35,12 @@ void main() {
     });
 
     test('ApiErr creation with minimal fields', () {
-      final error = ApiErr(message: HttpMessage(title: 'Server Error', details: 'Internal server error'));
+      final error = ApiErr(
+        message: HttpMessage(
+          title: 'Server Error',
+          details: 'Internal server error',
+        ),
+      );
 
       expect(error.exception, isNull);
       expect(error.message?.title, equals('Server Error'));
@@ -49,7 +61,13 @@ void main() {
 
     test('ApiErr toString with stack trace', () {
       final stackTrace = StackTrace.current;
-      final error = ApiErr(message: HttpMessage(title: 'Test Error', details: 'Test error details'), stackTrace: stackTrace);
+      final error = ApiErr(
+        message: HttpMessage(
+          title: 'Test Error',
+          details: 'Test error details',
+        ),
+        stackTrace: stackTrace,
+      );
 
       final errorString = error.toString();
       expect(errorString, contains('Test Error: Test error details'));
@@ -58,7 +76,13 @@ void main() {
     });
 
     test('ApiErr toString with exception and message', () {
-      final error = ApiErr(exception: Exception('Test exception'), message: HttpMessage(title: 'Validation Error', details: 'Invalid input'));
+      final error = ApiErr(
+        exception: Exception('Test exception'),
+        message: HttpMessage(
+          title: 'Validation Error',
+          details: 'Invalid input',
+        ),
+      );
 
       expect(error.toString(), equals('Validation Error: Invalid input'));
     });
@@ -96,13 +120,19 @@ void main() {
     });
 
     test('ApiErr registry by status code and type of exception operations', () {
-
       // Add a mapping
       ApiErr.registerStatusTypeErrors(
         SocketException,
         [501, 502, 505],
         [TypExceptionData.type1],
-        ApiErr(errorType: TypExceptionData.type1, statusCode: 505, message: HttpMessage(title: "Server Error", details: "Server not found")),
+        ApiErr(
+          errorType: TypExceptionData.type1,
+          statusCode: 505,
+          message: HttpMessage(
+            title: "Server Error",
+            details: "Server not found",
+          ),
+        ),
       );
 
       // Verify the mapping was added
@@ -119,16 +149,23 @@ void main() {
       final exception1 = Exception('Test 1');
       final exception2 = SocketException('Test 2');
       final error1 = ApiErr(
-          exception: exception1,
-          errorType: Exception,
-          statusCode: 300,message: HttpMessage(title: 'Error 1', details: 'Details 1'));
+        exception: exception1,
+        errorType: Exception,
+        statusCode: 300,
+        message: HttpMessage(title: 'Error 1', details: 'Details 1'),
+      );
       final error2 = ApiErr(
-          exception: exception2,
-          errorType: SocketException,
-          statusCode: 302,message: HttpMessage(title: 'Error 2', details: 'Details 2'));
+        exception: exception2,
+        errorType: SocketException,
+        statusCode: 302,
+        message: HttpMessage(title: 'Error 2', details: 'Details 2'),
+      );
 
       // Add multiple mappings
-      ApiErr.registerAllExceptionTypes({Exception: error1, SocketException: error2 });
+      ApiErr.registerAllExceptionTypes({
+        Exception: error1,
+        SocketException: error2,
+      });
 
       // Verify the mappings were added
       final mappedError1 = ApiErr.fromExceptionType(Exception);
@@ -144,14 +181,20 @@ void main() {
     test('Httperr basic creation', () {
       final exception = Exception('Network err');
       final stackTrace = MockStackTrace();
-      final data = HttpMessage(title: 'Connection err', details: 'Failed to connect to server');
+      final data = HttpMessage(
+        title: 'Connection err',
+        details: 'Failed to connect to server',
+      );
 
       final response = ApiResponse(
         data: data,
         err: ApiErr(
           exception: exception,
           stackTrace: stackTrace,
-          message: HttpMessage(title: 'Connection err', details: 'Failed to connect to server'),
+          message: HttpMessage(
+            title: 'Connection err',
+            details: 'Failed to connect to server',
+          ),
         ),
         headers: {},
       );
@@ -177,7 +220,10 @@ void main() {
     test('Httperr with null data', () {
       final exception = Exception('Network err');
       final stackTrace = MockStackTrace();
-      final response = ApiResponse(err: ApiErr(exception: exception, stackTrace: stackTrace), headers: {});
+      final response = ApiResponse(
+        err: ApiErr(exception: exception, stackTrace: stackTrace),
+        headers: {},
+      );
 
       expect(response.err?.exception, equals(exception));
       expect(response.err?.stackTrace, equals(stackTrace));
@@ -187,7 +233,10 @@ void main() {
 
   group('HttpMessage Tests', () {
     test('HttpMessage basic creation', () {
-      final message = HttpMessage(title: 'Success', details: 'Operation completed successfully');
+      final message = HttpMessage(
+        title: 'Success',
+        details: 'Operation completed successfully',
+      );
 
       expect(message.title, equals('Success'));
       expect(message.details, equals('Operation completed successfully'));
@@ -228,7 +277,10 @@ void main() {
     });
 
     test('HttpMessage.toJson', () {
-      final message = HttpMessage(title: 'Success', details: 'Operation completed successfully');
+      final message = HttpMessage(
+        title: 'Success',
+        details: 'Operation completed successfully',
+      );
 
       final json = message.toJson();
 
@@ -248,17 +300,26 @@ void main() {
       final apiError = ApiErr(
         exception: Exception('Network timeout'),
         stackTrace: MockStackTrace(),
-        message: HttpMessage(title: 'Connection err', details: 'Could not connect to the server'),
+        message: HttpMessage(
+          title: 'Connection err',
+          details: 'Could not connect to the server',
+        ),
       );
 
       final response = ApiResponse(err: apiError, headers: {});
 
       expect(response.err?.message?.title, equals('Connection err'));
-      expect(response.err?.message?.details, equals('Could not connect to the server'));
+      expect(
+        response.err?.message?.details,
+        equals('Could not connect to the server'),
+      );
     });
 
     test('HttpMessage.ApiErr without data', () {
-      final apiErr = ApiErr(exception: Exception('Network timeout'), stackTrace: MockStackTrace());
+      final apiErr = ApiErr(
+        exception: Exception('Network timeout'),
+        stackTrace: MockStackTrace(),
+      );
 
       final message = HttpMessage.fromError(apiErr);
 
