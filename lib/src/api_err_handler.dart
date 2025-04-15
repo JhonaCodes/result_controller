@@ -18,9 +18,6 @@ class ApiErr<E> extends ResultErr<E> {
   /// The original exception object that triggered this error (e.g., DioException, SocketException).
   final Object? exception;
 
-  /// HTTP status code associated with the API error response (e.g., 400, 401, 404, 500).
-  final int? statusCode;
-
   /// A structured, user-facing message providing context about the error.
   final HttpMessage? message;
 
@@ -53,7 +50,6 @@ class ApiErr<E> extends ResultErr<E> {
   /// );
   /// ```
   ApiErr({
-    this.statusCode,
     this.exception,
     this.message,
     this.validations,
@@ -107,7 +103,7 @@ class ApiErr<E> extends ResultErr<E> {
       parts.add('Error: $exceptionString');
     } else {
       parts.add(
-        'Unknown API error${statusCode != null ? " (Code: $statusCode)" : ""}',
+        'Unknown API error',
       );
     }
 
@@ -439,7 +435,6 @@ class ApiErr<E> extends ResultErr<E> {
       // Return a new instance based on the template, but with actual context.
       // This ensures the returned error reflects the *actual* status code and exception.
       return ApiErr<E>(
-        statusCode: statusCode, // Use actual status code
         errorType: errorType, // Use actual error type
         exception:
             exception ?? matchedTemplate.exception, // Use actual exception
@@ -454,7 +449,6 @@ class ApiErr<E> extends ResultErr<E> {
     if (typeErrorTemplate != null && typeErrorTemplate is ApiErr<E>) {
       // Found a simple template by type. Create a specific instance.
       return ApiErr<E>(
-        statusCode: statusCode, // Use actual status code
         errorType: errorType, // Use actual error type
         message: typeErrorTemplate.message, // Template message
         validations: typeErrorTemplate.validations, // Template validations
@@ -468,7 +462,6 @@ class ApiErr<E> extends ResultErr<E> {
 
     // 6. Fallback Final: Create a generic error if no template was found
     return ApiErr<E>(
-      statusCode: statusCode,
       errorType: errorType,
       exception: exception, // Include the original exception
       message: HttpMessage(

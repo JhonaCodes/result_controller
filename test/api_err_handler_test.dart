@@ -105,7 +105,6 @@ void main() {
       final testError = ApiErr(
         exception: testException,
         errorType: Exception,
-        statusCode: 301,
         message: HttpMessage(title: 'Test Error', details: 'Test details'),
       );
 
@@ -116,7 +115,6 @@ void main() {
       final mappedError = ApiErr.fromExceptionType(Exception);
       expect(mappedError.message?.title, equals('Test Error'));
       expect(mappedError.message?.details, equals('Test details'));
-      expect(mappedError.statusCode, equals(301));
     });
 
     test('ApiErr registry by status code and type of exception operations', () {
@@ -127,7 +125,6 @@ void main() {
         [TypExceptionData.type1],
         ApiErr(
           errorType: TypExceptionData.type1,
-          statusCode: 505,
           message: HttpMessage(
             title: "Server Error",
             details: "Server not found",
@@ -139,7 +136,6 @@ void main() {
       final mappedError = ApiErr.fromStatusAndType(505, TypExceptionData.type1);
       expect(mappedError.message?.title, equals('Server Error'));
       expect(mappedError.message?.details, equals('Server not found'));
-      expect(mappedError.statusCode, equals(505));
     });
 
     test('ApiErr registry with multiple mappings', () {
@@ -151,13 +147,11 @@ void main() {
       final error1 = ApiErr(
         exception: exception1,
         errorType: Exception,
-        statusCode: 300,
         message: HttpMessage(title: 'Error 1', details: 'Details 1'),
       );
       final error2 = ApiErr(
         exception: exception2,
         errorType: SocketException,
-        statusCode: 302,
         message: HttpMessage(title: 'Error 2', details: 'Details 2'),
       );
 
