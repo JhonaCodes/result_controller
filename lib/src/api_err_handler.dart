@@ -21,6 +21,8 @@ class ApiErr<E> extends ResultErr<E> {
   /// A structured, user-facing message providing context about the error.
   final HttpMessage? message;
 
+  final E? errorType;
+
   // --- Constructor ---
 
   /// Constructs a new [ApiErr] instance.
@@ -54,7 +56,7 @@ class ApiErr<E> extends ResultErr<E> {
     this.message,
     this.validations,
     StackTrace? stackTrace,
-    E? errorType,
+    this.errorType,
   }) : super(
          // Use message details, fallback to exception string, then to generic message
          message?.details ?? exception?.toString() ?? 'Unknown API error',
