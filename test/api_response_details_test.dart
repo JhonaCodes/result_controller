@@ -35,7 +35,8 @@ void main() {
     testError = ApiErr(
       exception: Exception('Test exception'),
       stackTrace: TestStackTrace(),
-      message: HttpMessage(title: 'Test Error', details: 'Test error details'),
+      title: 'Test Error',
+      msm: 'Test error details',
     );
   });
 
@@ -419,7 +420,7 @@ void main() {
         ApiErr(
           exception: Exception('Bad request'),
           stackTrace: TestStackTrace(),
-          message: HttpMessage(title: 'Error', details: 'Bad request'),
+            title: 'Error', msm: 'Bad request'
         ),
         statusCode: 400,
         headers: {},
@@ -427,8 +428,7 @@ void main() {
       final serverErrorResponse = ApiResponse.err(
         ApiErr(
           exception: Exception('Server error'),
-          stackTrace: TestStackTrace(),
-          message: HttpMessage(title: 'Error', details: 'Server error'),
+          stackTrace: TestStackTrace(), title: 'Error', msm: 'Server error'
         ),
         statusCode: 500,
         headers: {},

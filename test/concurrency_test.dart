@@ -30,7 +30,9 @@ void main() {
             return index;
           },
           (error, stack) => ApiErr(
-            message: HttpMessage(title: 'Error', details: error.toString()),
+            title: 'Error',
+            msm: error.toString(),
+
           ),
         );
 

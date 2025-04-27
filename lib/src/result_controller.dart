@@ -249,20 +249,20 @@ class ResultErr<T> {
   final T? type;
 
   /// Error message describing what went wrong
-  final String text;
+  final String details;
 
   /// Stack trace from when the error occurred (optional)
   final StackTrace? stackTrace;
 
   /// Creates a new ResultError with an error message and optional stack trace
-  ResultErr(this.text, {this.stackTrace, this.type});
+  ResultErr(this.details, {this.stackTrace, this.type});
 
   @override
   String toString() {
     if (stackTrace != null) {
-      return '$type\n$text\nStackTrace:\n$stackTrace';
+      return '$type\n$details\nStackTrace:\n$stackTrace';
     }
-    return text;
+    return details;
   }
 }
 
@@ -297,7 +297,7 @@ class GenericResultError extends ResultErr {
   final dynamic originalError;
 
   /// Creates a new GenericResultError with a message, the original error, and optional stack trace
-  GenericResultError(super.err, this.originalError, {super.stackTrace});
+  GenericResultError(super.details, this.originalError, {super.stackTrace});
 
   @override
   String toString() {

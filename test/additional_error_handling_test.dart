@@ -34,7 +34,7 @@ void main() {
           expect(value, equals(42));
         },
         err: (error) {
-          expect(error.text, contains('CustomError'));
+          expect(error.details, contains('CustomError'));
         },
       );
     });
@@ -56,7 +56,7 @@ void main() {
           expect(value, equals(42));
         },
         err: (error) {
-          expect(error.text, contains('NetworkError'));
+          expect(error.details, contains('NetworkError'));
         },
       );
     });

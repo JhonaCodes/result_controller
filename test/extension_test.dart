@@ -170,7 +170,8 @@ void main() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          message: HttpMessage(title: 'Error', details: 'Connection failed'),
+          title: 'Error',
+          msm: 'Connection failed'
         ),
         statusCode: 500,
         headers: {},
@@ -179,7 +180,7 @@ void main() {
       final result = apiResponse.toResult(User.fromJson);
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Error'));
+      expect(result.errorOrNull?.title, equals('Error'));
     });
 
     test('toListResult converts successful ApiResponse', () {
@@ -207,7 +208,8 @@ void main() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          message: HttpMessage(title: 'Error', details: 'Connection failed'),
+            title: 'Error',
+            msm: 'Connection failed'
         ),
         statusCode: 500,
         headers: {},
@@ -218,7 +220,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Error'));
+      expect(result.errorOrNull?.title, equals('Error'));
     });
   });
 }

@@ -118,7 +118,7 @@ void main() {
       final result = Result.trySync(() => throw Exception('Test exception'));
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.text, contains('Exception: Test exception'));
+      expect(result.errorOrNull?.details, contains('Exception: Test exception'));
     });
 
     test('trySyncMap method should use custom error mapper', () {
@@ -144,7 +144,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.text, contains('Exception: Test exception'));
+      expect(result.errorOrNull?.details, contains('Exception: Test exception'));
     });
 
     test(
@@ -197,7 +197,7 @@ void main() {
     test('ResultError basic creation', () {
       final error = ResultErr('Test error');
 
-      expect(error.text, equals('Test error'));
+      expect(error.details, equals('Test error'));
       expect(error.stackTrace, isNull);
       expect(error.toString(), equals('Test error'));
     });
@@ -206,7 +206,7 @@ void main() {
       final stackTrace = MockStackTrace();
       final error = ResultErr('Test error', stackTrace: stackTrace);
 
-      expect(error.text, equals('Test error'));
+      expect(error.details, equals('Test error'));
       expect(error.stackTrace, equals(stackTrace));
       expect(error.toString(), contains('Test error'));
       expect(error.toString(), contains('mock stack trace'));
@@ -221,7 +221,7 @@ void main() {
         stackTrace: stackTrace,
       );
 
-      expect(error.text, equals('Test error'));
+      expect(error.details, equals('Test error'));
       expect(error.originalError, equals(originalError));
       expect(error.stackTrace, equals(stackTrace));
       expect(error.toString(), contains('Test error'));

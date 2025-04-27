@@ -7,12 +7,13 @@ void main() {
       final result = await Result.tryAsyncMap<int, ApiErr>(
         () async => throw Exception('First error'),
         (error, stack) => ApiErr(
-          message: HttpMessage(title: 'First', details: error.toString()),
+          title: 'First',
+          msm: error.toString()
         ),
       );
 
       final recoveredResult = result.recover((error) {
-        if (error.message?.title == 'First') {
+        if (error.title == 'First') {
           return Ok(42);
         }
         return Err(error);

@@ -83,10 +83,8 @@ void demonstrateApiErrorHandling() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-          message: HttpMessage(
-            title: 'Connection Error',
-            details: 'Could not connect to the server',
-          ),
+          title: 'Connection Error',
+          msm: 'Could not connect to the server',
         ),
       );
     }
@@ -108,8 +106,8 @@ void demonstrateApiErrorHandling() {
     userResult.when(
       ok: (user) => log('User fetched: ${user.name}, Age: ${user.age}'),
       err: (apiError) {
-        log('API Error: ${apiError.message?.title}');
-        log('Details: ${apiError.message?.details}');
+        log('API Error: ${apiError.title}');
+        log('Details: ${apiError.msm}');
       },
     );
   }
@@ -151,7 +149,7 @@ void demonstrateAsyncErrorHandling() {
 
     result.when(
       ok: (data) => log('Async operation succeeded: $data'),
-      err: (error) => log('Async operation failed: ${error.text}'),
+      err: (error) => log('Async operation failed: ${error.details}'),
     );
   }
 

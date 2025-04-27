@@ -225,10 +225,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            message: HttpMessage(
-              title: 'Error',
-              details: 'No data in response',
-            ),
+            title: 'Error',
+            msm: 'No data in response',
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -249,10 +247,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
       return ApiResult.err(
         ApiErr(
           exception: e,
-          message: HttpMessage(
-            title: 'Data Processing Error',
-            details: 'Could not process the server response: ${e.toString()}',
-          ),
+          title: 'Data Processing Error',
+          msm: 'Could not process the server response: ${e.toString()}',
           stackTrace: stackTrace,
         ),
         statusCode: response.statusCode,
@@ -301,10 +297,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
         return ApiResult.err(
           ApiErr(
             exception: Exception('No data in response'),
-            message: HttpMessage(
-              title: 'Error',
-              details: 'No data in response',
-            ),
+            title: 'Error',
+            msm: 'No data in response',
             stackTrace: StackTrace.current,
           ),
           statusCode: response.statusCode,
@@ -325,11 +319,8 @@ class ApiResult<T> extends Result<T, ApiErr> {
       return ApiResult.err(
         ApiErr(
           exception: e,
-          message: HttpMessage(
-            title: 'Data Processing Error',
-            details:
-                'Could not process the server response list: ${e.toString()}',
-          ),
+          title: 'Data Processing Error',
+          msm: 'Could not process the server response list: ${e.toString()}',
           stackTrace: stackTrace,
         ),
         statusCode: response.statusCode,
@@ -450,146 +441,6 @@ class Params {
   /// The [path] parameter is required and defines the endpoint URL path.
   /// Optional [body] and [header] can be provided for request data and headers.
   Params({required this.path, this.body, this.header, this.queryParams});
-}
-
-/// User-friendly HTTP error message
-///
-/// This class provides a standardized structure for API response messages,
-/// especially useful for displaying user-friendly error information.
-///
-/// Example:
-/// ```dart
-/// // Create a success message
-/// final successMsg = HttpMessage(
-///   success: true,
-///   title: 'Profile Updated',
-///   details: 'Your profile has been successfully updated.'
-/// );
-///
-/// // Create an error message
-/// final errorMsg = HttpMessage(
-///   success: false,
-///   title: 'Connection Error',
-///   details: 'Unable to connect to the server. Please check your internet connection.'
-/// );
-///
-/// // Display the message to the user
-/// showDialog(
-///   context: context,
-///   builder: (context) => AlertDialog(
-///     title: Text(errorMsg.title),
-///     content: Text(errorMsg.details),
-///     actions: [
-///       TextButton(
-///         onPressed: () => Navigator.pop(context),
-///         child: Text('OK')
-///       )
-///     ]
-///   )
-/// );
-/// ```
-class HttpMessage {
-  /// Message title
-  ///
-  /// This should be a short, descriptive title for the message.
-  /// For errors, this might be the error type (e.g., "Network Error").
-  /// For success, this could be a confirmation (e.g., "Payment Successful").
-  final String title;
-
-  /// Message content/details
-  ///
-  /// This contains the detailed message to display to the user.
-  /// It should provide clear information about what happened and
-  /// possible actions the user can take.
-  final String details;
-
-  /// Creates a new HTTP message
-  ///
-  /// The [title] and [details] are required.
-  /// The [success] flag defaults to true, set it to false for error messages.
-  HttpMessage({required this.title, required this.details});
-
-  /// Creates an HttpMessage from a JSON map
-  ///
-  /// This factory is useful for parsing message objects from API responses.
-  /// It handles various field names that might be used in different API structures.
-  ///
-  /// Example:
-  /// ```dart
-  /// final responseData = jsonDecode(response.body);
-  /// final message = HttpMessage.fromJson(responseData);
-  /// ```
-  factory HttpMessage.fromJson(Map<String, dynamic> json) {
-    return HttpMessage(
-      title: json['title'] ?? 'Error',
-      details: json['details'] ?? json['message'] ?? 'Unknown error',
-    );
-  }
-
-  /// Converts this message to a JSON map
-  ///
-  /// This is useful when you need to serialize a message for storage
-  /// or to include in an API request.
-  ///
-  /// Example:
-  /// ```dart
-  /// final message = HttpMessage(
-  ///   success: true,
-  ///   title: 'Item Created',
-  ///   details: 'The item was successfully created'
-  /// );
-  ///
-  /// final jsonData = message.toJson();
-  /// ```
-  ///
-  /// Just if you key is equal to  [details]
-  Map<String, dynamic> toJsonDetails() {
-    return {'title': title, 'details': details};
-  }
-
-  /// Just if you key is equal to  [message]
-  Map<String, dynamic> toJson() {
-    return {'title': title, 'message': details};
-  }
-
-  /// Creates an HttpMessage from an exception
-  ///
-  /// This is a convenient way to convert an exception to a user-friendly message.
-  ///
-  /// Example:
-  /// ```dart
-  /// try {
-  ///   // Some operation that might throw
-  ///   await fetchData();
-  /// } catch (e) {
-  ///   final message = HttpMessage.fromException(e);
-  ///   showErrorDialog(message.title, message.details);
-  /// }
-  /// ```
-  factory HttpMessage.fromException(Object exception) {
-    return HttpMessage(title: 'Error', details: exception.toString());
-  }
-
-  /// Creates an HttpMessage from an HttpError
-  ///
-  /// This factory extracts the message from an HttpError or creates a new one
-  /// from the exception if no message is available.
-  ///
-  /// Example:
-  /// ```dart
-  /// final error = HttpError(
-  ///   exception: Exception('Network timeout'),
-  ///   stackTrace: StackTrace.current,
-  /// );
-  ///
-  /// final message = HttpMessage.fromError(error);
-  /// ```
-  factory HttpMessage.fromError(ApiErr error) {
-    return error.message ??
-        HttpMessage.fromException(
-          error.exception ?? Exception('Unknown error'),
-        );
-  }
 }
 
 /// Handles API requests with comprehensive error handling and response processing

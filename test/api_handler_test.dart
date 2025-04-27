@@ -23,10 +23,10 @@ class User {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is User &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name;
+          other is User &&
+              runtimeType == other.runtimeType &&
+              id == other.id &&
+              name == other.name;
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode;
@@ -46,34 +46,33 @@ void main() {
 
     test('ApiResult.err creation', () {
       final apiErr = ApiErr(
-        message: HttpMessage(title: 'Not Found', details: 'Resource not found'),
+        title: 'Not Found',
+        msm: 'Resource not found',
       );
 
       final result = ApiResult<int>.err(apiErr);
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Not Found'));
+      expect(result.errorOrNull?.title, equals('Not Found'));
     });
 
     test('ApiResult when method', () {
       final okResult = ApiResult<int>.ok(42);
       final errResult = ApiResult<int>.err(
         ApiErr(
-          message: HttpMessage(
-            title: 'Server Error',
-            details: 'Internal server error',
-          ),
+          title: 'Server Error',
+          msm: 'Internal server error',
         ),
       );
 
       final okValue = okResult.when(
         ok: (value) => 'Success: $value',
-        err: (error) => 'Error: ${error.message?.details}',
+        err: (error) => 'Error: ${error.msm}',
       );
 
       final errValue = errResult.when(
         ok: (value) => 'Success: $value',
-        err: (error) => 'Error: ${error.message?.details}',
+        err: (error) => 'Error: ${error.msm}',
       );
 
       expect(okValue, equals('Success: 42'));
@@ -90,44 +89,39 @@ void main() {
 
     test('ApiResult map method with error', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Server Error',
-          details: 'Internal server error',
-        ),
+        title: 'Server Error',
+        msm: 'Internal server error',
       );
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map((value) => value.toString());
 
       expect(mappedResult.isErr, isTrue);
-      expect(mappedResult.errorOrNull?.message?.title, equals('Server Error'));
+      expect(mappedResult.errorOrNull?.title, equals('Server Error'));
     });
 
     test('ApiResult map method with error transform', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Server Error',
-          details: 'Internal server error',
-        ),
+        title: 'Server Error',
+        msm: 'Internal server error',
       );
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map(
-        (value) => value.toString(),
-        (error) => ApiErr(
-          message: HttpMessage(
-            title: 'Transformed',
-            details: 'Error was transformed',
-          ),
+            (value) => value.toString(),
+            (error) => ApiErr(
+          title: 'Transformed',
+          msm: 'Error was transformed',
+
         ),
       );
 
       expect(mappedResult.isErr, isTrue);
-      expect(mappedResult.errorOrNull?.message?.title, equals('Transformed'));
+      expect(mappedResult.errorOrNull?.title, equals('Transformed'));
     });
 
     test('ApiResult flatMap method', () {
       final okResult = ApiResult<int>.ok(42);
       final chainedResult = okResult.flatMap(
-        (value) => ApiResult<String>.ok('Value: $value'),
+            (value) => ApiResult<String>.ok('Value: $value'),
       );
 
       expect(chainedResult.isOk, isTrue);
@@ -136,14 +130,12 @@ void main() {
 
     test('ApiResult flatMap method with error', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Server Error',
-          details: 'Internal server error',
-        ),
+        title: 'Server Error',
+        msm: 'Internal server error',
       );
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
-        (value) => ApiResult<String>.ok('Value: $value'),
+            (value) => ApiResult<String>.ok('Value: $value'),
       );
 
       expect(chainedResult.isErr, isTrue);
@@ -152,26 +144,22 @@ void main() {
 
     test('ApiResult flatMap method with error transform', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Server Error',
-          details: 'Internal server error',
-        ),
+        title: 'Server Error',
+        msm: 'Internal server error',
       );
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
-        (value) => ApiResult<String>.ok('Value: $value'),
-        (error) => ApiResult<String>.err(
+            (value) => ApiResult<String>.ok('Value: $value'),
+            (error) => ApiResult<String>.err(
           ApiErr(
-            message: HttpMessage(
-              title: 'Transformed',
-              details: 'Error was transformed',
-            ),
+            title: 'Transformed',
+            msm: 'Error was transformed',
           ),
         ),
       );
 
       expect(chainedResult.isErr, isTrue);
-      expect(chainedResult.errorOrNull?.message?.title, equals('Transformed'));
+      expect(chainedResult.errorOrNull?.title, equals('Transformed'));
     });
 
     test('ApiResult.from with successful response', () {
@@ -196,10 +184,8 @@ void main() {
       final apiErr = ApiErr(
         exception: Exception('Network error'),
         stackTrace: stackTrace,
-        message: HttpMessage(
-          title: 'Connection Error',
-          details: 'Failed to connect to the server',
-        ),
+        title: 'Connection Error',
+        msm: 'Failed to connect to the server',
       );
 
       final response = ApiResponse.err(apiErr, statusCode: null, headers: {});
@@ -210,7 +196,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Connection Error'));
+      expect(result.errorOrNull?.title, equals('Connection Error'));
       expect(result.errorOrNull?.exception, isA<Exception>());
     });
 
@@ -228,10 +214,10 @@ void main() {
 
       expect(result.isErr, isTrue);
       expect(
-        result.errorOrNull?.message?.title,
+        result.errorOrNull?.title,
         equals('Data Processing Error'),
       );
-      expect(result.errorOrNull?.message?.details, contains('type'));
+      expect(result.errorOrNull?.msm, contains('type'));
     });
 
     test('ApiResult.fromList with successful response', () {
@@ -260,10 +246,8 @@ void main() {
       final apiErr = ApiErr(
         exception: Exception('Network error'),
         stackTrace: stackTrace,
-        message: HttpMessage(
-          title: 'Connection Error',
-          details: 'Failed to connect to the server',
-        ),
+        title: 'Connection Error',
+        msm: 'Failed to connect to the server',
       );
 
       final response = ApiResponse.err(apiErr, statusCode: null, headers: {});
@@ -274,7 +258,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.message?.title, equals('Connection Error'));
+      expect(result.errorOrNull?.title, equals('Connection Error'));
     });
 
     test('ApiResult.fromList with parsing error', () {
@@ -294,10 +278,10 @@ void main() {
 
       expect(result.isErr, isTrue);
       expect(
-        result.errorOrNull?.message?.title,
+        result.errorOrNull?.title,
         equals('Data Processing Error'),
       );
-      expect(result.errorOrNull?.message?.details, contains('type'));
+      expect(result.errorOrNull?.msm, contains('type'));
     });
 
     test('ApiResult.from with JSON string', () {
@@ -346,10 +330,10 @@ void main() {
 
       expect(result.isErr, isTrue);
       expect(
-        result.errorOrNull?.message?.title,
+        result.errorOrNull?.title,
         equals('Data Processing Error'),
       );
-      expect(result.errorOrNull?.message?.details, contains('JSON'));
+      expect(result.errorOrNull?.msm, contains('JSON'));
     });
 
     test('ApiResult.fromList with invalid JSON string', () {
@@ -367,10 +351,10 @@ void main() {
 
       expect(result.isErr, isTrue);
       expect(
-        result.errorOrNull?.message?.title,
+        result.errorOrNull?.title,
         equals('Data Processing Error'),
       );
-      expect(result.errorOrNull?.message?.details, contains('JSON'));
+      expect(result.errorOrNull?.msm, contains('JSON'));
     });
   });
 

@@ -27,12 +27,15 @@ void main() {
       };
 
       final response = ApiResponse.err(
-        ApiErr(message: HttpMessage(title: 'Error', details: 'Details')),
-        statusCode: 401,
-        headers: headers,
-      );
+          ApiErr(
+            title: 'Error',
+            msm: 'Details',
+          ),
+            statusCode: 401,
+            headers: headers,
+          );
 
-      expect(response.headers, equals(headers));
+          expect(response.headers, equals(headers));
       expect(response.headers['WWW-Authenticate'], contains('invalid_token'));
     });
   });

@@ -34,10 +34,8 @@ void main() {
 
     test('err factory creates response with error data', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Test Error',
-          details: 'Test error details',
-        ),
+        title: 'Test Error',
+        msm: 'Test error details',
       );
 
       final response = ApiResponse.err(apiErr, statusCode: 400, headers: {});
@@ -58,7 +56,7 @@ void main() {
 
       final result = response.when(
         ok: (data) => 'Success: ${data['name']}',
-        err: (error) => 'Error: ${error.message?.details}',
+        err: (error) => 'Error: ${error.msm}',
       );
 
       expect(result, 'Success: John');
@@ -66,17 +64,15 @@ void main() {
 
     test('calls err function when response has error', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Test Error',
-          details: 'Test error details',
-        ),
+        title: 'Test Error',
+        msm: 'Test error details',
       );
 
       final response = ApiResponse.err(apiErr, statusCode: 400, headers: {});
 
       final result = response.when(
         ok: (data) => 'Success: $data',
-        err: (error) => 'Error: ${error.message?.details}',
+        err: (error) => 'Error: ${error.msm}',
       );
 
       expect(result, 'Error: Test error details');
@@ -136,10 +132,8 @@ void main() {
 
     test('calls err function when response has error', () {
       final apiErr = ApiErr(
-        message: HttpMessage(
-          title: 'Test Error',
-          details: 'Test error details',
-        ),
+        title: 'Test Error',
+        msm: 'Test error details',
       );
 
       final response = ApiResponse.err(apiErr, statusCode: 400, headers: {});
