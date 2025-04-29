@@ -413,7 +413,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
 ///   }
 /// );
 /// ```
-class Params {
+class Params<T> {
   /// The endpoint path (relative URL path after the base URL)
   final String path;
 
@@ -430,6 +430,9 @@ class Params {
   /// For form data, you can provide key-value pairs.
   final Map<String, dynamic>? body;
 
+  /// Optional model data for specifics params from model
+  T? model;
+
   /// Optional query parameters to append to the URL
   ///
   /// Example: {'page': '1', 'limit': '10', 'sort': 'desc'}
@@ -440,7 +443,7 @@ class Params {
   ///
   /// The [path] parameter is required and defines the endpoint URL path.
   /// Optional [body] and [header] can be provided for request data and headers.
-  Params({required this.path, this.body, this.header, this.queryParams});
+  Params({required this.path, this.body, this.header, this.queryParams, this.model});
 }
 
 /// Handles API requests with comprehensive error handling and response processing
