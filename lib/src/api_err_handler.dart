@@ -62,6 +62,52 @@ class ApiErr<E> {
     this.errorType,
   });
 
+  /// Creates a copy of this [ApiErr] instance with the given fields replaced with new values.
+  ///
+  /// This method allows you to create a new instance based on this one, while only
+  /// changing specific properties.
+  ///
+  /// Parameters:
+  ///   * [exception] - The new exception that replaces the current one.
+  ///   * [title] - The new title that replaces the current one.
+  ///   * [msm] - The new detailed error message that replaces the current one.
+  ///   * [validations] - The new field-specific validation errors map that replaces the current one.
+  ///   * [stackTrace] - The new stack trace that replaces the current one.
+  ///   * [errorType] - The new categorized error type that replaces the current one.
+  ///
+  /// Returns a new [ApiErr] instance with the updated properties.
+  ///
+  /// Example:
+  /// ```dart
+  /// final originalError = ApiErr<NetworkErrorType>(
+  ///   title: 'Connection Error',
+  ///   errorType: NetworkErrorType.timeout,
+  /// );
+  ///
+  /// final updatedError = originalError.copyWith(
+  ///   title: 'Network Timeout',
+  ///   msm: 'The connection timed out after 30 seconds',
+  /// );
+  /// ```
+  ApiErr<E> copyWith({
+    Object? exception,
+    String? title,
+    String? msm,
+    Map<String, String>? validations,
+    StackTrace? stackTrace,
+    E? errorType,
+  }) {
+    return ApiErr<E>(
+      exception: exception ?? this.exception,
+      title: title ?? this.title,
+      msm: msm ?? this.msm,
+      validations: validations ?? this.validations,
+      stackTrace: stackTrace ?? this.stackTrace,
+      errorType: errorType ?? this.errorType,
+    );
+  }
+
+
   // --- toString Implementation ---
 
   /// Returns a human-readable string representation of the API error.
