@@ -437,7 +437,7 @@ class Params<T> {
   ///
   /// Example: {'page': '1', 'limit': '10', 'sort': 'desc'}
   /// Would result in ?page=1&limit=10&sort=desc
-  final Map<String, String>? queryParams;
+  final Map<String, dynamic>? queryParams;
 
   /// Creates a new set of API request parameters
   ///
