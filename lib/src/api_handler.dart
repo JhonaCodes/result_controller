@@ -428,7 +428,7 @@ class Params<T> {
   ///
   /// For JSON requests, this will be automatically serialized to JSON.
   /// For form data, you can provide key-value pairs.
-  final Map<String, dynamic>? body;
+  final dynamic body;
 
   /// Optional model data for specifics params from model
   T? model;
