@@ -171,7 +171,7 @@ void main() {
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
           title: 'Error',
-          msm: 'Connection failed'
+          msm: 'Connection failed',
         ),
         statusCode: 500,
         headers: {},
@@ -208,8 +208,8 @@ void main() {
         ApiErr(
           exception: Exception('Network error'),
           stackTrace: StackTrace.current,
-            title: 'Error',
-            msm: 'Connection failed'
+          title: 'Error',
+          msm: 'Connection failed',
         ),
         statusCode: 500,
         headers: {},

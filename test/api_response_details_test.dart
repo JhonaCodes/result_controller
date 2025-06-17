@@ -420,7 +420,8 @@ void main() {
         ApiErr(
           exception: Exception('Bad request'),
           stackTrace: TestStackTrace(),
-            title: 'Error', msm: 'Bad request'
+          title: 'Error',
+          msm: 'Bad request',
         ),
         statusCode: 400,
         headers: {},
@@ -428,7 +429,9 @@ void main() {
       final serverErrorResponse = ApiResponse.err(
         ApiErr(
           exception: Exception('Server error'),
-          stackTrace: TestStackTrace(), title: 'Error', msm: 'Server error'
+          stackTrace: TestStackTrace(),
+          title: 'Error',
+          msm: 'Server error',
         ),
         statusCode: 500,
         headers: {},

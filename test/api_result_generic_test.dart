@@ -12,10 +12,7 @@ void main() {
     });
 
     test('ApiResult.err creates error result', () {
-      final error = ApiErr(
-        title: 'Test Error',
-        msm: 'Test error details',
-      );
+      final error = ApiErr(title: 'Test Error', msm: 'Test error details');
       final result = ApiResult<String>.err(error);
 
       expect(result.isErr, isTrue);
@@ -42,8 +39,8 @@ void main() {
     test('ApiResult.map transforms success value', () {
       final result = ApiResult<int>.ok(42);
       final transformed = result.map(
-            (value) => value.toString(),
-            (error) => error,
+        (value) => value.toString(),
+        (error) => error,
       );
 
       expect(transformed.isOk, isTrue);
@@ -51,28 +48,19 @@ void main() {
     });
 
     test('ApiResult.map transforms error value', () {
-      final error = ApiErr(
-        title: 'Original Error',
-        msm: 'Original details',
-      );
+      final error = ApiErr(title: 'Original Error', msm: 'Original details');
       final result = ApiResult<int>.err(error);
       final transformed = result.map(
-            (value) => value.toString(),
-            (error) => ApiErr(
+        (value) => value.toString(),
+        (error) => ApiErr(
           title: 'Transformed Error',
           msm: 'Transformed: ${error.msm}',
         ),
       );
 
       expect(transformed.isErr, isTrue);
-      expect(
-        transformed.errorOrNull?.title,
-        equals('Transformed Error'),
-      );
-      expect(
-        transformed.errorOrNull?.msm,
-        contains('Original details'),
-      );
+      expect(transformed.errorOrNull?.title, equals('Transformed Error'));
+      expect(transformed.errorOrNull?.msm, contains('Original details'));
     });
   });
 }

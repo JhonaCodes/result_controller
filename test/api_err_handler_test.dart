@@ -32,10 +32,7 @@ void main() {
     });
 
     test('ApiErr creation with minimal fields', () {
-      final error = ApiErr(
-        msm: 'Internal server error',
-        title: 'Server Error',
-      );
+      final error = ApiErr(msm: 'Internal server error', title: 'Server Error');
 
       expect(error.exception, isNull);
       expect(error.title, equals('Server Error'));
@@ -89,14 +86,16 @@ void main() {
 
       expect(error.toString(), equals('Unknown API error'));
     });
-
   });
 
   group('Httperr Tests', () {
     test('Httperr basic creation', () {
       final exception = Exception('Network err');
       final stackTrace = MockStackTrace();
-      final data = {'title': 'Connection err', 'details': 'Failed to connect to server'};
+      final data = {
+        'title': 'Connection err',
+        'details': 'Failed to connect to server',
+      };
 
       final response = ApiResponse(
         data: data,
@@ -140,5 +139,4 @@ void main() {
       expect(response.data, isNull);
     });
   });
-
 }

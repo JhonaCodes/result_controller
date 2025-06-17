@@ -23,10 +23,10 @@ class User {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is User &&
-              runtimeType == other.runtimeType &&
-              id == other.id &&
-              name == other.name;
+      other is User &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name;
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode;
@@ -45,10 +45,7 @@ void main() {
     });
 
     test('ApiResult.err creation', () {
-      final apiErr = ApiErr(
-        title: 'Not Found',
-        msm: 'Resource not found',
-      );
+      final apiErr = ApiErr(title: 'Not Found', msm: 'Resource not found');
 
       final result = ApiResult<int>.err(apiErr);
 
@@ -59,10 +56,7 @@ void main() {
     test('ApiResult when method', () {
       final okResult = ApiResult<int>.ok(42);
       final errResult = ApiResult<int>.err(
-        ApiErr(
-          title: 'Server Error',
-          msm: 'Internal server error',
-        ),
+        ApiErr(title: 'Server Error', msm: 'Internal server error'),
       );
 
       final okValue = okResult.when(
@@ -106,12 +100,8 @@ void main() {
       );
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map(
-            (value) => value.toString(),
-            (error) => ApiErr(
-          title: 'Transformed',
-          msm: 'Error was transformed',
-
-        ),
+        (value) => value.toString(),
+        (error) => ApiErr(title: 'Transformed', msm: 'Error was transformed'),
       );
 
       expect(mappedResult.isErr, isTrue);
@@ -121,7 +111,7 @@ void main() {
     test('ApiResult flatMap method', () {
       final okResult = ApiResult<int>.ok(42);
       final chainedResult = okResult.flatMap(
-            (value) => ApiResult<String>.ok('Value: $value'),
+        (value) => ApiResult<String>.ok('Value: $value'),
       );
 
       expect(chainedResult.isOk, isTrue);
@@ -135,7 +125,7 @@ void main() {
       );
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
-            (value) => ApiResult<String>.ok('Value: $value'),
+        (value) => ApiResult<String>.ok('Value: $value'),
       );
 
       expect(chainedResult.isErr, isTrue);
@@ -149,12 +139,9 @@ void main() {
       );
       final errResult = ApiResult<int>.err(apiErr);
       final chainedResult = errResult.flatMap(
-            (value) => ApiResult<String>.ok('Value: $value'),
-            (error) => ApiResult<String>.err(
-          ApiErr(
-            title: 'Transformed',
-            msm: 'Error was transformed',
-          ),
+        (value) => ApiResult<String>.ok('Value: $value'),
+        (error) => ApiResult<String>.err(
+          ApiErr(title: 'Transformed', msm: 'Error was transformed'),
         ),
       );
 
@@ -213,10 +200,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.title, equals('Data Processing Error'));
       expect(result.errorOrNull?.msm, contains('type'));
     });
 
@@ -277,10 +261,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.title, equals('Data Processing Error'));
       expect(result.errorOrNull?.msm, contains('type'));
     });
 
@@ -329,10 +310,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.title, equals('Data Processing Error'));
       expect(result.errorOrNull?.msm, contains('JSON'));
     });
 
@@ -350,10 +328,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.title, equals('Data Processing Error'));
       expect(result.errorOrNull?.msm, contains('JSON'));
     });
   });

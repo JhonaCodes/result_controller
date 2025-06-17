@@ -6,10 +6,7 @@ void main() {
     test('recovers from multiple errors in chain', () async {
       final result = await Result.tryAsyncMap<int, ApiErr>(
         () async => throw Exception('First error'),
-        (error, stack) => ApiErr(
-          title: 'First',
-          msm: error.toString()
-        ),
+        (error, stack) => ApiErr(title: 'First', msm: error.toString()),
       );
 
       final recoveredResult = result.recover((error) {

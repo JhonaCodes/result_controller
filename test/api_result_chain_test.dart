@@ -124,10 +124,7 @@ void main() {
     test('Chain breaks at first error', () {
       // Create an error result
       final errorResult = ApiResult<User>.err(
-        ApiErr(
-          title: 'Not Found',
-          msm: 'User not found',
-        ),
+        ApiErr(title: 'Not Found', msm: 'User not found'),
       );
 
       // Chain multiple map operations
@@ -144,16 +141,13 @@ void main() {
     test('Error transformation in chain', () {
       // Create an error result
       final errorResult = ApiResult<User>.err(
-        ApiErr(
-          title: 'Not Found',
-          msm: 'User not found',
-        ),
+        ApiErr(title: 'Not Found', msm: 'User not found'),
       );
 
       // Chain with error transformation
       final result = errorResult.map(
-            (user) => user.name,
-            (error) => ApiErr(
+        (user) => user.name,
+        (error) => ApiErr(
           title: 'Transformed Error',
           msm: 'Original error: ${error.msm}',
         ),
@@ -167,28 +161,21 @@ void main() {
     test('Multiple error transformations in chain', () {
       // Create an error result
       final errorResult = ApiResult<User>.err(
-        ApiErr(
-          title: 'Not Found',
-          msm: 'User not found',
-        ),
+        ApiErr(title: 'Not Found', msm: 'User not found'),
       );
 
       // Chain with multiple error transformations
       final result = errorResult
           .map(
             (user) => user.name,
-            (error) => ApiErr(
-          title: 'First Transform',
-          msm: 'Step 1: ${error.msm}',
-        ),
-      )
+            (error) =>
+                ApiErr(title: 'First Transform', msm: 'Step 1: ${error.msm}'),
+          )
           .map(
             (name) => name.toUpperCase(),
-            (error) => ApiErr(
-          title: 'Second Transform',
-          msm: 'Step 2: ${error.msm}',
-        ),
-      );
+            (error) =>
+                ApiErr(title: 'Second Transform', msm: 'Step 2: ${error.msm}'),
+          );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.title, equals('Second Transform'));
@@ -323,19 +310,19 @@ void main() {
       final result = getUser('1').flatMap((user) {
         return getUserPosts(user)
             .recover((error) {
-          if (error.msm == 'Failed to fetch posts for user 1') {
-            // Recovery logic
-            return getFallbackPosts(user);
-          }
-          return ApiResult.err(error); // Propagate other errors
-        })
+              if (error.msm == 'Failed to fetch posts for user 1') {
+                // Recovery logic
+                return getFallbackPosts(user);
+              }
+              return ApiResult.err(error); // Propagate other errors
+            })
             .flatMap((posts) {
-          return ApiResult.ok({
-            'user': user,
-            'posts': posts,
-            'postsCount': posts.length,
-          });
-        });
+              return ApiResult.ok({
+                'user': user,
+                'posts': posts,
+                'postsCount': posts.length,
+              });
+            });
       });
 
       expect(result.isOk, isTrue);
@@ -351,10 +338,7 @@ void main() {
       ApiResult<User> getUser(String id) {
         if (id == '404') {
           return ApiResult.err(
-            ApiErr(
-              title: 'Not Found',
-              msm: 'User not found',
-            ),
+            ApiErr(title: 'Not Found', msm: 'User not found'),
           );
         }
         return ApiResult.ok(User(id: id, name: 'John Doe'));
@@ -403,39 +387,39 @@ void main() {
       // Chain of operations with type changes
       final result = initialResult
           .flatMap((userId) {
-        // Convert string to User
-        final user = User(id: userId, name: 'User $userId');
-        return ApiResult<User>.ok(user);
-      })
+            // Convert string to User
+            final user = User(id: userId, name: 'User $userId');
+            return ApiResult<User>.ok(user);
+          })
           .flatMap((user) {
-        // Convert User to List<Post>
-        final posts = [
-          Post(
-            id: '1',
-            userId: user.id,
-            title: 'Post 1',
-            body: 'Content 1',
-          ),
-          Post(
-            id: '2',
-            userId: user.id,
-            title: 'Post 2',
-            body: 'Content 2',
-          ),
-        ];
-        return ApiResult<List<Post>>.ok(posts);
-      })
+            // Convert User to List<Post>
+            final posts = [
+              Post(
+                id: '1',
+                userId: user.id,
+                title: 'Post 1',
+                body: 'Content 1',
+              ),
+              Post(
+                id: '2',
+                userId: user.id,
+                title: 'Post 2',
+                body: 'Content 2',
+              ),
+            ];
+            return ApiResult<List<Post>>.ok(posts);
+          })
           .flatMap((posts) {
-        // Convert List<Post> to Post count
-        return ApiResult<int>.ok(posts.length);
-      })
+            // Convert List<Post> to Post count
+            return ApiResult<int>.ok(posts.length);
+          })
           .flatMap((postCount) {
-        // Convert post count to message
-        return ApiResult<Map<String, dynamic>>.ok({
-          'message': 'Found $postCount posts',
-          'count': postCount,
-        });
-      });
+            // Convert post count to message
+            return ApiResult<Map<String, dynamic>>.ok({
+              'message': 'Found $postCount posts',
+              'count': postCount,
+            });
+          });
 
       expect(result.isOk, isTrue);
       expect(result.data['message'], equals('Found 2 posts'));
@@ -476,17 +460,11 @@ void main() {
       );
 
       final authError = ApiResult<User>.err(
-        ApiErr(
-          title: 'Unauthorized',
-          msm: 'Token expired',
-        ),
+        ApiErr(title: 'Unauthorized', msm: 'Token expired'),
       );
 
       final serverError = ApiResult<User>.err(
-        ApiErr(
-          title: 'Internal Error',
-          msm: 'Database failure',
-        ),
+        ApiErr(title: 'Internal Error', msm: 'Database failure'),
       );
 
       // Apply different error handlers based on status code
@@ -503,72 +481,60 @@ void main() {
 
       // Process each error
       final processedNetworkError = networkError.map(
-            (user) => user,
+        (user) => user,
         processError,
       );
       final processedAuthError = authError.map((user) => user, processError);
       final processedServerError = serverError.map(
-            (user) => user,
+        (user) => user,
         processError,
       );
 
       // Check results
-      expect(
-        processedNetworkError.errorOrNull?.title,
-        equals('Network Error'),
-      );
+      expect(processedNetworkError.errorOrNull?.title, equals('Network Error'));
       expect(
         processedAuthError.errorOrNull?.title,
         equals('Authentication Error'),
       );
-      expect(
-        processedServerError.errorOrNull?.title,
-        equals('Server Error'),
-      );
+      expect(processedServerError.errorOrNull?.title, equals('Server Error'));
     });
 
     test('Error transformation in nested operations', () {
       // Create a chain of operations with nested errors
       final result = ApiResult<String>.ok('start')
           .flatMap((value) {
-        // First flatMap returns an error
-        return ApiResult<int>.err(
-          ApiErr(
-            title: 'Level 1 Error',
-            msm: 'Error at first level',
-          ),
-        );
-      })
+            // First flatMap returns an error
+            return ApiResult<int>.err(
+              ApiErr(title: 'Level 1 Error', msm: 'Error at first level'),
+            );
+          })
           .flatMap(
             (value) {
-          // This would transform the success value
-          return ApiResult<bool>.ok(value > 0);
-        },
+              // This would transform the success value
+              return ApiResult<bool>.ok(value > 0);
+            },
             (error) {
-          // This transforms the Level 1 error
-          return ApiResult<bool>.err(
-            ApiErr(
-              title: 'Transformed Level 1',
-              msm: 'Transformed: ${error.msm}',
-            ),
-          );
-        },
-      )
+              // This transforms the Level 1 error
+              return ApiResult<bool>.err(
+                ApiErr(
+                  title: 'Transformed Level 1',
+                  msm: 'Transformed: ${error.msm}',
+                ),
+              );
+            },
+          )
           .flatMap(
             (value) {
-          // This would transform the success value again
-          return ApiResult<String>.ok(value ? 'Yes' : 'No');
-        },
+              // This would transform the success value again
+              return ApiResult<String>.ok(value ? 'Yes' : 'No');
+            },
             (error) {
-          // This transforms the Level 2 error
-          return ApiResult<String>.err(
-            ApiErr(
-              title: 'Final Error',
-              msm: 'Final: ${error.msm}',
-            ),
+              // This transforms the Level 2 error
+              return ApiResult<String>.err(
+                ApiErr(title: 'Final Error', msm: 'Final: ${error.msm}'),
+              );
+            },
           );
-        },
-      );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.title, equals('Final Error'));
@@ -584,30 +550,28 @@ void main() {
 
       final result = initialValue
           .flatMap((value) {
-        if (value > 5) {
-          // Produce an error in the middle of the chain
-          return ApiResult<String>.err(
-            ApiErr(
-              title: 'Value Too Large',
-              msm: 'Value $value exceeds maximum of 5',
-            ),
-          );
-        }
-        return ApiResult<String>.ok('Value is $value');
-      })
+            if (value > 5) {
+              // Produce an error in the middle of the chain
+              return ApiResult<String>.err(
+                ApiErr(
+                  title: 'Value Too Large',
+                  msm: 'Value $value exceeds maximum of 5',
+                ),
+              );
+            }
+            return ApiResult<String>.ok('Value is $value');
+          })
           .recover((error) {
-        // Recover from the error with a fallback value
-        return ApiResult<String>.ok(
-          'Fallback: Error was ${error.msm}',
-        );
-      })
+            // Recover from the error with a fallback value
+            return ApiResult<String>.ok('Fallback: Error was ${error.msm}');
+          })
           .flatMap((value) {
-        // Continue the chain with the recovered value
-        return ApiResult<Map<String, dynamic>>.ok({
-          'originalOrFallback': value,
-          'processed': true,
-        });
-      });
+            // Continue the chain with the recovered value
+            return ApiResult<Map<String, dynamic>>.ok({
+              'originalOrFallback': value,
+              'processed': true,
+            });
+          });
 
       expect(result.isOk, isTrue);
       expect(result.data['originalOrFallback'], contains('Fallback'));
@@ -634,10 +598,7 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.title,
-        equals('Data Processing Error'),
-      );
+      expect(result.errorOrNull?.title, equals('Data Processing Error'));
     });
 
     test('Handles API schema changes gracefully', () {
@@ -688,14 +649,8 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.title,
-        equals('Data Processing Error'),
-      );
-      expect(
-        result.errorOrNull?.msm,
-        contains('Missing required field: name'),
-      );
+      expect(result.errorOrNull?.title, equals('Data Processing Error'));
+      expect(result.errorOrNull?.msm, contains('Missing required field: name'));
     });
 
     test('Handles unexpected data types gracefully', () {

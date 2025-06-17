@@ -118,7 +118,10 @@ void main() {
       final result = Result.trySync(() => throw Exception('Test exception'));
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.details, contains('Exception: Test exception'));
+      expect(
+        result.errorOrNull?.details,
+        contains('Exception: Test exception'),
+      );
     });
 
     test('trySyncMap method should use custom error mapper', () {
@@ -144,7 +147,10 @@ void main() {
       );
 
       expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.details, contains('Exception: Test exception'));
+      expect(
+        result.errorOrNull?.details,
+        contains('Exception: Test exception'),
+      );
     });
 
     test(

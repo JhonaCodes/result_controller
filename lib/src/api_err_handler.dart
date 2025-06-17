@@ -107,7 +107,6 @@ class ApiErr<E> {
     );
   }
 
-
   // --- toString Implementation ---
 
   /// Returns a human-readable string representation of the API error.
@@ -140,14 +139,12 @@ class ApiErr<E> {
     } else if (exception != null) {
       // Format exception message cleanly
       final exceptionString =
-      exception is Exception
-          ? (exception as Exception).toString()
-          : exception.toString();
+          exception is Exception
+              ? (exception as Exception).toString()
+              : exception.toString();
       parts.add('Error: $exceptionString');
     } else {
-      parts.add(
-        'Unknown API error',
-      );
+      parts.add('Unknown API error');
     }
 
     // Optionally add validation errors
@@ -181,5 +178,4 @@ class ApiErr<E> {
     final template = _errorRegistry[errorType];
     return template is ApiErr<T> ? template : null;
   }
-
 }

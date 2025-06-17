@@ -443,7 +443,13 @@ class Params<T> {
   ///
   /// The [path] parameter is required and defines the endpoint URL path.
   /// Optional [body] and [header] can be provided for request data and headers.
-  Params({required this.path, this.body, this.header, this.queryParams, this.model});
+  Params({
+    required this.path,
+    this.body,
+    this.header,
+    this.queryParams,
+    this.model,
+  });
 }
 
 /// Handles API requests with comprehensive error handling and response processing

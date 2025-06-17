@@ -23,18 +23,11 @@ void main() {
 
     test('handles concurrent error recovery', () async {
       final futures = List.generate(10, (index) async {
-        final result = await Result.tryAsyncMap<int, ApiErr>(
-          () async {
-            await Future.delayed(Duration(milliseconds: index * 10));
-            if (index % 2 == 0) throw Exception('Error $index');
-            return index;
-          },
-          (error, stack) => ApiErr(
-            title: 'Error',
-            msm: error.toString(),
-
-          ),
-        );
+        final result = await Result.tryAsyncMap<int, ApiErr>(() async {
+          await Future.delayed(Duration(milliseconds: index * 10));
+          if (index % 2 == 0) throw Exception('Error $index');
+          return index;
+        }, (error, stack) => ApiErr(title: 'Error', msm: error.toString()));
 
         return result.recover((error) => Ok(index * 2));
       });

@@ -33,10 +33,7 @@ void main() {
     });
 
     test('err factory creates response with error data', () {
-      final apiErr = ApiErr(
-        title: 'Test Error',
-        msm: 'Test error details',
-      );
+      final apiErr = ApiErr(title: 'Test Error', msm: 'Test error details');
 
       final response = ApiResponse.err(apiErr, statusCode: 400, headers: {});
 
@@ -63,10 +60,7 @@ void main() {
     });
 
     test('calls err function when response has error', () {
-      final apiErr = ApiErr(
-        title: 'Test Error',
-        msm: 'Test error details',
-      );
+      final apiErr = ApiErr(title: 'Test Error', msm: 'Test error details');
 
       final response = ApiResponse.err(apiErr, statusCode: 400, headers: {});
 
@@ -131,10 +125,7 @@ void main() {
     });
 
     test('calls err function when response has error', () {
-      final apiErr = ApiErr(
-        title: 'Test Error',
-        msm: 'Test error details',
-      );
+      final apiErr = ApiErr(title: 'Test Error', msm: 'Test error details');
 
       final response = ApiResponse.err(apiErr, statusCode: 400, headers: {});
 
