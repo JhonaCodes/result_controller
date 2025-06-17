@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'dart:convert';
 
 import 'package:result_controller/src/api_err_handler.dart';
-import 'package:result_controller/src/api_handler.dart';
 import 'package:result_controller/src/api_response_handler.dart';
 
 void main() {
