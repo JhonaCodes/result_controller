@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0]
+- Removed `HttpMessage`, now just use `ApiErr`, contain `title` an `msm`
+- Some logic update.
+
 ## [1.1.0]
 
 ### Breaking Changes
