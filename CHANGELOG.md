@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.0]
+### Updates
+- Updated to Dart 3.9.0
+- Removed unused static methods for better API simplicity
+- Improved documentation and examples
+- Code cleanup and optimization
+- Enhanced type safety with latest Dart features
+
+### Breaking Changes
+- Removed several unused static methods to streamline the API
+- Cleaned up internal implementation for better performance
+
+### Developer Experience
+- Better IntelliSense support with improved documentation
+- Cleaner API surface with focused functionality
+- Updated examples to reflect current best practices
+
 ## [1.2.0]
 - Removed `HttpMessage`, now just use `ApiErr`, contain `title` an `msm`
 - Some logic update.

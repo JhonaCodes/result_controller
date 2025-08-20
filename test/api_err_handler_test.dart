@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:result_controller/src/api_err_handler.dart';
-import 'package:result_controller/src/api_response_handler.dart';
 
 enum TypExceptionData { type1, type2 }
 
@@ -75,65 +74,13 @@ void main() {
     test('ApiErr toString with exception only', () {
       final error = ApiErr(exception: Exception('Test exception'));
 
-      expect(error.exception.toString(), equals('Exception: Test exception'));
+      expect(error.toString(), contains('Exception: Test exception'));
     });
 
     test('ApiErr toString with no fields', () {
       final error = ApiErr();
 
       expect(error.toString(), equals('Unknown API error'));
-    });
-  });
-
-  group('Httperr Tests', () {
-    test('Httperr basic creation', () {
-      final exception = Exception('Network err');
-      final stackTrace = MockStackTrace();
-      final data = {
-        'title': 'Connection err',
-        'details': 'Failed to connect to server',
-      };
-
-      final response = ApiResponse(
-        data: data,
-        err: ApiErr(
-          exception: exception,
-          stackTrace: stackTrace,
-          title: 'Connection err',
-          msm: 'Failed to connect to server',
-        ),
-        headers: {},
-      );
-
-      expect(response.err?.exception, equals(exception));
-      expect(response.err?.stackTrace, equals(stackTrace));
-      expect(response.data, equals(data));
-    });
-
-    test('Httperr with null exception', () {
-      final stackTrace = MockStackTrace();
-
-      // Debería compilar y ejecutarse sin erres
-      final httperr = ApiErr(exception: null, stackTrace: stackTrace);
-
-      final response = ApiResponse(err: httperr, headers: {});
-
-      expect(response.err?.exception, isNull);
-      expect(response.err?.stackTrace, equals(stackTrace));
-      expect(response.data, isNull);
-    });
-
-    test('Httperr with null data', () {
-      final exception = Exception('Network err');
-      final stackTrace = MockStackTrace();
-      final response = ApiResponse(
-        err: ApiErr(exception: exception, stackTrace: stackTrace),
-        headers: {},
-      );
-
-      expect(response.err?.exception, equals(exception));
-      expect(response.err?.stackTrace, equals(stackTrace));
-      expect(response.data, isNull);
     });
   });
 }

@@ -1,11 +1,16 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:result_controller/result_controller.dart';
 
-import 'api_handler_test.dart';
+class User {
+  final String id;
+  final String name;
+
+  User({required this.id, required this.name});
+}
 
 class CustomError extends Error {
   final String message;
-  CustomError(this.message, String part);
+  CustomError(this.message);
 
   @override
   String toString() => 'CustomError: $message';
@@ -21,107 +26,6 @@ class NetworkError implements Exception {
 
 void main() {
   group('Advanced Error Handling Scenarios', () {
-    test('Result.trySync handles complex synchronous errors', () {
-      Result<int, ResultErr> complexErrorResult = Result.trySync(() {
-        if (DateTime.now().millisecondsSinceEpoch.isEven) {
-          throw CustomError('Random error on even timestamp', '1');
-        }
-        return 42;
-      });
-
-      complexErrorResult.when(
-        ok: (value) {
-          expect(value, equals(42));
-        },
-        err: (error) {
-          expect(error.details, contains('CustomError'));
-        },
-      );
-    });
-
-    test('Result.tryAsync handles complex asynchronous errors', () async {
-      Future<Result<int, ResultErr>> complexAsyncErrorResult = Result.tryAsync(
-        () async {
-          await Future.delayed(Duration(milliseconds: 100));
-          if (DateTime.now().millisecondsSinceEpoch.isEven) {
-            throw NetworkError('Simulated network failure');
-          }
-          return 42;
-        },
-      );
-
-      final result = await complexAsyncErrorResult;
-      result.when(
-        ok: (value) {
-          expect(value, equals(42));
-        },
-        err: (error) {
-          expect(error.details, contains('NetworkError'));
-        },
-      );
-    });
-
-    test('Result.trySyncMap provides granular error transformation', () {
-      final result = Result.trySyncMap<int, String>(
-        () {
-          if (DateTime.now().millisecondsSinceEpoch.isEven) {
-            throw FormatException('Invalid input format');
-          }
-          return 42;
-        },
-        (error, stackTrace) {
-          if (error is FormatException) {
-            return 'Validation Error: ${error.message}';
-          }
-          return 'Unknown Error: $error';
-        },
-      );
-
-      result.when(
-        ok: (value) {
-          expect(value, equals(42));
-        },
-        err: (error) {
-          expect(error, matches(RegExp(r'Validation Error:|Unknown Error:')));
-        },
-      );
-    });
-
-    test(
-      'Result.tryAsyncMap handles complex asynchronous error transformations',
-      () async {
-        final result = await Result.tryAsyncMap<int, String>(
-          () async {
-            await Future.delayed(Duration(milliseconds: 100));
-            if (DateTime.now().millisecondsSinceEpoch.isEven) {
-              throw NetworkError('Connection timeout');
-            }
-            return 42;
-          },
-          (error, stackTrace) {
-            if (error is NetworkError) {
-              return 'Network Connectivity Error: ${error.reason}';
-            }
-            return 'Unexpected Async Error: $error';
-          },
-        );
-
-        result.when(
-          ok: (value) {
-            expect(value, equals(42));
-          },
-          err: (error) {
-            expect(
-              error,
-              matches(
-                RegExp(r'Network Connectivity Error:|Unexpected Async Error:'),
-              ),
-            );
-          },
-        );
-      },
-    );
-
     test('Nested error handling with multiple Result transformations', () {
       Result<int, String> divideNumber(int dividend, int divisor) {
         if (divisor == 0) {

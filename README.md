@@ -25,7 +25,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  result_controller: ^1.2.0
+  result_controller: ^1.3.0
 ```
 
 ## Basic Usage

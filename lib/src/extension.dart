@@ -1,7 +1,5 @@
 import 'package:result_controller/src/result_controller.dart';
 
-import 'api_handler.dart';
-import 'api_response_handler.dart';
 import 'err_handler.dart';
 import 'ok_handler.dart';
 
@@ -50,12 +48,13 @@ import 'ok_handler.dart';
 /// }
 /// ```
 ///
-/// API Response Conversion Example:
+/// JSON Data Conversion Example:
 /// ```dart
-/// // Convert API response to Result
+/// // Convert raw JSON data to Result
 /// Future<Result<User>> fetchUserFromApi(String id) async {
 ///   final response = await http.get(Uri.parse('https://api.example.com/users/$id'));
-///   return ApiResponse.fromResponse(response).toResult((json) => User.fromJson(json));
+///   final jsonData = jsonDecode(response.body);
+///   return ApiResult.fromJson(data: jsonData, onData: (json) => User.fromJson(json));
 /// }
 /// ```
 extension FutureResultExtensions<T, E> on Future<Result<T, E>> {
@@ -205,31 +204,3 @@ extension ResultCollectionExtensions<T, E> on Result<List<T>, E> {
   }
 }
 
-/// Extensions for working with ApiResponse objects
-extension ApiResponseExtensions on ApiResponse {
-  /// Converts this ApiResponse into an ApiResult
-  ///
-  /// Example:
-  /// ```dart
-  /// final userResult = apiResponse.toResult(
-  ///   onData: User.fromJson,
-  /// );
-  /// ```
-  ApiResult<T> toResult<T>(T Function(Map<String, dynamic> data) onData) {
-    return ApiResult.from(response: this, onData: onData);
-  }
-
-  /// Converts this ApiResponse into an ApiResult containing a list
-  ///
-  /// Example:
-  /// ```dart
-  /// final usersResult = apiResponse.toListResult(
-  ///   onData: (items) => items.map(User.fromJson).toList(),
-  /// );
-  /// ```
-  ApiResult<List<T>> toListResult<T>(
-    List<T> Function(List<Map<String, dynamic>> data) onData,
-  ) {
-    return ApiResult.fromList(response: this, onData: onData);
-  }
-}

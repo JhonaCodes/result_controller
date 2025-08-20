@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:result_controller/result_controller.dart';
 
 // Mock classes for testing
@@ -147,80 +147,6 @@ void main() {
 
       expect(filteredResult.isErr, isTrue);
       expect(filteredResult.errorOrNull, equals('Error'));
-    });
-  });
-
-  group('ApiResponseExtensions', () {
-    test('toResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.ok(
-        {'id': '123', 'name': 'John Doe'},
-        statusCode: 200,
-        headers: {},
-      );
-
-      final result = apiResponse.toResult(User.fromJson);
-
-      expect(result.isOk, isTrue);
-      expect(result.data.id, equals('123'));
-      expect(result.data.name, equals('John Doe'));
-    });
-
-    test('toResult converts failed ApiResponse', () {
-      final apiResponse = ApiResponse.err(
-        ApiErr(
-          exception: Exception('Network error'),
-          stackTrace: StackTrace.current,
-          title: 'Error',
-          msm: 'Connection failed',
-        ),
-        statusCode: 500,
-        headers: {},
-      );
-
-      final result = apiResponse.toResult(User.fromJson);
-
-      expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.title, equals('Error'));
-    });
-
-    test('toListResult converts successful ApiResponse', () {
-      final apiResponse = ApiResponse.ok(
-        [
-          {'id': '1', 'name': 'John'},
-          {'id': '2', 'name': 'Jane'},
-        ],
-        statusCode: 200,
-        headers: {},
-      );
-
-      final result = apiResponse.toListResult(
-        (items) => items.map(User.fromJson).toList(),
-      );
-
-      expect(result.isOk, isTrue);
-      expect(result.data.length, equals(2));
-      expect(result.data[0].id, equals('1'));
-      expect(result.data[1].name, equals('Jane'));
-    });
-
-    test('toListResult converts failed ApiResponse', () {
-      final apiResponse = ApiResponse.err(
-        ApiErr(
-          exception: Exception('Network error'),
-          stackTrace: StackTrace.current,
-          title: 'Error',
-          msm: 'Connection failed',
-        ),
-        statusCode: 500,
-        headers: {},
-      );
-
-      final result = apiResponse.toListResult(
-        (items) => items.map(User.fromJson).toList(),
-      );
-
-      expect(result.isErr, isTrue);
-      expect(result.errorOrNull?.title, equals('Error'));
     });
   });
 }

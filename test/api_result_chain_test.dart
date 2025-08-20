@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:result_controller/result_controller.dart';
 
 // Mock class for testing
@@ -586,14 +586,14 @@ void main() {
   group('ApiResult unexpected data handling', () {
     test('Handles unexpected response structures gracefully', () {
       // Mock an unexpected API response format
-      final response = ApiResponse.ok({
+      final data = {
         'meta': {'status': 'success'},
         'data': null,
-      }, headers: {});
+      };
 
       // Try to convert to a User
-      final result = ApiResult.from<User>(
-        response: response,
+      final result = ApiResult.fromJson<User>(
+        data: data,
         onData: (data) => User.fromJson(data),
       );
 
@@ -603,14 +603,14 @@ void main() {
 
     test('Handles API schema changes gracefully', () {
       // Mock a response with changed schema (field name changes)
-      final changedSchemaResponse = ApiResponse.ok({
+      final changedSchemaData = {
         'userId': '123',
         'userName': 'John Doe',
-      }, headers: {});
+      };
 
       // Try to convert with schema handling
-      final result = ApiResult.from<User>(
-        response: changedSchemaResponse,
+      final result = ApiResult.fromJson<User>(
+        data: changedSchemaData,
         onData: (data) {
           try {
             // Try the new schema first
@@ -635,11 +635,11 @@ void main() {
 
     test('Handles missing required fields gracefully', () {
       // Mock a response with missing required fields
-      final missingFieldsResponse = ApiResponse.ok({'id': '123'}, headers: {});
+      final missingFieldsData = {'id': '123'};
 
       // Try to convert with error handling for missing fields
-      final result = ApiResult.from<User>(
-        response: missingFieldsResponse,
+      final result = ApiResult.fromJson<User>(
+        data: missingFieldsData,
         onData: (data) {
           if (!data.containsKey('name')) {
             throw FormatException('Missing required field: name');
@@ -655,14 +655,14 @@ void main() {
 
     test('Handles unexpected data types gracefully', () {
       // Mock a response with unexpected data types
-      final wrongTypesResponse = ApiResponse.ok({
+      final wrongTypesData = {
         'id': 123,
         'name': true,
-      }, headers: {});
+      };
 
       // Try to convert with type coercion
-      final result = ApiResult.from<User>(
-        response: wrongTypesResponse,
+      final result = ApiResult.fromJson<User>(
+        data: wrongTypesData,
         onData: (data) {
           return User(id: data['id'].toString(), name: data['name'].toString());
         },

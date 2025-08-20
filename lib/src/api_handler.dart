@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:result_controller/src/result_controller.dart';
 
 import 'api_err_handler.dart';
-import 'api_response_handler.dart';
 
 /// ApiResult: A specialized Result type for HTTP API operations
 ///
@@ -187,24 +186,25 @@ class ApiResult<T> extends Result<T, ApiErr> {
     }
   }
 
-  /// Creates an ApiResult from a raw API response
+  /// Creates an ApiResult from raw JSON data
   ///
-  /// This static method processes an ApiResponse and converts it to an ApiResult,
+  /// This static method processes raw JSON data and converts it to an ApiResult,
   /// handling potential errors and data conversion.
   ///
   /// Parameters:
-  /// - `response`: The API response to process
+  /// - `data`: The raw JSON data to process
   /// - `onData`: A function that converts a JSON map to your domain object
+  /// - `statusCode`: Optional HTTP status code
+  /// - `headers`: Optional HTTP headers
   ///
   /// Example:
   /// ```dart
-  /// ApiResponse response = await _api.get(
-  ///   params: Params(path: 'users/123'),
-  /// );
-  ///
-  /// ApiResult<User> result = ApiResult.from(
-  ///   response: response,
+  /// final jsonData = {'id': '123', 'name': 'John'};
+  /// 
+  /// ApiResult<User> result = ApiResult.fromJson(
+  ///   data: jsonData,
   ///   onData: (data) => User.fromJson(data),
+  ///   statusCode: 200,
   /// );
   ///
   /// return result.when(
@@ -212,68 +212,69 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   err: (error) => throw error, // Or handle differently
   /// );
   /// ```
-  static ApiResult<T> from<T>({
-    required ApiResponse response,
+  static ApiResult<T> fromJson<T>({
+    required dynamic data,
     required T Function(Map<String, dynamic> data) onData,
+    int? statusCode,
+    Map<String, dynamic>? headers,
   }) {
     try {
-      if (response.err != null) {
-        return ApiResult.err(response.err!, statusCode: response.statusCode);
-      }
-
-      if (response.data == null) {
+      if (data == null) {
         return ApiResult.err(
           ApiErr(
-            exception: Exception('No data in response'),
+            exception: Exception('No data provided'),
             title: 'Error',
-            msm: 'No data in response',
+            msm: 'No data provided',
             stackTrace: StackTrace.current,
           ),
-          statusCode: response.statusCode,
+          statusCode: statusCode,
+          headers: headers,
         );
       }
 
-      final jsonData = _ensureJsonMap(response.data);
+      final jsonData = _ensureJsonMap(data);
       final result = onData(jsonData);
-      return ApiResult.ok(result, statusCode: response.statusCode);
+      return ApiResult.ok(result, statusCode: statusCode, headers: headers);
     } catch (e, stackTrace) {
-      log('Error parsing API response ${e.toString()}');
+      log('Error parsing JSON data ${e.toString()}');
       log(stackTrace.toString());
 
       if (e is ApiErr) {
-        return ApiResult.err(e, statusCode: response.statusCode);
+        return ApiResult.err(e, statusCode: statusCode, headers: headers);
       }
 
       return ApiResult.err(
         ApiErr(
           exception: e,
           title: 'Data Processing Error',
-          msm: 'Could not process the server response: ${e.toString()}',
+          msm: 'Could not process the JSON data: ${e.toString()}',
           stackTrace: stackTrace,
         ),
-        statusCode: response.statusCode,
+        statusCode: statusCode,
+        headers: headers,
       );
     }
   }
 
-  /// Creates an ApiResult from an API response containing a list
+  /// Creates an ApiResult from raw JSON list data
   ///
-  /// Similar to `from()`, but specifically designed for handling responses that
-  /// contain a list of items that need to be converted to domain objects.
+  /// Similar to `fromJson()`, but specifically designed for handling JSON data that
+  /// contains a list of items that need to be converted to domain objects.
   ///
   /// Parameters:
-  /// - `response`: The API response to process
+  /// - `data`: The raw JSON list data to process
   /// - `onData`: A function that converts a list of JSON maps to your domain objects
+  /// - `statusCode`: Optional HTTP status code
+  /// - `headers`: Optional HTTP headers
   ///
   /// Example:
   /// ```dart
-  /// ApiResponse response = await _api.get(
-  ///   params: Params(path: 'users'),
-  /// );
+  /// final jsonList = [{'id': '1', 'name': 'John'}, {'id': '2', 'name': 'Jane'}];
   ///
-  /// ApiResult<List<User>> result = ApiResult.fromList(
-  ///   response: response,
+  /// ApiResult<List<User>> result = ApiResult.fromJsonList(
+  ///   data: jsonList,
   ///   onData: (items) => items.map((item) => User.fromJson(item)).toList(),
+  ///   statusCode: 200,
   /// );
   ///
   /// return result.when(
@@ -284,46 +285,46 @@ class ApiResult<T> extends Result<T, ApiErr> {
   ///   },
   /// );
   /// ```
-  static ApiResult<List<T>> fromList<T>({
-    required ApiResponse response,
+  static ApiResult<List<T>> fromJsonList<T>({
+    required dynamic data,
     required List<T> Function(List<Map<String, dynamic>> data) onData,
+    int? statusCode,
+    Map<String, dynamic>? headers,
   }) {
     try {
-      if (response.err != null) {
-        return ApiResult.err(response.err!, statusCode: response.statusCode);
-      }
-
-      if (response.data == null) {
+      if (data == null) {
         return ApiResult.err(
           ApiErr(
-            exception: Exception('No data in response'),
+            exception: Exception('No data provided'),
             title: 'Error',
-            msm: 'No data in response',
+            msm: 'No data provided',
             stackTrace: StackTrace.current,
           ),
-          statusCode: response.statusCode,
+          statusCode: statusCode,
+          headers: headers,
         );
       }
 
-      final jsonList = _ensureJsonList(response.data);
+      final jsonList = _ensureJsonList(data);
       final result = onData(jsonList);
-      return ApiResult.ok(result, statusCode: response.statusCode);
+      return ApiResult.ok(result, statusCode: statusCode, headers: headers);
     } catch (e, stackTrace) {
-      log('Error parsing API response list ${e.toString()}');
+      log('Error parsing JSON list data ${e.toString()}');
       log(stackTrace.toString());
 
       if (e is ApiErr) {
-        return ApiResult.err(e, statusCode: response.statusCode);
+        return ApiResult.err(e, statusCode: statusCode, headers: headers);
       }
 
       return ApiResult.err(
         ApiErr(
           exception: e,
           title: 'Data Processing Error',
-          msm: 'Could not process the server response list: ${e.toString()}',
+          msm: 'Could not process the JSON list data: ${e.toString()}',
           stackTrace: stackTrace,
         ),
-        statusCode: response.statusCode,
+        statusCode: statusCode,
+        headers: headers,
       );
     }
   }

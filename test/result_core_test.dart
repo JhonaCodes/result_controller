@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 import 'package:result_controller/result_controller.dart';
 
@@ -104,65 +104,6 @@ void main() {
 
         expect(chainedResult.isErr, isTrue);
         expect(chainedResult.errorOrNull, equals('Transformed: Error message'));
-      },
-    );
-
-    test('trySync method should wrap successful operation', () {
-      final result = Result.trySync(() => 42);
-
-      expect(result.isOk, isTrue);
-      expect(result.data, equals(42));
-    });
-
-    test('trySync method should wrap exception', () {
-      final result = Result.trySync(() => throw Exception('Test exception'));
-
-      expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.details,
-        contains('Exception: Test exception'),
-      );
-    });
-
-    test('trySyncMap method should use custom error mapper', () {
-      final result = Result.trySyncMap<int, String>(
-        () => throw Exception('Test exception'),
-        (error, stack) => 'Custom error: $error',
-      );
-
-      expect(result.isErr, isTrue);
-      expect(result.errorOrNull, contains('Custom error:'));
-    });
-
-    test('tryAsync method should wrap successful async operation', () async {
-      final result = await Result.tryAsync(() async => 42);
-
-      expect(result.isOk, isTrue);
-      expect(result.data, equals(42));
-    });
-
-    test('tryAsync method should wrap async exception', () async {
-      final result = await Result.tryAsync(
-        () async => throw Exception('Test exception'),
-      );
-
-      expect(result.isErr, isTrue);
-      expect(
-        result.errorOrNull?.details,
-        contains('Exception: Test exception'),
-      );
-    });
-
-    test(
-      'tryAsyncMap method should use custom error mapper for async operations',
-      () async {
-        final result = await Result.tryAsyncMap<int, String>(
-          () async => throw Exception('Test exception'),
-          (error, stack) => 'Custom async error: $error',
-        );
-
-        expect(result.isErr, isTrue);
-        expect(result.errorOrNull, contains('Custom async error:'));
       },
     );
 

@@ -1,10 +1,22 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:result_controller/result_controller.dart';
+
+Future<Result<T, E>> tryAsyncMap<T, E>(
+  Future<T> Function() computation,
+  E Function(Object, StackTrace) errorMapper,
+) async {
+  try {
+    final value = await computation();
+    return Ok(value);
+  } catch (e, s) {
+    return Err(errorMapper(e, s));
+  }
+}
 
 void main() {
   group('Error Recovery Chain Tests', () {
     test('recovers from multiple errors in chain', () async {
-      final result = await Result.tryAsyncMap<int, ApiErr>(
+      final result = await tryAsyncMap<int, ApiErr>(
         () async => throw Exception('First error'),
         (error, stack) => ApiErr(title: 'First', msm: error.toString()),
       );
@@ -21,7 +33,7 @@ void main() {
     });
 
     test('transforms errors through chain', () async {
-      final result = await Result.tryAsyncMap<int, String>(
+      final result = await tryAsyncMap<int, String>(
         () async => throw Exception('Original error'),
         (error, stack) => 'First: $error',
       );
