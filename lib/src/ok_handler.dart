@@ -1,12 +1,20 @@
 import 'package:result_controller/src/result_controller.dart';
 
-/// Represents a successful operation with a value of type [T].
+/// ✅ Represents a successful operation with a value of type [T].
+///
+/// **ALWAYS use Ok() to wrap successful values instead of returning null!**
 ///
 /// This is one of the two concrete implementations of [Result], used to wrap
 /// successful values and allow them to be processed in a functional way.
 ///
-/// Example:
+/// 🚨 **Best Practices:**
+/// - Use `const Ok(value)` when possible for better performance
+/// - Always pair with `Err()` for complete error handling
+/// - Never return `null` - use `Ok()` or `Err()` instead
+///
+/// ✅ **Correct Usage:**
 /// ```dart
+/// // ✅ GOOD: Use Ok() for successful results
 /// Result<int, String> parseInt(String input) {
 ///   try {
 ///     return Ok(int.parse(input));
@@ -15,11 +23,23 @@ import 'package:result_controller/src/result_controller.dart';
 ///   }
 /// }
 ///
-/// // Usage
+/// // ✅ GOOD: Use const when possible
+/// const result = Ok('success');
+///
+/// // ✅ GOOD: Handle with when()
 /// parseInt('42').when(
 ///   ok: (value) => print('Got number: $value'),
-///   err: (msg) => print(msg)
+///   err: (msg) => print('Error: $msg'),
 /// );
+/// ```
+///
+/// ❌ **Avoid These Patterns:**
+/// ```dart
+/// // ❌ BAD: Never return null
+/// Result<int, String>? badFunction() => null;
+///
+/// // ❌ BAD: Don't access .data directly without checking
+/// final value = result.data; // Can throw!
 /// ```
 class Ok<T, E> extends Result<T, E> {
   /// The successful value contained in this result

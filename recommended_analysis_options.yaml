@@ -1,0 +1,88 @@
+# Recommended analysis_options.yaml for Result Controller usage
+# Copy this configuration to your project's analysis_options.yaml
+# to get the best linting experience with Result Controller
+
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    # Critical: Enforce Result Controller best practices
+    avoid_returning_null: error
+    avoid_returning_null_for_future: error
+    avoid_catching_errors: warning
+    
+    # Code quality that helps with Result patterns
+    prefer_typing_uninitialized_variables: warning
+    unnecessary_null_checks: warning
+    unnecessary_null_in_if_null_operators: warning
+    
+    # Documentation requirements
+    public_member_api_docs: info
+    
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    # Core Result Controller guidelines
+    - avoid_catching_errors            # Use Result.trySync() instead
+    - avoid_empty_else                 # Handle errors explicitly
+    - avoid_returning_null             # Use Ok() or Err() instead
+    - avoid_returning_null_for_future  # Use Future<Result<T,E>> instead
+    - avoid_types_on_closure_parameters
+    
+    # Const and performance
+    - prefer_const_constructors        # Use const Ok() and const Err()
+    - prefer_const_constructors_in_immutables
+    - prefer_const_literals_to_create_immutables
+    
+    # Variable declarations
+    - prefer_final_fields              # Use final for Result variables
+    - prefer_final_in_for_each
+    - prefer_final_locals              # final result = getResult();
+    
+    # Type safety and nullability
+    - prefer_typing_uninitialized_variables
+    - unnecessary_null_checks
+    - unnecessary_null_in_if_null_operators
+    - unnecessary_nullable_for_final_variable_declarations
+    
+    # Code style that improves Result usage
+    - prefer_is_empty
+    - prefer_is_not_empty
+    - require_trailing_commas
+    - use_key_in_widget_constructors
+    
+    # Error handling best practices
+    - only_throw_errors               # Prefer Err() over throwing
+    - avoid_slow_async_io
+    - cancel_subscriptions
+    - close_sinks
+    
+    # Documentation
+    - public_member_api_docs          # Document your Result-returning methods
+    - comment_references
+    
+    # General code quality
+    - avoid_print                     # Use proper logging
+    - avoid_web_libraries_in_flutter
+    - no_logic_in_create_state
+    - prefer_relative_imports
+    - sort_child_properties_last
+    - use_build_context_synchronously
+
+# Custom lint messages that will appear in your IDE:
+# 
+# When you:
+# - Return null from a Result function → "Use Ok() or Err() instead of null"
+# - Use try-catch → "Consider using Result.trySync() for safer error handling" 
+# - Don't use const → "Use const Ok() or const Err() when possible"
+# - Use var instead of final → "Use final for Result variables"
+#
+# This configuration will help your team consistently use Result Controller patterns!

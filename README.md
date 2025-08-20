@@ -28,6 +28,35 @@ dependencies:
   result_controller: ^1.3.0
 ```
 
+### 🚨 Recommended: Enable Lint Rules
+
+For the best development experience, copy our recommended lint configuration:
+
+```bash
+# Copy recommended linting rules to your project
+cp node_modules/result_controller/recommended_analysis_options.yaml analysis_options.yaml
+```
+
+Or manually add to your `analysis_options.yaml`:
+
+```yaml
+include: package:lints/recommended.yaml
+
+analyzer:
+  errors:
+    avoid_returning_null: error              # Use Ok() instead of null
+    avoid_returning_null_for_future: error   # Use Future<Result<T,E>>
+    avoid_catching_errors: warning           # Use Result.trySync()
+
+linter:
+  rules:
+    - prefer_const_constructors             # Use const Ok() and const Err()
+    - prefer_final_locals                   # Use final for Result variables
+    - public_member_api_docs               # Document Result-returning methods
+```
+
+These rules will help your IDE guide you toward correct Result Controller usage!
+
 ## Basic Usage
 
 ### Base Result Type
