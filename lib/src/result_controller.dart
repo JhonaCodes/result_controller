@@ -96,9 +96,8 @@ abstract class Result<T, E> {
   R whenData<R>(R Function(T) ok) {
     return this.when(
       ok: ok,
-      err:
-          (error) =>
-              throw StateError('Cannot access data on Err value: $error'),
+      err: (error) =>
+          throw StateError('Cannot access data on Err value: $error'),
     );
   }
 
@@ -108,7 +107,6 @@ abstract class Result<T, E> {
   R? whenError<R>(R Function(E) err) {
     return this.when(ok: (_) => null, err: err);
   }
-
 
   /// Returns true if this is a success result
   bool get isOk => this.when(ok: (_) => true, err: (_) => false);

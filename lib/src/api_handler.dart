@@ -200,7 +200,7 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// Example:
   /// ```dart
   /// final jsonData = {'id': '123', 'name': 'John'};
-  /// 
+  ///
   /// ApiResult<User> result = ApiResult.fromJson(
   ///   data: jsonData,
   ///   onData: (data) => User.fromJson(data),

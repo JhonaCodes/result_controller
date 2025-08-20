@@ -345,32 +345,35 @@ void main() {
       }
 
       // Chain with complex error handling
-      final result = getUser(
-        '404',
-      ).flatMap((user) => ApiResult.ok('User: ${user.name}'), (error) {
-        if (error.msm == 'User not found') {
-          return ApiResult.err(
-            ApiErr(
-              title: 'Custom Not Found',
-              msm: 'Could not find the requested user. Please try another ID.',
-            ),
-          );
-        } else if (error.msm == 'Unauthorized') {
-          return ApiResult.err(
-            ApiErr(
-              title: 'Authentication Required',
-              msm: 'Please login to access this resource.',
-            ),
-          );
-        } else {
-          return ApiResult.err(
-            ApiErr(
-              title: 'System Error',
-              msm: 'An unexpected error occurred. Original error: ${error.msm}',
-            ),
-          );
-        }
-      });
+      final result = getUser('404').flatMap(
+        (user) => ApiResult.ok('User: ${user.name}'),
+        (error) {
+          if (error.msm == 'User not found') {
+            return ApiResult.err(
+              ApiErr(
+                title: 'Custom Not Found',
+                msm:
+                    'Could not find the requested user. Please try another ID.',
+              ),
+            );
+          } else if (error.msm == 'Unauthorized') {
+            return ApiResult.err(
+              ApiErr(
+                title: 'Authentication Required',
+                msm: 'Please login to access this resource.',
+              ),
+            );
+          } else {
+            return ApiResult.err(
+              ApiErr(
+                title: 'System Error',
+                msm:
+                    'An unexpected error occurred. Original error: ${error.msm}',
+              ),
+            );
+          }
+        },
+      );
 
       expect(result.isErr, isTrue);
       expect(result.errorOrNull?.title, equals('Custom Not Found'));
@@ -603,10 +606,7 @@ void main() {
 
     test('Handles API schema changes gracefully', () {
       // Mock a response with changed schema (field name changes)
-      final changedSchemaData = {
-        'userId': '123',
-        'userName': 'John Doe',
-      };
+      final changedSchemaData = {'userId': '123', 'userName': 'John Doe'};
 
       // Try to convert with schema handling
       final result = ApiResult.fromJson<User>(
@@ -655,10 +655,7 @@ void main() {
 
     test('Handles unexpected data types gracefully', () {
       // Mock a response with unexpected data types
-      final wrongTypesData = {
-        'id': 123,
-        'name': true,
-      };
+      final wrongTypesData = {'id': 123, 'name': true};
 
       // Try to convert with type coercion
       final result = ApiResult.fromJson<User>(

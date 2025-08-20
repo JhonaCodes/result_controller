@@ -1,4 +1,3 @@
-
 import 'package:test/test.dart';
 import 'package:result_controller/result_controller.dart';
 
@@ -177,7 +176,10 @@ void main() {
     });
 
     test('ApiResult.fromJson with parsing error', () {
-      final jsonData = {'id': 123, 'name': null}; // Invalid data that will cause parsing error
+      final jsonData = {
+        'id': 123,
+        'name': null,
+      }; // Invalid data that will cause parsing error
 
       final result = ApiResult.fromJson<User>(
         data: jsonData,

@@ -77,7 +77,10 @@ void main() {
 
       expect(result.isOk, isTrue);
       expect(result.data.statusCode, equals(200));
-      expect(result.data.whenData((data) => data), equals({'id': '123', 'name': 'Test User'}));
+      expect(
+        result.data.whenData((data) => data),
+        equals({'id': '123', 'name': 'Test User'}),
+      );
     });
 
     test('handles network timeout exception', () async {

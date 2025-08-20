@@ -203,4 +203,3 @@ extension ResultCollectionExtensions<T, E> on Result<List<T>, E> {
     return map((list) => list.where(predicate).toList());
   }
 }
-

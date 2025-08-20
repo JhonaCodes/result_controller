@@ -30,7 +30,9 @@ void main() {
 
       final results = await Future.wait(futures);
       final recovered = results.map((r) {
-        return r.recover((error) => Ok(int.parse(error.msm!.split(' ').last) * 2));
+        return r.recover(
+          (error) => Ok(int.parse(error.msm!.split(' ').last) * 2),
+        );
       }).toList();
 
       expect(recovered.length, equals(10));
