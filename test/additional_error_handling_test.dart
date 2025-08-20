@@ -140,7 +140,7 @@ void main() {
           (150, 'Oversized input'),
         ];
 
-        for (var (input, description) in scenarios) {
+        for (final (input, description) in scenarios) {
           final result = riskyCalculation(input)
               .recover((error) => Ok(0))
               .map((value) => value + 10)

@@ -200,7 +200,7 @@ void advancedPatterns() {
   // Example 4: Type transformations
   log('\n4. Type Transformations:');
 
-  final stringResult = parseNumber('42').map((num) => 'Number: $num');
+  final stringResult = parseNumber('42').map((number) => 'Number: $number');
   stringResult.when(
     ok: (str) => log('  Transformed: $str'),
     err: (error) => log('  Error: $error'),

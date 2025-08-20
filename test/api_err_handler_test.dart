@@ -28,7 +28,10 @@ void main() {
     });
 
     test('ApiErr creation with minimal fields', () {
-      final error = ApiErr(msm: 'Internal server error', title: 'Server Error');
+      final error = const ApiErr(
+        msm: 'Internal server error',
+        title: 'Server Error',
+      );
 
       expect(error.exception, isNull);
       expect(error.title, equals('Server Error'));

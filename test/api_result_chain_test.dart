@@ -124,7 +124,7 @@ void main() {
     test('Chain breaks at first error', () {
       // Create an error result
       final errorResult = ApiResult<User>.err(
-        ApiErr(title: 'Not Found', msm: 'User not found'),
+        const ApiErr(title: 'Not Found', msm: 'User not found'),
       );
 
       // Chain multiple map operations
@@ -141,7 +141,7 @@ void main() {
     test('Error transformation in chain', () {
       // Create an error result
       final errorResult = ApiResult<User>.err(
-        ApiErr(title: 'Not Found', msm: 'User not found'),
+        const ApiErr(title: 'Not Found', msm: 'User not found'),
       );
 
       // Chain with error transformation
@@ -161,7 +161,7 @@ void main() {
     test('Multiple error transformations in chain', () {
       // Create an error result
       final errorResult = ApiResult<User>.err(
-        ApiErr(title: 'Not Found', msm: 'User not found'),
+        const ApiErr(title: 'Not Found', msm: 'User not found'),
       );
 
       // Chain with multiple error transformations
@@ -350,7 +350,7 @@ void main() {
         (error) {
           if (error.msm == 'User not found') {
             return ApiResult.err(
-              ApiErr(
+              const ApiErr(
                 title: 'Custom Not Found',
                 msm:
                     'Could not find the requested user. Please try another ID.',
@@ -358,7 +358,7 @@ void main() {
             );
           } else if (error.msm == 'Unauthorized') {
             return ApiResult.err(
-              ApiErr(
+              const ApiErr(
                 title: 'Authentication Required',
                 msm: 'Please login to access this resource.',
               ),
@@ -456,18 +456,18 @@ void main() {
 
       // Create different error scenarios
       final networkError = ApiResult<User>.err(
-        ApiErr(
+        const ApiErr(
           title: 'Network Error',
           msm: 'Please check your connection and try again',
         ),
       );
 
       final authError = ApiResult<User>.err(
-        ApiErr(title: 'Unauthorized', msm: 'Token expired'),
+        const ApiErr(title: 'Unauthorized', msm: 'Token expired'),
       );
 
       final serverError = ApiResult<User>.err(
-        ApiErr(title: 'Internal Error', msm: 'Database failure'),
+        const ApiErr(title: 'Internal Error', msm: 'Database failure'),
       );
 
       // Apply different error handlers based on status code
@@ -508,7 +508,7 @@ void main() {
           .flatMap((value) {
             // First flatMap returns an error
             return ApiResult<int>.err(
-              ApiErr(title: 'Level 1 Error', msm: 'Error at first level'),
+              const ApiErr(title: 'Level 1 Error', msm: 'Error at first level'),
             );
           })
           .flatMap(

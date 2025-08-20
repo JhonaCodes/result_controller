@@ -27,6 +27,7 @@ class ApiErr<E> {
   /// The categorized error type (of type [E]) for identifying the kind of error.
   final E? errorType;
 
+  /// The stack trace associated with the error, if available.
   final StackTrace? stackTrace;
   // --- Constructor ---
 
@@ -53,7 +54,7 @@ class ApiErr<E> {
   ///   stackTrace: StackTrace.current,
   /// );
   /// ```
-  ApiErr({
+  const ApiErr({
     this.exception,
     this.title,
     this.msm,
@@ -165,14 +166,16 @@ class ApiErr<E> {
 
   // --- Static Error Registry ---
 
-  /// Stores mappings of error types and complex keys ([_StatusTypeKey]) to predefined [ApiErr] templates.
+  /// Stores mappings of error types and complex keys to predefined [ApiErr] templates.
   /// This single map holds registrations for both simple type lookups and complex context-based lookups.
   static final Map<dynamic, ApiErr> _errorRegistry = {};
 
+  /// Registers a template for a given error type.
   static void registerTemplate<T>(T errorType, ApiErr template) {
     _errorRegistry[errorType] = template;
   }
 
+  /// Retrieves a template for a given error type.
   static ApiErr<T>? getTemplate<T>(T errorType) {
     final template = _errorRegistry[errorType];
     return template is ApiErr<T> ? template : null;

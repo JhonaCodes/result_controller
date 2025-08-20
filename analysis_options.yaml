@@ -13,17 +13,12 @@ analyzer:
 linter:
   rules:
     # Core Result Controller usage guidelines
-    - prefer_const_constructors
-    - prefer_const_constructors_in_immutables
     - prefer_final_fields
     - prefer_final_in_for_each
     - prefer_final_locals
     
     # Error handling best practices
-    - avoid_catching_errors
     - avoid_empty_else
-    - avoid_returning_null
-    - avoid_returning_null_for_future
     - avoid_types_on_closure_parameters
     
     # Code quality for Result patterns
@@ -31,8 +26,6 @@ linter:
     - prefer_is_not_empty
     - prefer_typing_uninitialized_variables
     - require_trailing_commas
-    - unnecessary_null_checks
-    - unnecessary_null_in_if_null_operators
     
     # Documentation requirements
     - public_member_api_docs

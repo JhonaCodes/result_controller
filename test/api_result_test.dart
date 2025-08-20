@@ -45,7 +45,10 @@ void main() {
     });
 
     test('ApiResult.err creation', () {
-      final apiErr = ApiErr(title: 'Not Found', msm: 'Resource not found');
+      final apiErr = const ApiErr(
+        title: 'Not Found',
+        msm: 'Resource not found',
+      );
 
       final result = ApiResult<int>.err(apiErr);
 
@@ -56,7 +59,7 @@ void main() {
     test('ApiResult when method', () {
       final okResult = ApiResult<int>.ok(42);
       final errResult = ApiResult<int>.err(
-        ApiErr(title: 'Server Error', msm: 'Internal server error'),
+        const ApiErr(title: 'Server Error', msm: 'Internal server error'),
       );
 
       final okValue = okResult.when(
@@ -82,7 +85,7 @@ void main() {
     });
 
     test('ApiResult map method with error', () {
-      final apiErr = ApiErr(
+      final apiErr = const ApiErr(
         title: 'Server Error',
         msm: 'Internal server error',
       );
@@ -94,14 +97,15 @@ void main() {
     });
 
     test('ApiResult map method with error transform', () {
-      final apiErr = ApiErr(
+      final apiErr = const ApiErr(
         title: 'Server Error',
         msm: 'Internal server error',
       );
       final errResult = ApiResult<int>.err(apiErr);
       final mappedResult = errResult.map(
         (value) => value.toString(),
-        (error) => ApiErr(title: 'Transformed', msm: 'Error was transformed'),
+        (error) =>
+            const ApiErr(title: 'Transformed', msm: 'Error was transformed'),
       );
 
       expect(mappedResult.isErr, isTrue);
@@ -119,7 +123,7 @@ void main() {
     });
 
     test('ApiResult flatMap method with error', () {
-      final apiErr = ApiErr(
+      final apiErr = const ApiErr(
         title: 'Server Error',
         msm: 'Internal server error',
       );
@@ -133,7 +137,7 @@ void main() {
     });
 
     test('ApiResult flatMap method with error transform', () {
-      final apiErr = ApiErr(
+      final apiErr = const ApiErr(
         title: 'Server Error',
         msm: 'Internal server error',
       );
@@ -141,7 +145,7 @@ void main() {
       final chainedResult = errResult.flatMap(
         (value) => ApiResult<String>.ok('Value: $value'),
         (error) => ApiResult<String>.err(
-          ApiErr(title: 'Transformed', msm: 'Error was transformed'),
+          const ApiErr(title: 'Transformed', msm: 'Error was transformed'),
         ),
       );
 
@@ -313,7 +317,10 @@ void main() {
     });
 
     test('ApiResult.err creates error result', () {
-      final error = ApiErr(title: 'Test Error', msm: 'Test error details');
+      final error = const ApiErr(
+        title: 'Test Error',
+        msm: 'Test error details',
+      );
       final result = ApiResult<String>.err(error);
 
       expect(result.isErr, isTrue);
@@ -349,7 +356,10 @@ void main() {
     });
 
     test('ApiResult.map transforms error value', () {
-      final error = ApiErr(title: 'Original Error', msm: 'Original details');
+      final error = const ApiErr(
+        title: 'Original Error',
+        msm: 'Original details',
+      );
       final result = ApiResult<int>.err(error);
       final transformed = result.map(
         (value) => value.toString(),

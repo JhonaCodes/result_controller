@@ -44,10 +44,13 @@ class ApiResult<T> extends Result<T, ApiErr> {
   /// - 403: Forbidden (authenticated but not authorized)
   /// - 404: Not found
   /// - 500-599: Server errors
+  /// Optional HTTP status code (overrides any status in the error)
   final int? statusCode;
 
+  /// The HTTP headers associated with the response.
   final T? _data;
 
+  /// The HTTP headers associated with the response.
   final Map<String, dynamic> headers;
   final ApiErr? _error;
   final bool _isOk;

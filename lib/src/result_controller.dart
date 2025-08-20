@@ -94,7 +94,7 @@ abstract class Result<T, E> {
   /// Only use this when you're certain the Result is Ok or when you want exceptions
   /// for error cases.
   R whenData<R>(R Function(T) ok) {
-    return this.when(
+    return when(
       ok: ok,
       err: (error) =>
           throw StateError('Cannot access data on Err value: $error'),
@@ -105,11 +105,11 @@ abstract class Result<T, E> {
   ///
   /// Returns null for Ok results.
   R? whenError<R>(R Function(E) err) {
-    return this.when(ok: (_) => null, err: err);
+    return when(ok: (_) => null, err: err);
   }
 
   /// Returns true if this is a success result
-  bool get isOk => this.when(ok: (_) => true, err: (_) => false);
+  bool get isOk => when(ok: (_) => true, err: (_) => false);
 
   /// Returns true if this is an error result
   bool get isErr => !isOk;
@@ -117,18 +117,18 @@ abstract class Result<T, E> {
   /// Gets the success value or throws if this is an error
   ///
   /// Throws [StateError] if called on an Err value
-  T get data => this.whenData((data) => data);
+  T get data => whenData((data) => data);
 
   /// Gets the error value if present, null otherwise
-  E? get errorOrNull => this.whenError((error) => error);
+  E? get errorOrNull => whenError((error) => error);
 
   @override
   String toString() =>
-      this.when(ok: (data) => 'Ok($data)', err: (error) => 'Err($error)');
+      when(ok: (data) => 'Ok($data)', err: (error) => 'Err($error)');
 
   @override
   bool operator ==(Object other) {
-    return this.when(
+    return when(
       ok: (data) => other is Ok<T, E> && other.data == data,
       err: (error) => other is Err<T, E> && other.error == error,
     );
@@ -136,7 +136,7 @@ abstract class Result<T, E> {
 
   @override
   int get hashCode =>
-      this.when(ok: (data) => data.hashCode, err: (error) => error.hashCode);
+      when(ok: (data) => data.hashCode, err: (error) => error.hashCode);
 }
 
 /// Base class for all result errors
@@ -161,6 +161,7 @@ abstract class Result<T, E> {
 /// // #0 main (file:///...)
 /// ```
 class ResultErr<T> {
+  /// The type of the error, used for categorization.
   final T? type;
 
   /// Error message describing what went wrong
